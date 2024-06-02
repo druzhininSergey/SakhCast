@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">Sakh Cast</string>
+    <string name="app_name">Sakh Cast Application</string>
+    <string name="sakh_cast">Sakh Cast</string>
+    <string name="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc convallis eleifend eleifend. Aliquam vehicula turpis non metus tincidunt placerat. Nam id enim viverra tellus egestas volutpat. Donec vulputate semper nulla a iaculis. Sed aliquet orci id nisl tempor vehicula. Vivamus quam eros, facilisis non ullamcorper eu, pretium vel mi. Donec feugiat cursus iaculis. Morbi eget convallis eros. Morbi placerat justo ac nisi gravida facilisis. Suspendisse non urna id eros elementum venenatis. In purus justo, aliquet at massa vel, posuere iaculis felis. Nullam odio augue, blandit eu fringilla maximus, viverra et tortor. Pellentesque non condimentum ligula.
+
+Sed facilisis mauris lectus. Suspendisse nisl enim, aliquam hendrerit ex volutpat, elementum blandit ligula. Proin suscipit mi accumsan, tincidunt nunc non, venenatis velit. Cras ac odio fringilla, egestas odio eu, fringilla nulla. Integer vitae ornare nunc, eget sagittis arcu. Donec semper, ligula sit amet posuere imperdiet, elit massa imperdiet lorem, at tincidunt odio massa eu ante. Praesent eu massa eget tellus auctor maximus tincidunt a enim. Nulla ligula magna, finibus eu metus at, congue tempus dui. Nam sed nisl sem. Aliquam pharetra ipsum et enim tincidunt, in faucibus purus suscipit. Donec congue felis vitae elit rhoncus, non sagittis erat elementum. Aliquam erat volutpat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+
+Cras egestas enim a nisl ullamcorper ornare a in quam. Donec sagittis, ligula eget consequat mattis, enim magna tincidunt elit, a pretium nisi enim non lacus. Aliquam erat volutpat. Suspendisse mollis ornare sapien, sed varius leo. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aenean imperdiet nunc vel enim finibus dignissim.
+
+Nullam sed mi non diam fermentum egestas. Curabitur blandit ultrices vehicula. Mauris rhoncus odio a tellus vulputate mollis. Nullam sed varius tortor, ac auctor ligula. Etiam ut libero rhoncus, tincidunt tortor in, mattis lectus. Mauris auctor sapien pretium dignissim feugiat. Cras quis nisl sit amet libero suscipit maximus. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer sagittis ante ac nibh euismod, in sollicitudin ligula bibendum. Pellentesque cursus accumsan massa, ut tristique nisl viverra in. Etiam convallis ipsum lectus, vel tincidunt sem auctor quis. Etiam pretium hendrerit molestie. Aenean venenatis imperdiet risus quis tincidunt. Curabitur non massa viverra, elementum dui a, faucibus augue. Vestibulum et venenatis nisi. Aliquam a molestie augue.</string>
+
+
 </resources>
