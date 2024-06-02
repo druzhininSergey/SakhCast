@@ -33,12 +33,9 @@ class HomeScreenViewModel @Inject constructor() : ViewModel() {
 
     private fun getSetiesListSample() = Samples.getAllSeries()
 
-
     private fun getMoviesListSample() = Samples.getAllMovies()
 
-
     private fun getOneMovie() = Samples.getOneMovie()
-
 
     private fun getOneSeries() = Samples.getOneSeries()
 
