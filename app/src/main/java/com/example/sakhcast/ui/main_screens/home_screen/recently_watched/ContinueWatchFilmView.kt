@@ -30,12 +30,12 @@ import com.example.sakhcast.model.MovieCard
 @Preview(showBackground = true)
 @Composable
 fun Preview2() {
-    ContinueWatchFilmView(movieCard = Samples.getOneMovie())
+    ContinueWatchMovieView(movieCard = Samples.getOneMovie())
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ContinueWatchFilmView(movieCard: MovieCard) {
+fun ContinueWatchMovieView(movieCard: MovieCard) {
     Card(
         modifier = Modifier
             .height(234.dp)
