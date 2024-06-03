@@ -8,17 +8,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -27,17 +26,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Preview(showBackground = true)
 @Composable
-fun CatalogScreen(paddingValues: PaddingValues, navHostController: NavHostController) {
-    val catalogScreenViewModel: CatalogScreenViewModel = viewModel()
-    val catalogScreenState =
-        catalogScreenViewModel.catalogScreenState.observeAsState(CatalogScreenViewModel.CatalogScreenState())
+fun CatalogScreen(
+    paddingValues: PaddingValues,
+    navHostController: NavHostController,
+    catalogScreenState: CatalogScreenViewModel.CatalogScreenState
+) {
     val tabList = listOf("Сериалы", "Фильмы")
     var tabIndex by remember {
         mutableIntStateOf(0)
@@ -56,9 +55,9 @@ fun CatalogScreen(paddingValues: PaddingValues, navHostController: NavHostContro
         TabRow(
             selectedTabIndex = tabIndex,
             containerColor = MaterialTheme.colorScheme.primary,
-            divider = { Divider(color = MaterialTheme.colorScheme.primary) },
+            divider = { HorizontalDivider(color = MaterialTheme.colorScheme.primary) },
             indicator = { tabPositions ->
-                TabRowDefaults.Indicator(
+                SecondaryIndicator(
                     Modifier.tabIndicatorOffset(tabPositions[tabIndex]),
                     color = Color.White
                 )
@@ -86,8 +85,8 @@ fun CatalogScreen(paddingValues: PaddingValues, navHostController: NavHostContro
             state = pagerState,
         ) { index ->
             val categories =
-                if (index == 0) catalogScreenState.value.seriesCategories
-                else catalogScreenState.value.moviesCategories
+                if (index == 0) catalogScreenState.seriesCategories
+                else catalogScreenState.moviesCategories
             CatalogList(categories = categories, navHostController, tabIndex)
         }
     }
