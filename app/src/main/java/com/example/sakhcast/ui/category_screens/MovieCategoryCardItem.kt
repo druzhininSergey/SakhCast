@@ -112,7 +112,7 @@ fun MovieCategoryCard(movieCard: MovieCard) {
                     contentAlignment = Alignment.Center
                 ) {
                     Row(
-                        modifier = Modifier.padding(5.dp),
+                        modifier = Modifier.padding(horizontal = 5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
@@ -130,13 +130,13 @@ fun MovieCategoryCard(movieCard: MovieCard) {
                 Box(
                     modifier = Modifier
                         .background(
-                            color = Color.Gray.copy(alpha = 0.7f),
+                            color = Color.Gray.copy(alpha = 0.8f),
                             shape = RoundedCornerShape(8.dp)
                         ),
                     contentAlignment = Alignment.Center
                 ) {
                     Row(
-                        modifier = Modifier.padding(5.dp),
+                        modifier = Modifier.padding(horizontal = 5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(

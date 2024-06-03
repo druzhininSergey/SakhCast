@@ -19,9 +19,12 @@ import com.example.sakhcast.SEARCH_SCREEN
 import com.example.sakhcast.SERIES_CATEGORY_SCREEN
 import com.example.sakhcast.SERIES_VIEW
 import com.example.sakhcast.ui.category_screens.MovieCategoryScreen
+import com.example.sakhcast.ui.category_screens.MovieCategoryScreenViewModel
 import com.example.sakhcast.ui.category_screens.SeriesCategoryScreen
+import com.example.sakhcast.ui.category_screens.SeriesCategoryScreenViewModel
 import com.example.sakhcast.ui.log_in_screen.LogInScreen
 import com.example.sakhcast.ui.main_screens.catalog_screen.CatalogScreen
+import com.example.sakhcast.ui.main_screens.catalog_screen.CatalogScreenViewModel
 import com.example.sakhcast.ui.main_screens.favorites_screen.FavoritesScreen
 import com.example.sakhcast.ui.main_screens.home_screen.HomeScreen
 import com.example.sakhcast.ui.main_screens.home_screen.HomeScreenViewModel
@@ -44,13 +47,17 @@ fun NavGraph(
         }
         composable(HOME_SCREEN) {
             val homeScreenViewModel = hiltViewModel<HomeScreenViewModel>()
-            val homeScreenState by homeScreenViewModel.homeScreenState.observeAsState(
-                HomeScreenViewModel.HomeScreenState()
-            )
+            val homeScreenState by
+            homeScreenViewModel.homeScreenState.observeAsState(HomeScreenViewModel.HomeScreenState())
+
             HomeScreen(paddingValues = paddingValues, homeScreenState)
         }
         composable(CATALOG_SCREEN) {
-            CatalogScreen(paddingValues = paddingValues, navHostController)
+            val catalogScreenViewModel = hiltViewModel<CatalogScreenViewModel>()
+            val catalogScreenState by
+            catalogScreenViewModel.catalogScreenState.observeAsState(CatalogScreenViewModel.CatalogScreenState())
+
+            CatalogScreen(paddingValues = paddingValues, navHostController, catalogScreenState)
         }
         composable(FAVORITES_SCREEN) {
             FavoritesScreen(paddingValues = paddingValues)
@@ -67,11 +74,29 @@ fun NavGraph(
         composable(SERIES_VIEW) {
             SeriesView(paddingValues)
         }
-        composable(MOVIE_CATEGORY_SCREEN) {
-            MovieCategoryScreen(paddingValues, navHostController)
+        composable("$MOVIE_CATEGORY_SCREEN/{category}") {
+            val movieCategoryScreenViewModel = hiltViewModel<MovieCategoryScreenViewModel>()
+            movieCategoryScreenViewModel.getSelectedCategoryName(
+                navHostController.currentBackStackEntry?.arguments?.getString(
+                    "category"
+                ) ?: "Все"
+            )
+            val moviesCategoryScreenState by movieCategoryScreenViewModel.moviesCategoryScreenState.observeAsState(
+                MovieCategoryScreenViewModel.MoviesCategoryScreenState()
+            )
+            MovieCategoryScreen(paddingValues, navHostController, moviesCategoryScreenState)
         }
-        composable(SERIES_CATEGORY_SCREEN) {
-            SeriesCategoryScreen(paddingValues, navHostController)
+        composable("$SERIES_CATEGORY_SCREEN/{category}") {
+            val seriesCategoryScreenViewModel = hiltViewModel<SeriesCategoryScreenViewModel>()
+            seriesCategoryScreenViewModel.getSelectedCategoryName(
+                navHostController.currentBackStackEntry?.arguments?.getString(
+                    "category"
+                ) ?: "Все"
+            )
+            val seriesCategoryScreenState by seriesCategoryScreenViewModel.seriesCategoryScreenState.observeAsState(
+                SeriesCategoryScreenViewModel.SeriesCategoryScreenState()
+            )
+            SeriesCategoryScreen(paddingValues, navHostController, seriesCategoryScreenState)
         }
     }
 }

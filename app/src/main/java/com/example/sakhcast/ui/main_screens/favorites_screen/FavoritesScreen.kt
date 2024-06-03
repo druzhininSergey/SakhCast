@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,7 +53,7 @@ fun FavoritesScreen(paddingValues: PaddingValues) {
             containerColor = MaterialTheme.colorScheme.primary,
             divider = { Divider(color = MaterialTheme.colorScheme.primary) },
             indicator = { tabPositions ->
-                TabRowDefaults.Indicator(
+                SecondaryIndicator(
                     Modifier.tabIndicatorOffset(tabPositions[tabIndex]),
                     color = MaterialTheme.colorScheme.onPrimary // Устанавливаем цвет индикатора
                 )

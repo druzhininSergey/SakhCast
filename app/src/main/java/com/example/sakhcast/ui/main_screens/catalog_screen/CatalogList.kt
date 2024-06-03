@@ -11,8 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,14 +38,15 @@ fun CatalogList(categories: List<String>, navHostController: NavHostController, 
                     .height(50.dp)
                     .background(MaterialTheme.colorScheme.primary)
                     .clickable {
-                        if (tabIndex == 0) navHostController.navigate(SERIES_CATEGORY_SCREEN)
-                        else navHostController.navigate(MOVIE_CATEGORY_SCREEN)
+                        val route =
+                            if (tabIndex == 0) SERIES_CATEGORY_SCREEN + "/${item}"
+                            else MOVIE_CATEGORY_SCREEN + "/${item}"
+                        navHostController.navigate(route)
                     },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-
                     modifier = Modifier.padding(
                         start = Dimens.mainPaddingHalf,
                         end = Dimens.mainPaddingHalf
