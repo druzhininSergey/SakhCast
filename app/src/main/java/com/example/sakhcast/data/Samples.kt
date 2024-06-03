@@ -210,25 +210,25 @@ object Samples {
     fun isLogin(loginInput: String, passwordInput: String) =
         userList.any { it.userLogin == loginInput && it.userPassword == passwordInput }
 
-    fun getMoviesCategories(): List<String> = listOf(
-        "Все",
-        "Свежее",
-        "Новинки",
-        "Сейчас смотрят",
-        "Мировой топ",
-        "Российский топ",
-        "Жанры"
-    )
-
-    fun getSeriesCategories(): List<String> = listOf(
-        "Все",
-        "Свежее",
-        "Новинки",
-        "Сейчас смотрят",
-        "Мировой топ",
-        "Российский топ",
-        "Жанры"
-    )
+//    fun getMoviesCategories(): List<String> = listOf(
+//        "Все",
+//        "Свежее",
+//        "Новинки",
+//        "Сейчас смотрят",
+//        "Мировой топ",
+//        "Российский топ",
+//        "Жанры"
+//    )
+//
+//    fun getSeriesCategories(): List<String> = listOf(
+//        "Все",
+//        "Свежее",
+//        "Новинки",
+//        "Сейчас смотрят",
+//        "Мировой топ",
+//        "Российский топ",
+//        "Жанры"
+//    )
 
     fun getAllNotifications(): List<Notification> = notificationList
 

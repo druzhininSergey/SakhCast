@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -26,14 +27,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.sakhcast.data.Samples
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Preview(showBackground = true)
 @Composable
 fun CatalogScreen(paddingValues: PaddingValues, navHostController: NavHostController) {
+    val catalogScreenViewModel: CatalogScreenViewModel = viewModel()
+    val catalogScreenState =
+        catalogScreenViewModel.catalogScreenState.observeAsState(CatalogScreenViewModel.CatalogScreenState())
     val tabList = listOf("Сериалы", "Фильмы")
     var tabIndex by remember {
         mutableIntStateOf(0)
@@ -81,8 +85,9 @@ fun CatalogScreen(paddingValues: PaddingValues, navHostController: NavHostContro
         HorizontalPager(
             state = pagerState,
         ) { index ->
-            val categories = if (index == 0) Samples.getSeriesCategories()
-            else Samples.getMoviesCategories()
+            val categories =
+                if (index == 0) catalogScreenState.value.seriesCategories
+                else catalogScreenState.value.moviesCategories
             CatalogList(categories = categories, navHostController, tabIndex)
         }
     }

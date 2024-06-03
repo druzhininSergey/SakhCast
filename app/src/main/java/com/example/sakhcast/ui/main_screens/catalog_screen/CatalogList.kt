@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -54,13 +56,13 @@ fun CatalogList(categories: List<String>, navHostController: NavHostController, 
                     color = MaterialTheme.colorScheme.onPrimary
                 )
                 Icon(
-                    imageVector = Icons.Filled.KeyboardArrowRight,
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
             if (index != categories.size - 1)
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier
                         .padding(start = Dimens.mainPaddingHalf, end = Dimens.mainPaddingHalf),
                     thickness = 1.dp,
