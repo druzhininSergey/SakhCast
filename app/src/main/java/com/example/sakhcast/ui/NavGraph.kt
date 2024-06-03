@@ -2,6 +2,9 @@ package com.example.sakhcast.ui
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,6 +24,7 @@ import com.example.sakhcast.ui.log_in_screen.LogInScreen
 import com.example.sakhcast.ui.main_screens.catalog_screen.CatalogScreen
 import com.example.sakhcast.ui.main_screens.favorites_screen.FavoritesScreen
 import com.example.sakhcast.ui.main_screens.home_screen.HomeScreen
+import com.example.sakhcast.ui.main_screens.home_screen.HomeScreenViewModel
 import com.example.sakhcast.ui.main_screens.notifications_screen.NotificationScreen
 import com.example.sakhcast.ui.main_screens.search_screen.SearchScreen
 import com.example.sakhcast.ui.movie_series_view.MovieView
@@ -39,7 +43,11 @@ fun NavGraph(
             LogInScreen(navController = navHostController)
         }
         composable(HOME_SCREEN) {
-            HomeScreen(paddingValues = paddingValues)
+            val homeScreenViewModel = hiltViewModel<HomeScreenViewModel>()
+            val homeScreenState by homeScreenViewModel.homeScreenState.observeAsState(
+                HomeScreenViewModel.HomeScreenState()
+            )
+            HomeScreen(paddingValues = paddingValues, homeScreenState)
         }
         composable(CATALOG_SCREEN) {
             CatalogScreen(paddingValues = paddingValues, navHostController)

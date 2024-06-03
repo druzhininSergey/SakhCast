@@ -54,11 +54,20 @@ android {
 dependencies {
     //kotlinx.serialization
     implementation(libs.kotlinx.serialization.json)
+
     //navigation
     implementation(libs.androidx.navigation.compose)
+
     //hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.android.compiler)
+
+    //liveData observer
+    implementation(libs.androidx.runtime.livedata)
+
+    //lifecycle ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel.compose) // возможно не нужна
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
