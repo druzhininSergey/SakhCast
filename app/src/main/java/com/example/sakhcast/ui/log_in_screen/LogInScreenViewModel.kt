@@ -11,6 +11,7 @@ import com.example.sakhcast.data.Samples
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.security.SecureRandom
+import java.util.Base64
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,6 +24,8 @@ class LogInScreenViewModel @Inject constructor(private val sharedPreferences: Sh
     init {
         val token = generateToken()
         _userDataState.value = userDataState.value?.copy(userToken = token)
+//        Log.i("!!!", "token = $token")
+//        Log.i("!!!", "stateToken = $token")
     }
 
     data class UserDataState(
@@ -32,16 +35,12 @@ class LogInScreenViewModel @Inject constructor(private val sharedPreferences: Sh
         val isLogged: Boolean? = null,
     )
 
-    private fun generateToken(): String {
+    fun generateToken(length: Int = 36): String {
         val random = SecureRandom()
-        val token = CharArray(36)
-        for (i in token.indices) {
-            token[i] = when (i) {
-                8, 13, 18, 23 -> '-'
-                else -> "0123456789abcdef"[random.nextInt(16)]
-            }
-        }
-        return String(token)
+        val bytes = ByteArray((length * 3) / 4)
+        random.nextBytes(bytes)
+        return Base64.getUrlEncoder().withoutPadding()
+            .encodeToString(bytes)
     }
 
     fun checkUserData(loginInput: String, passwordInput: String) {
@@ -54,13 +53,13 @@ class LogInScreenViewModel @Inject constructor(private val sharedPreferences: Sh
         }
     }
 
-    fun saveIsLoggedInSharedPreferences(isLogged: Boolean) {
+    private fun saveIsLoggedInSharedPreferences(isLogged: Boolean) {
         sharedPreferences.edit().putBoolean(IS_LOGGED_IN_KEY, isLogged).apply()
-        Log.i("!!!", "LogInScreenVM isLoggedState = ${userDataState.value?.isLogged}")
-        Log.i("!!!", "shared prefs saved in loginScreenVM ${getIsLoggedInSharedPreferences()}")
+//        Log.i("!!!", "LogInScreenVM isLoggedState = ${userDataState.value?.isLogged}")
+//        Log.i("!!!", "shared prefs saved in loginScreenVM ${getIsLoggedInSharedPreferences()}")
     }
 
-    fun getIsLoggedInSharedPreferences(): Boolean {
+    private fun getIsLoggedInSharedPreferences(): Boolean {
         return sharedPreferences.getBoolean(IS_LOGGED_IN_KEY, false) // по умолчанию false
     }
 }

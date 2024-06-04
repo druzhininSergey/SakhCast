@@ -46,7 +46,7 @@ fun NavGraph(
     val profileScreenState = profileScreenViewModel.profileScreenState.observeAsState(
         ProfileScreenViewModel.ProfileScreenState()
     )
-    Log.i("!!!", "NavGraph profile state isLogged ${profileScreenState.value.isLogged}")
+//    Log.i("!!!", "NavGraph profile state isLogged ${profileScreenState.value.isLogged}")
     NavHost(
         navController = navHostController,
         startDestination = if (!profileScreenState.value.isLogged!!) LOG_IN_SCREEN else HOME_SCREEN

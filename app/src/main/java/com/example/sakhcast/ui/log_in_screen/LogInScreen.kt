@@ -138,9 +138,6 @@ fun LogInScreen(
                 }
             }
         )
-//        Log.i("!!!", "pas = $password")
-//        Log.i("!!!", "log = $login")
-//        Log.i("!!!", "isLogged = ${logInScreenState.value.isLogged}")
         if (logInScreenState.value.isLogged == false) {
             Text(
                 text = "Неверный логин или пароль",

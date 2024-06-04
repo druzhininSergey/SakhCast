@@ -27,7 +27,7 @@ class ProfileScreenViewModel @Inject constructor(private val sharedPreferences: 
                     currentUser = UserSample.getUserInfo(),
                     isLogged = getIsLoggedInSharedPreferences()
                 )
-            Log.i("!!!", "init isLoggedState = ${getIsLoggedInSharedPreferences()}")
+//            Log.i("!!!", "init isLoggedState = ${getIsLoggedInSharedPreferences()}")
         }
     }
 
