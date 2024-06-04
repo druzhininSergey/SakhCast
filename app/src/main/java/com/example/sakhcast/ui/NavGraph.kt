@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,15 +33,23 @@ import com.example.sakhcast.ui.main_screens.notifications_screen.NotificationScr
 import com.example.sakhcast.ui.main_screens.search_screen.SearchScreen
 import com.example.sakhcast.ui.movie_series_view.MovieView
 import com.example.sakhcast.ui.movie_series_view.SeriesView
+import com.example.sakhcast.ui.profile_screen.ProfileScreenViewModel
+import kotlinx.coroutines.coroutineScope
 
 @Composable
 fun NavGraph(
     navHostController: NavHostController,
     paddingValues: PaddingValues,
 ) {
+    val profileScreenViewModel: ProfileScreenViewModel = hiltViewModel()
+    profileScreenViewModel.getIsLoggedInSharedPreferences()
+    val profileScreenState = profileScreenViewModel.profileScreenState.observeAsState(
+        ProfileScreenViewModel.ProfileScreenState()
+    )
+    Log.i("!!!", "NavGraph profile state isLogged ${profileScreenState.value.isLogged}")
     NavHost(
         navController = navHostController,
-        startDestination = LOG_IN_SCREEN
+        startDestination = if (!profileScreenState.value.isLogged!!) LOG_IN_SCREEN else HOME_SCREEN
     ) {
         composable(LOG_IN_SCREEN) {
             LogInScreen(navController = navHostController)
@@ -69,10 +78,10 @@ fun NavGraph(
             SearchScreen()
         }
         composable(MOVIE_VIEW) {
-            MovieView(paddingValues)
+            MovieView(paddingValues, navHostController)
         }
         composable(SERIES_VIEW) {
-            SeriesView(paddingValues)
+            SeriesView(paddingValues, navHostController)
         }
         composable("$MOVIE_CATEGORY_SCREEN/{category}") {
             val movieCategoryScreenViewModel = hiltViewModel<MovieCategoryScreenViewModel>()

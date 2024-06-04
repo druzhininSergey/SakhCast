@@ -86,7 +86,8 @@ object Samples {
             kinopoiskRating = 9.8,
             releaseYear = 2020,
             totalSeasonsAndSeries = "4 Сезон 20 Cерии"
-        ))
+        )
+    )
     val movieCardLists: List<MovieCard> = listOf(
         MovieCard(
             id = 1,
@@ -200,35 +201,10 @@ object Samples {
         Notification(text = "Вышел 3-й эпизод 1-го сезона сериала \"Городок\".<br><a href='https://sakh.tv/watch/the.town/01/03/viruse_project/'>Перейти к просмотру.</a>"),
         Notification(text = "Вышел 3-й эпизод 1-го сезона сериала \"Городок\".<br><a href='https://sakh.tv/watch/the.town/01/03/viruse_project/'>Перейти к просмотру.</a>"),
     )
-    private val userList = listOf(
-        UserData(userLogin = "1", userPassword = "1"),
-        UserData(userLogin = "2", userPassword = "2"),
-        UserData(userLogin = "3", userPassword = "3"),
-        UserData(userLogin = "4", userPassword = "4"),
-    )
+    private val user = UserData(userLogin = "1", userPassword = "1")
 
     fun isLogin(loginInput: String, passwordInput: String) =
-        userList.any { it.userLogin == loginInput && it.userPassword == passwordInput }
-
-//    fun getMoviesCategories(): List<String> = listOf(
-//        "Все",
-//        "Свежее",
-//        "Новинки",
-//        "Сейчас смотрят",
-//        "Мировой топ",
-//        "Российский топ",
-//        "Жанры"
-//    )
-//
-//    fun getSeriesCategories(): List<String> = listOf(
-//        "Все",
-//        "Свежее",
-//        "Новинки",
-//        "Сейчас смотрят",
-//        "Мировой топ",
-//        "Российский топ",
-//        "Жанры"
-//    )
+        (user.userLogin == loginInput && user.userPassword == passwordInput)
 
     fun getAllNotifications(): List<Notification> = notificationList
 
