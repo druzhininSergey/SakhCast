@@ -13,8 +13,8 @@ class CatalogScreenViewModel @Inject constructor() : ViewModel() {
     val catalogScreenState: LiveData<CatalogScreenState> = _catalogScreenState
 
     data class CatalogScreenState(
-        val seriesCategories: List<String> = getSeriesCategories(),
-        val moviesCategories: List<String> = getMoviesCategories(),
+        var seriesCategories: List<String> = getSeriesCategories(),
+        var moviesCategories: List<String> = getMoviesCategories(),
     )
 
     companion object {

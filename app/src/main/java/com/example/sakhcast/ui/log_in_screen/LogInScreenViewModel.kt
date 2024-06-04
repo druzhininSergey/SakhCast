@@ -29,10 +29,10 @@ class LogInScreenViewModel @Inject constructor(private val sharedPreferences: Sh
     }
 
     data class UserDataState(
-        val userToken: String = "",
-        val userLogin: String = "",
-        val userPassword: String = "",
-        val isLogged: Boolean? = null,
+        var userToken: String = "",
+        var userLogin: String = "",
+        var userPassword: String = "",
+        var isLogged: Boolean? = null,
     )
 
     fun generateToken(length: Int = 36): String {

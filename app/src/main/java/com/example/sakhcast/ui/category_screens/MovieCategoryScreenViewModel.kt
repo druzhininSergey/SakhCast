@@ -11,7 +11,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MovieCategoryScreenViewModel @Inject constructor() : ViewModel() {
 
-    private val _moviesCategoryScreenState = MutableLiveData(MoviesCategoryScreenState())
+    private var _moviesCategoryScreenState = MutableLiveData(MoviesCategoryScreenState())
     val moviesCategoryScreenState: LiveData<MoviesCategoryScreenState> = _moviesCategoryScreenState
 
     init {
@@ -21,8 +21,8 @@ class MovieCategoryScreenViewModel @Inject constructor() : ViewModel() {
     }
 
     data class MoviesCategoryScreenState(
-        val moviesList: List<MovieCard> = emptyList(),
-        val categoryName: String = "",
+        var moviesList: List<MovieCard> = emptyList(),
+        var categoryName: String = "",
     )
 
     fun getMoviesList() = Samples.getAllMovies()

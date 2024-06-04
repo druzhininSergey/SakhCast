@@ -11,29 +11,37 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.Divider
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.sakhcast.Colors
 import com.example.sakhcast.Dimens
-import com.example.sakhcast.data.Samples
+import com.example.sakhcast.data.NotificationSample
 
 @Preview
 @Composable
 fun PreviewNotificationScreen() {
-    NotificationScreen(paddingValues = PaddingValues(20.dp))
+//    NotificationScreen(
+//        paddingValues = PaddingValues(20.dp),
+//        notificationScreenState = notificationScreenState
+//    )
 }
 
 @Composable
-fun NotificationScreen(paddingValues: PaddingValues) {
-    val notificationList = Samples.getAllNotifications()
+fun NotificationScreen(
+    paddingValues: PaddingValues,
+    notificationScreenState: State<NotificationScreenViewModel.NotificationScreenState>
+) {
+    val notificationList = notificationScreenState.value.notificationsList.items
 
     LazyColumn(
         modifier = Modifier
@@ -53,19 +61,20 @@ fun NotificationScreen(paddingValues: PaddingValues) {
                     modifier = Modifier
                         .padding(start = Dimens.mainPadding, top = 3.dp, bottom = 3.dp)
                         .widthIn(max = 350.dp),
-                    text = notification.text.substringBefore("<br>")
+                    text = notification.text.substringBefore("<br>"),
+                    fontSize = 12.sp
                 )
                 Icon(
-                    imageVector = Icons.Filled.KeyboardArrowRight,
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
-                    tint = if (!notification.isRead) Color.Blue else Color.White
+                    tint = if (!notification.acknowledge) Colors.blueColor else MaterialTheme.colorScheme.onPrimary
                 )
             }
             if (index in 0 until notificationList.size - 1) {
-                Divider(
-                    thickness = 1.dp,
+                HorizontalDivider(
                     modifier = Modifier
-                        .padding(start = Dimens.mainPadding, end = Dimens.mainPadding)
+                        .padding(start = Dimens.mainPadding, end = Dimens.mainPadding),
+                    thickness = 1.dp
                 )
             }
         }
