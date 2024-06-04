@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.sakhcast.R
 import com.example.sakhcast.data.SeriesEpisodesSample
 import com.example.sakhcast.data.SeriesSample
@@ -65,7 +66,7 @@ import kotlin.math.min
 @Preview
 @Composable
 fun PreviewSeriesView() {
-    SeriesView(PaddingValues(top = 40.dp, bottom = 40.dp))
+//    SeriesView(PaddingValues(top = 40.dp, bottom = 40.dp), navHostController)
 }
 
 @Preview
@@ -75,7 +76,7 @@ fun PreviewSeriesInfo() {
 }
 
 @Composable
-fun SeriesView(paddingValues: PaddingValues) {
+fun SeriesView(paddingValues: PaddingValues, navHostController: NavHostController) {
     val series = SeriesSample.getFullSeries()
     val seriesEpisodes = SeriesEpisodesSample.getSeriesEpisodes()
     val scrollState = rememberScrollState()
@@ -170,7 +171,7 @@ fun SeriesView(paddingValues: PaddingValues) {
                 SeriesInfo(series, seriesEpisodes)
             }
         }
-        TopSeriesBar(scrollState, series.name, paddingValues, series.userFavorite)
+        TopSeriesBar(scrollState, series.name, paddingValues, series.userFavorite, navHostController)
     }
 }
 
@@ -270,7 +271,8 @@ fun TopSeriesBar(
     scrollState: ScrollState,
     ruTitle: String,
     paddingValues: PaddingValues,
-    userFavorite: UserFavorite?
+    userFavorite: UserFavorite?,
+    navHostController: NavHostController
 ) {
     val alpha = min(1f, (scrollState.value.toFloat() / scrollState.maxValue) * 1.5f)
     val primaryColor = MaterialTheme.colorScheme.primary
@@ -293,7 +295,7 @@ fun TopSeriesBar(
             modifier = Modifier
                 .padding(8.dp)
                 .size(30.dp)
-                .clickable { },
+                .clickable { navHostController.popBackStack() },
             tint = Color.White,
         )
         Text(

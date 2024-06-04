@@ -27,6 +27,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
@@ -54,6 +55,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.sakhcast.R
 import com.example.sakhcast.data.MovieSample
 import com.example.sakhcast.data.Samples
@@ -73,7 +75,7 @@ import kotlin.math.min
 @Preview
 @Composable
 fun PreviewMovieView() {
-    MovieView(PaddingValues(top = 40.dp, bottom = 40.dp))
+//    MovieView(PaddingValues(top = 40.dp, bottom = 40.dp), navHostController)
 }
 
 @Preview
@@ -83,7 +85,7 @@ fun PreviewMovieInfo() {
 }
 
 @Composable
-fun MovieView(paddingValues: PaddingValues) {
+fun MovieView(paddingValues: PaddingValues, navHostController: NavHostController) {
     val movie = MovieSample.getFullMovie()
     val scrollState = rememberScrollState()
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
@@ -177,7 +179,7 @@ fun MovieView(paddingValues: PaddingValues) {
                 MovieInfo(movie)
             }
         }
-        TopMovieBar(scrollState, movie.ruTitle, paddingValues = paddingValues)
+        TopMovieBar(scrollState, movie.ruTitle, paddingValues = paddingValues, navHostController)
 
     }
 }
@@ -294,7 +296,12 @@ fun MovieProductionCompanies(productionCompanies: List<ProductionCompany>) {
 }
 
 @Composable
-fun TopMovieBar(scrollState: ScrollState, ruTitle: String, paddingValues: PaddingValues) {
+fun TopMovieBar(
+    scrollState: ScrollState,
+    ruTitle: String,
+    paddingValues: PaddingValues,
+    navHostController: NavHostController
+) {
     val alpha = min(1f, (scrollState.value.toFloat() / scrollState.maxValue) * 2.5f)
     val primaryColor = MaterialTheme.colorScheme.primary
 
@@ -308,12 +315,12 @@ fun TopMovieBar(scrollState: ScrollState, ruTitle: String, paddingValues: Paddin
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = Icons.Filled.KeyboardArrowLeft,
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
             contentDescription = null,
             modifier = Modifier
                 .padding(8.dp)
                 .size(30.dp)
-                .clickable { },
+                .clickable { navHostController.popBackStack() },
             tint = Color.White,
         )
         Text(

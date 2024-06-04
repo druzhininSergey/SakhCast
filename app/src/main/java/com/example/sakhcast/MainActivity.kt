@@ -19,9 +19,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             SakhCastTheme {
                 MainScreen()
-//                Scaffold {
-//                    SeriesView(series = SeriesSample.getFullSeries(), paddingValues = it)
-//                }
             }
         }
     }

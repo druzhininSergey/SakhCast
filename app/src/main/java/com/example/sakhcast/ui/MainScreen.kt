@@ -37,7 +37,7 @@ fun MainScreen() {
     }
 
     Scaffold(
-        topBar = { if (isTopBarVisible) TopBar(currentUser = UserSample.getUserInfo()) },
+        topBar = { if (isTopBarVisible) TopBar() },
         bottomBar = { if (isBottomBarVisible) BottomBar(navController) },
         containerColor = MaterialTheme.colorScheme.primary
     ) {
