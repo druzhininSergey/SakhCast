@@ -32,15 +32,6 @@ data class MovieCard(
     val available: Boolean? = null,
 )
 
-data class Notification(
-    val id: Int? = null,
-    val date: String? = null,
-    val userId: Int? = null,
-    val subject: String? = null,
-    val text: String,
-    val isRead: Boolean = false,
-)
-
 data class UserData(
     val userToken: String? = null,
     val userLogin: String,

@@ -13,15 +13,11 @@ data class Movie(
     @SerialName("backdrop_alt") val backdropAlt: String,
     @SerialName("backdrop_colors") val backdropColors: BackdropColors,
     @SerialName("budget") val budget: Int,
-//    @SerialName("chapters")
-//    val chapters: List<Any>,
     @SerialName("create_date") val createDate: String,
     @SerialName("downloads") val downloads: List<Download>,
     @SerialName("favorites") val favorites: Int,
     @SerialName("genres") val genres: List<Genre>,
     @SerialName("hidden") val hidden: Boolean,
-//    @SerialName("homepage")
-//    val homepage: Any,
     @SerialName("id") val id: Int,
     @SerialName("id_alpha") val idAlpha: String,
     @SerialName("imdb_id") val imdbId: String,

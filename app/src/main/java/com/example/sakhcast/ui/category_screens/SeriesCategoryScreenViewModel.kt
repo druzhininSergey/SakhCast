@@ -11,7 +11,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SeriesCategoryScreenViewModel @Inject constructor() : ViewModel() {
 
-    private val _seriesCategoryScreenState = MutableLiveData(SeriesCategoryScreenState())
+    private var _seriesCategoryScreenState = MutableLiveData(SeriesCategoryScreenState())
     val seriesCategoryScreenState: LiveData<SeriesCategoryScreenState> = _seriesCategoryScreenState
 
     init {
@@ -21,8 +21,8 @@ class SeriesCategoryScreenViewModel @Inject constructor() : ViewModel() {
     }
 
     data class SeriesCategoryScreenState(
-        val seriesList: List<SeriesCard> = emptyList(),
-        val categoryName: String = "",
+        var seriesList: List<SeriesCard> = emptyList(),
+        var categoryName: String = "",
     )
 
     fun getSeriesList() = Samples.getAllSeries()

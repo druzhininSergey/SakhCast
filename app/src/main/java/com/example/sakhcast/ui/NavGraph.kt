@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui
 
-import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,11 +29,11 @@ import com.example.sakhcast.ui.main_screens.favorites_screen.FavoritesScreen
 import com.example.sakhcast.ui.main_screens.home_screen.HomeScreen
 import com.example.sakhcast.ui.main_screens.home_screen.HomeScreenViewModel
 import com.example.sakhcast.ui.main_screens.notifications_screen.NotificationScreen
+import com.example.sakhcast.ui.main_screens.notifications_screen.NotificationScreenViewModel
 import com.example.sakhcast.ui.main_screens.search_screen.SearchScreen
 import com.example.sakhcast.ui.movie_series_view.MovieView
 import com.example.sakhcast.ui.movie_series_view.SeriesView
 import com.example.sakhcast.ui.profile_screen.ProfileScreenViewModel
-import kotlinx.coroutines.coroutineScope
 
 @Composable
 fun NavGraph(
@@ -72,7 +71,12 @@ fun NavGraph(
             FavoritesScreen(paddingValues = paddingValues)
         }
         composable(NOTIFICATION_SCREEN) {
-            NotificationScreen(paddingValues = paddingValues)
+            val notificationScreenViewModel: NotificationScreenViewModel = hiltViewModel()
+            val notificationScreenState =
+                notificationScreenViewModel.notificationScreenState.observeAsState(
+                    NotificationScreenViewModel.NotificationScreenState()
+                )
+            NotificationScreen(paddingValues = paddingValues, notificationScreenState)
         }
         composable(SEARCH_SCREEN) {
             SearchScreen()

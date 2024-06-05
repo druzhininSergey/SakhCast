@@ -17,7 +17,7 @@ import javax.inject.Inject
 class ProfileScreenViewModel @Inject constructor(private val sharedPreferences: SharedPreferences) :
     ViewModel() {
 
-    private val _profileScreenState = MutableLiveData(ProfileScreenState())
+    private var _profileScreenState = MutableLiveData(ProfileScreenState())
     val profileScreenState: LiveData<ProfileScreenState> = _profileScreenState
 
     init {

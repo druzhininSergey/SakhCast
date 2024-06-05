@@ -12,7 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor() : ViewModel() {
 
-    private val _homeScreenState = MutableLiveData(HomeScreenState())
+    private var _homeScreenState = MutableLiveData(HomeScreenState())
     val homeScreenState: LiveData<HomeScreenState> = _homeScreenState
 
     init {
@@ -25,10 +25,10 @@ class HomeScreenViewModel @Inject constructor() : ViewModel() {
     }
 
     data class HomeScreenState(
-        val seriesList: List<SeriesCard> = emptyList(),
-        val moviesList: List<MovieCard> = emptyList(),
-        val lastSeriesWatched: SeriesCard? = null,
-        val lastMovieWatched: MovieCard? = null,
+        var seriesList: List<SeriesCard> = emptyList(),
+        var moviesList: List<MovieCard> = emptyList(),
+        var lastSeriesWatched: SeriesCard? = null,
+        var lastMovieWatched: MovieCard? = null,
     )
 
     private fun getSetiesListSample() = Samples.getAllSeries()
