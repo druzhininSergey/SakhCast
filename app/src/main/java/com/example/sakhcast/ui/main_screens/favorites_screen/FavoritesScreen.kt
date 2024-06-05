@@ -12,12 +12,12 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -25,14 +25,22 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.sakhcast.data.Samples
 import com.example.sakhcast.model.MovieCard
 import com.example.sakhcast.model.SeriesCard
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FavoritesScreen(paddingValues: PaddingValues) {
+fun FavoritesScreen(
+    paddingValues: PaddingValues,
+    favoritesScreenState: State<FavoritesScreenViewModel.FavoritesScreenState>
+) {
+    val seriesCardWatching: List<SeriesCard> = favoritesScreenState.value.seriesCardWatching
+    val seriesCardWillWatch: List<SeriesCard> = favoritesScreenState.value.seriesCardWillWatch
+    val seriesCardFinishedWatching: List<SeriesCard> =
+        favoritesScreenState.value.seriesCardFinishedWatching
+    val movieCardsWillWatch: List<MovieCard> = favoritesScreenState.value.movieCardsWillWatch
+
     val tabList = listOf("Сериалы", "Фильмы")
     var tabIndex by remember {
         mutableIntStateOf(0)
@@ -81,19 +89,9 @@ fun FavoritesScreen(paddingValues: PaddingValues) {
             state = pagerState,
             userScrollEnabled = false
         ) { index ->
-            val seriesCardWatching: List<SeriesCard>
-            val seriesCardWillWatch: List<SeriesCard>
-            val seriesCardFinishedWatching: List<SeriesCard>
-            val movieCardsWillWatch: List<MovieCard>
-            if (index == 0) {
-                seriesCardWatching = Samples.getAllSeries()
-                seriesCardWillWatch = Samples.getAllSeries()
-                seriesCardFinishedWatching = Samples.getAllSeries()
+            if (index == 0)
                 SeriesPage(seriesCardWatching, seriesCardWillWatch, seriesCardFinishedWatching)
-            } else {
-                movieCardsWillWatch = Samples.getAllMovies()
-                MoviesPage(movieCardsWillWatch = movieCardsWillWatch)
-            }
+            else MoviesPage(movieCardsWillWatch = movieCardsWillWatch)
         }
     }
 }

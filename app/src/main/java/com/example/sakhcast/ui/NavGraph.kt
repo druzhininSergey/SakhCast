@@ -26,6 +26,7 @@ import com.example.sakhcast.ui.log_in_screen.LogInScreen
 import com.example.sakhcast.ui.main_screens.catalog_screen.CatalogScreen
 import com.example.sakhcast.ui.main_screens.catalog_screen.CatalogScreenViewModel
 import com.example.sakhcast.ui.main_screens.favorites_screen.FavoritesScreen
+import com.example.sakhcast.ui.main_screens.favorites_screen.FavoritesScreenViewModel
 import com.example.sakhcast.ui.main_screens.home_screen.HomeScreen
 import com.example.sakhcast.ui.main_screens.home_screen.HomeScreenViewModel
 import com.example.sakhcast.ui.main_screens.notifications_screen.NotificationScreen
@@ -68,7 +69,11 @@ fun NavGraph(
             CatalogScreen(paddingValues = paddingValues, navHostController, catalogScreenState)
         }
         composable(FAVORITES_SCREEN) {
-            FavoritesScreen(paddingValues = paddingValues)
+            val favoritesScreenViewModel: FavoritesScreenViewModel = hiltViewModel()
+            val favoritesScreenState = favoritesScreenViewModel.favoritesScreenState.observeAsState(
+                FavoritesScreenViewModel.FavoritesScreenState()
+            )
+            FavoritesScreen(paddingValues = paddingValues, favoritesScreenState)
         }
         composable(NOTIFICATION_SCREEN) {
             val notificationScreenViewModel: NotificationScreenViewModel = hiltViewModel()
