@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,13 +73,17 @@ fun PreviewSeriesView() {
 @Preview
 @Composable
 fun PreviewSeriesInfo() {
-    SeriesInfo(SeriesSample.getFullSeries(), SeriesEpisodesSample.getSeriesEpisodes())
+    SeriesInfo(SeriesSample.getFullSeries(), SeriesEpisodesSample.getSeriesEpisodesList())
 }
 
 @Composable
-fun SeriesView(paddingValues: PaddingValues, navHostController: NavHostController) {
-    val series = SeriesSample.getFullSeries()
-    val seriesEpisodes = SeriesEpisodesSample.getSeriesEpisodes()
+fun SeriesView(
+    paddingValues: PaddingValues,
+    navHostController: NavHostController,
+    seriesState: State<SeriesViewModel.SeriesState>
+) {
+    val series = seriesState.value.series ?: throw IllegalStateException("Series is null")
+    val seriesEpisodes = seriesState.value.episodeList
     val scrollState = rememberScrollState()
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
 

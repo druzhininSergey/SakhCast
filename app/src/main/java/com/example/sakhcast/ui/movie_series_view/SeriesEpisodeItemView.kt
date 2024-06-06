@@ -34,14 +34,14 @@ import com.example.sakhcast.model.Episode
 @Preview(showBackground = true)
 @Composable
 fun PreviewSeriesEpisodeView() {
-    val episodes = SeriesEpisodesSample.getSeriesEpisodes()
+    val episodes = SeriesEpisodesSample.getSeriesEpisodesList()
     SeriesEpisodeView(episodes)
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewSeriesEpisodeItemView() {
-    val episodes = SeriesEpisodesSample.getSeriesEpisodes()[0]
+    val episodes = SeriesEpisodesSample.getSeriesEpisodesList()[0]
     SeriesEpisodeItemView(seriesEpisode = episodes)
 }
 
