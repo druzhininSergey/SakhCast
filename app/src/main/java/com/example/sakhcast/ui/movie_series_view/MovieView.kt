@@ -28,7 +28,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,6 +35,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,6 +68,7 @@ import com.example.sakhcast.model.Person
 import com.example.sakhcast.model.ProductionCompany
 import com.example.sakhcast.model.ProductionCountry
 import com.example.sakhcast.ui.DividerBase
+import com.example.sakhcast.ui.MovieViewModel
 import com.example.sakhcast.ui.main_screens.home_screen.movie.MovieItemView
 import java.util.Locale
 import kotlin.math.min
@@ -85,8 +86,12 @@ fun PreviewMovieInfo() {
 }
 
 @Composable
-fun MovieView(paddingValues: PaddingValues, navHostController: NavHostController) {
-    val movie = MovieSample.getFullMovie()
+fun MovieView(
+    paddingValues: PaddingValues,
+    navHostController: NavHostController,
+    movieState: State<MovieViewModel.MovieState>
+) {
+    val movie = movieState.value.movie ?: throw IllegalStateException("Movie is null")
     val scrollState = rememberScrollState()
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
 

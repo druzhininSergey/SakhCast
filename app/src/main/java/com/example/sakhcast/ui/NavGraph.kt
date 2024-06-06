@@ -34,6 +34,7 @@ import com.example.sakhcast.ui.main_screens.notifications_screen.NotificationScr
 import com.example.sakhcast.ui.main_screens.search_screen.SearchScreen
 import com.example.sakhcast.ui.movie_series_view.MovieView
 import com.example.sakhcast.ui.movie_series_view.SeriesView
+import com.example.sakhcast.ui.movie_series_view.SeriesViewModel
 import com.example.sakhcast.ui.profile_screen.ProfileScreenViewModel
 
 @Composable
@@ -87,10 +88,15 @@ fun NavGraph(
             SearchScreen()
         }
         composable(MOVIE_VIEW) {
-            MovieView(paddingValues, navHostController)
+            val movieViewModel: MovieViewModel = hiltViewModel()
+            val movieState = movieViewModel.movieState.observeAsState(MovieViewModel.MovieState())
+            MovieView(paddingValues, navHostController, movieState)
         }
         composable(SERIES_VIEW) {
-            SeriesView(paddingValues, navHostController)
+            val seriesViewModel: SeriesViewModel = hiltViewModel()
+            val seriesState =
+                seriesViewModel.seriesState.observeAsState(SeriesViewModel.SeriesState())
+            SeriesView(paddingValues, navHostController, seriesState)
         }
         composable("$MOVIE_CATEGORY_SCREEN/{category}") {
             val movieCategoryScreenViewModel = hiltViewModel<MovieCategoryScreenViewModel>()

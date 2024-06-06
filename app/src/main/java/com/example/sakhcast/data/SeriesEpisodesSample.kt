@@ -768,5 +768,5 @@ object SeriesEpisodesSample {
         )
     )
 
-    fun getSeriesEpisodes() = episodes
+    fun getSeriesEpisodesList() = episodes
 }
