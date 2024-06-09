@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.log_in_screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -130,9 +131,8 @@ fun LogInScreen(
             trailingIcon = {
                 IconButton(onClick = { passwordHidden = !passwordHidden }) {
                     val visibilityIcon =
-                        if (passwordHidden) painterResource(id = R.drawable.ic_visibility) else painterResource(
-                            id = R.drawable.ic_visibility_off
-                        )
+                        if (passwordHidden) painterResource(id = R.drawable.ic_visibility)
+                        else painterResource(id = R.drawable.ic_visibility_off)
                     val description = if (passwordHidden) "Show password" else "Hide password"
                     Icon(painter = visibilityIcon, contentDescription = description)
                 }
@@ -150,7 +150,7 @@ fun LogInScreen(
         }
         Button(
             onClick = {
-//                logInScreenViewModel.checkUserData(login, password) //TODO убрать коментарий, код-рабочий
+                logInScreenViewModel.checkUserData(login, password)
                 if (logInScreenState.value.isLogged == true) navController.navigate(HOME_SCREEN)
             },
             shape = RoundedCornerShape(10.dp),

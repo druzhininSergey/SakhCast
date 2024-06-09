@@ -1,5 +1,8 @@
 package com.example.sakhcast.model
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
 data class SeriesCard(
     val id: Int,
     val linkUrl: String? = null,
@@ -36,4 +39,9 @@ data class UserData(
     val userToken: String? = null,
     val userLogin: String,
     val userPassword: String,
+)
+
+@Serializable
+data class ResultLogout(
+    @SerialName("result") val result: Boolean
 )

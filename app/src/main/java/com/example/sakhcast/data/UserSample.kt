@@ -1,11 +1,11 @@
 package com.example.sakhcast.data
 
-import com.example.sakhcast.model.CurrentUser
+import com.example.sakhcast.model.CurentUser
 import com.example.sakhcast.model.NewEpisodes
 import com.example.sakhcast.model.Privacy
 
 object UserSample {
-    private val curentUser = CurrentUser(
+    private val curentUser = CurentUser(
         access = true,
         alerts = 0,
         authorized = true,

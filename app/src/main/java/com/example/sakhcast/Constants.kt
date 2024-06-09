@@ -15,3 +15,5 @@ const val MOVIE_VIEW = "movie_view"
 const val SERIES_VIEW = "series_view"
 
 const val IS_LOGGED_IN_KEY = "is_logged_in"
+
+const val BASE_URL = "https://api.sakh.tv"

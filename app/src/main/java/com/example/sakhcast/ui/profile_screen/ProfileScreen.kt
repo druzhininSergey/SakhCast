@@ -30,24 +30,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sakhcast.Colors
 import com.example.sakhcast.R
-import kotlinx.coroutines.coroutineScope
+import com.example.sakhcast.ui.log_in_screen.LogInScreenViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     onDismissRequest: () -> Unit,
-    profileScreenViewModel: ProfileScreenViewModel = hiltViewModel(),
+    logInScreenViewModel: LogInScreenViewModel = hiltViewModel(),
+    avatar: Painter,
 ) {
-    val profileScreenState = profileScreenViewModel.profileScreenState.observeAsState(
-        ProfileScreenViewModel.ProfileScreenState()
+    val profileScreenState = logInScreenViewModel.userDataState.observeAsState(
+        LogInScreenViewModel.UserDataState()
     )
-    val currentUser = profileScreenState.value.currentUser
+    val curentUser = profileScreenState.value.curentUser
     var skipPartiallyExpanded by rememberSaveable { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = skipPartiallyExpanded
@@ -97,18 +99,18 @@ fun ProfileScreen(
                             .padding(8.dp)
                             .size(55.dp)
                             .clip(CircleShape),
-                        painter = painterResource(id = R.drawable.cast),
+                        painter = avatar,
                         contentDescription = null
                     )
                     Column(
                         modifier = Modifier.padding(8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        if (currentUser != null) {
-                            Text(text = currentUser.login)
+                        if (curentUser != null) {
+                            Text(text = curentUser.login)
                             Spacer(modifier = Modifier.height(15.dp))
                             Text(
-                                text = currentUser.proDays.toString() + "дн.",
+                                text = curentUser.proDays.toString() + "дн.",
                                 color = Color.Black,
                                 modifier = Modifier
                                     .clip(MaterialTheme.shapes.small)
@@ -121,7 +123,7 @@ fun ProfileScreen(
             }
             TextButton(
                 onClick = {
-                    profileScreenViewModel.onLogoutButtonPushed()
+                    logInScreenViewModel.onLogoutButtonPushed()
                 }, modifier = Modifier
                     .padding(16.dp)
                     .clip(MaterialTheme.shapes.small)
