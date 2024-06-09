@@ -68,7 +68,6 @@ import com.example.sakhcast.model.Person
 import com.example.sakhcast.model.ProductionCompany
 import com.example.sakhcast.model.ProductionCountry
 import com.example.sakhcast.ui.DividerBase
-import com.example.sakhcast.ui.MovieViewModel
 import com.example.sakhcast.ui.main_screens.home_screen.movie.MovieItemView
 import java.util.Locale
 import kotlin.math.min

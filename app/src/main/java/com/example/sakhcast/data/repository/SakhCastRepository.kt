@@ -5,6 +5,7 @@ import com.example.sakhcast.data.api_service.SackCastApiService
 import com.example.sakhcast.model.CurentUser
 import com.example.sakhcast.model.LoginResponse
 import com.example.sakhcast.model.ResultLogout
+import com.example.sakhcast.model.last_watched.LastWatched
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -43,6 +44,7 @@ class SakhCastRepository @Inject constructor(
             }
         }
     }
+
     suspend fun checkLoginStatus(): CurentUser? {
         return withContext(ioDispatcher) {
             try {
@@ -56,4 +58,18 @@ class SakhCastRepository @Inject constructor(
         }
     }
 
+    suspend fun getContinueWatchMovieAndSerias(): LastWatched? {
+        return withContext(ioDispatcher) {
+            try {
+                val lastWatchedCall = sackCastApiService.getContinueWatchMovieAndSerias()
+                val responseBody = lastWatchedCall.execute()
+                Log.i("!!!", "LastWatched = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+                Log.i("!!!", "LastWatched = exeprion")
+                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
 }

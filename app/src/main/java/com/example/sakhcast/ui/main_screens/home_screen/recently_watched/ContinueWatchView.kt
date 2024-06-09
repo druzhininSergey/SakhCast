@@ -17,13 +17,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.sakhcast.Dimens
-import com.example.sakhcast.model.MovieCard
-import com.example.sakhcast.model.SeriesCard
+import com.example.sakhcast.model.last_watched.MovieRecent
+import com.example.sakhcast.model.last_watched.SeriesRecent
 
 @OptIn(ExperimentalFoundationApi::class)
 @Preview
 @Composable
-fun ContinueWatchView(movie: MovieCard, series: SeriesCard) {
+fun ContinueWatchView(movie: MovieRecent, series: SeriesRecent, lastWatchedMovieTime: String) {
     val pagerState = rememberPagerState { 2 }
     var tabIndex by remember {
         mutableIntStateOf(0)
@@ -46,7 +46,7 @@ fun ContinueWatchView(movie: MovieCard, series: SeriesCard) {
         ) { index ->
             when (index) {
                 0 -> ContinueWatchSeriesView(seriesCard = series)
-                1 -> ContinueWatchMovieView(movieCard = movie)
+                1 -> ContinueWatchMovieView(movieCard = movie, lastWatchedMovieTime)
             }
         }
     }
