@@ -72,7 +72,7 @@ fun MovieCategoryCardItem(movieCard: MovieCard, navHostController: NavHostContro
                     color = MaterialTheme.colorScheme.onPrimary
                 )
                 Text(
-                    text = movieCard.duration, fontSize = 12.sp,
+                    text = movieCard.runtime.toString(), fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             }
@@ -145,7 +145,7 @@ fun MovieCategoryCard(movieCard: MovieCard) {
                         )
                         Text(
                             modifier = Modifier.padding(start = 3.dp),
-                            text = movieCard.kinopoiskRating.toString(),
+                            text = movieCard.kpRating.toString(),
                             color = Color.White,
                             fontSize = 8.sp
                         )

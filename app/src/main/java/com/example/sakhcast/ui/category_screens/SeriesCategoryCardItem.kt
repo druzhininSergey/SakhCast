@@ -68,11 +68,11 @@ fun SeriesCategoryCardItem(seriesCard: SeriesCard, navHostController: NavHostCon
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = seriesCard.releaseYear.toString(), fontSize = 12.sp,
+                    text = seriesCard.year.toString(), fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
                 Text(
-                    text = seriesCard.totalSeasonsAndSeries, fontSize = 12.sp,
+                    text = seriesCard.seasons, fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             }
@@ -145,7 +145,7 @@ fun SeriesCategoryCard(seriesCard: SeriesCard) {
                         )
                         Text(
                             modifier = Modifier.padding(start = 3.dp),
-                            text = seriesCard.kinopoiskRating.toString(),
+                            text = seriesCard.kpRating.toString(),
                             color = Color.White,
                             fontSize = 8.sp
                         )

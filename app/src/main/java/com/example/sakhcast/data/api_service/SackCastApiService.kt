@@ -1,9 +1,11 @@
 package com.example.sakhcast.data.api_service
 
 import com.example.sakhcast.model.CurentUser
+import com.example.sakhcast.model.LastWatched
 import com.example.sakhcast.model.LoginResponse
+import com.example.sakhcast.model.MovieList
 import com.example.sakhcast.model.ResultLogout
-import com.example.sakhcast.model.last_watched.LastWatched
+import com.example.sakhcast.model.SeriesList
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -12,7 +14,10 @@ import retrofit2.http.Query
 interface SackCastApiService {
 
     @POST("v1/users/login")
-    fun userLogin(@Query("login") login: String, @Query("password") password: String): Call<LoginResponse>
+    fun userLogin(
+        @Query("login") login: String,
+        @Query("password") password: String
+    ): Call<LoginResponse>
 
     @POST("v1/users/logout")
     fun userLogout(): Call<ResultLogout>
@@ -22,4 +27,18 @@ interface SackCastApiService {
 
     @GET("v2/users/continue")
     fun getContinueWatchMovieAndSerias(): Call<LastWatched>
+
+    @GET("catalog.items")
+    fun getSeriesListByCategoryName(
+        @Query("category") category: String,
+        @Query("page") page: Int,
+        @Query("amount") amount: Int = 40,
+    ): Call<SeriesList>
+
+    @GET("v2/catalog/movies/items")
+    fun getMoviesByCategoryName(
+        @Query("category") category: String,
+        @Query("page") page: Int,
+        @Query("amount") amount: Int = 40
+    ): Call<MovieList>
 }

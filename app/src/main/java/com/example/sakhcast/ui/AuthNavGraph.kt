@@ -26,7 +26,6 @@ import com.example.sakhcast.ui.main_screens.catalog_screen.CatalogScreenViewMode
 import com.example.sakhcast.ui.main_screens.favorites_screen.FavoritesScreen
 import com.example.sakhcast.ui.main_screens.favorites_screen.FavoritesScreenViewModel
 import com.example.sakhcast.ui.main_screens.home_screen.HomeScreen
-import com.example.sakhcast.ui.main_screens.home_screen.HomeScreenViewModel
 import com.example.sakhcast.ui.main_screens.notifications_screen.NotificationScreen
 import com.example.sakhcast.ui.main_screens.notifications_screen.NotificationScreenViewModel
 import com.example.sakhcast.ui.main_screens.search_screen.SearchScreen
@@ -47,16 +46,7 @@ fun AuthNavGraph(
     ) {
 
         composable(HOME_SCREEN) {
-            val homeScreenViewModel = hiltViewModel<HomeScreenViewModel>()
-            homeScreenViewModel.getLastWatched()
-            val homeScreenState by
-            homeScreenViewModel.homeScreenState.observeAsState(HomeScreenViewModel.HomeScreenState())
-            homeScreenState.lastWatched?.movie?.data?.user?.position?.let { it1 ->
-                homeScreenViewModel.convertSeconds(
-                    it1
-                )
-            }
-            HomeScreen(paddingValues = paddingValues, homeScreenState)
+            HomeScreen(paddingValues = paddingValues)
         }
         composable(CATALOG_SCREEN) {
             val catalogScreenViewModel = hiltViewModel<CatalogScreenViewModel>()
