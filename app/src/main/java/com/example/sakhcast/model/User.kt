@@ -1,10 +1,16 @@
 package com.example.sakhcast.model
 
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Serializable
-data class CurrentUser(
+data class LoginResponse(
+    @SerialName("auth") val auth: String,
+    @SerialName("user") val user: CurentUser,
+)
+
+@Serializable
+data class CurentUser(
     @SerialName("access") val access: Boolean,
     @SerialName("alerts") val alerts: Int,
     @SerialName("authorized") val authorized: Boolean,

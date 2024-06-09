@@ -35,22 +35,19 @@ import com.example.sakhcast.ui.main_screens.search_screen.SearchScreen
 import com.example.sakhcast.ui.movie_series_view.MovieView
 import com.example.sakhcast.ui.movie_series_view.SeriesView
 import com.example.sakhcast.ui.movie_series_view.SeriesViewModel
-import com.example.sakhcast.ui.profile_screen.ProfileScreenViewModel
 
 @Composable
 fun NavGraph(
     navHostController: NavHostController,
     paddingValues: PaddingValues,
+    isLogged: Boolean?,
 ) {
-    val profileScreenViewModel: ProfileScreenViewModel = hiltViewModel()
-    profileScreenViewModel.getIsLoggedInSharedPreferences()
-    val profileScreenState = profileScreenViewModel.profileScreenState.observeAsState(
-        ProfileScreenViewModel.ProfileScreenState()
-    )
-//    Log.i("!!!", "NavGraph profile state isLogged ${profileScreenState.value.isLogged}")
+
     NavHost(
         navController = navHostController,
-        startDestination = if (!profileScreenState.value.isLogged!!) LOG_IN_SCREEN else HOME_SCREEN
+        startDestination = if
+                (isLogged == false ||
+            isLogged == null) LOG_IN_SCREEN else HOME_SCREEN
     ) {
         composable(LOG_IN_SCREEN) {
             LogInScreen(navController = navHostController)

@@ -70,6 +70,24 @@ dependencies {
     //lifecycle ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.compose) // возможно не нужна
 
+    //okhttp3
+    implementation(libs.okhttp)
+    //logging interceptor
+    implementation(libs.logging.interceptor)
+
+    //retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
+
+    // DataStore
+    implementation(libs.androidx.datastore.preferences)
+
+    //Coil
+    implementation(libs.coil.compose)
+
+    //glide
+    implementation (libs.compose)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

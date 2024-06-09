@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -59,7 +60,7 @@ fun FavoritesScreen(
         TabRow(
             selectedTabIndex = tabIndex,
             containerColor = MaterialTheme.colorScheme.primary,
-            divider = { Divider(color = MaterialTheme.colorScheme.primary) },
+            divider = { HorizontalDivider(color = MaterialTheme.colorScheme.primary) },
             indicator = { tabPositions ->
                 SecondaryIndicator(
                     Modifier.tabIndicatorOffset(tabPositions[tabIndex]),
