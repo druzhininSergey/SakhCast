@@ -37,21 +37,21 @@ import com.example.sakhcast.ui.movie_series_view.SeriesView
 import com.example.sakhcast.ui.movie_series_view.SeriesViewModel
 
 @Composable
-fun NavGraph(
+fun AuthNavGraph(
     navHostController: NavHostController,
     paddingValues: PaddingValues,
-    isLogged: Boolean?,
 ) {
 
     NavHost(
         navController = navHostController,
-        startDestination = if
-                (isLogged == false ||
-            isLogged == null) LOG_IN_SCREEN else HOME_SCREEN
+        startDestination = HOME_SCREEN
+//        if
+//                (isLogged == false ||
+//            isLogged == null) LOG_IN_SCREEN else HOME_SCREEN
     ) {
-        composable(LOG_IN_SCREEN) {
-            LogInScreen(navController = navHostController)
-        }
+//        composable(LOG_IN_SCREEN) {
+//            LogInScreen(navController = navHostController)
+//        }
         composable(HOME_SCREEN) {
             val homeScreenViewModel = hiltViewModel<HomeScreenViewModel>()
             val homeScreenState by
