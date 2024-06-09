@@ -1,43 +1,44 @@
 package com.example.sakhcast.model
 
-//data class MovieList(
-//    val amount: Int,
-//    val items: List<MovieCard>,
-//    val page: Int,
-//    val title: String
-//)
-//data class User(
-//    val fav_kind: Any,
-//    val is_fav: Boolean
-//)
-//data class MovieCard(
-//    val adult: Boolean,
-//    val agelimits: Int,
-//    val available: Boolean,
-//    val cover: String,
-//    val cover_alt: String,
-//    val cover_colors: CoverColors,
-//    val cover_h: Int,
-//    val cover_lq: String,
-//    val cover_w: Int,
-//    val id: Int,
-//    val id_alpha: String,
-//    val imdb: Boolean,
-//    val imdb_rating: Double,
-//    val kp: Boolean,
-//    val kp_rating: Double,
-//    val link: String,
-//    val origin_title: String,
-//    val progress: Boolean,
-//    val release_date: String,
-//    val ru_title: String,
-//    val runtime: Int,
-//    val user: User
-//)
-//data class CoverColors(
-//    val background1: String,
-//    val background2: String,
-//    val lum: Double,
-//    val text: String,
-//    val title: String
-//)
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
+
+@Serializable
+data class MovieList(
+    @SerialName("amount") val amount: Int,
+    @SerialName("items") val items: List<MovieCard>,
+    @SerialName("page") val page: Int,
+    @SerialName("title") val title: String
+)
+
+@Serializable
+data class User(
+    @SerialName("fav_kind") val favKind: String?,
+    @SerialName("is_fav") val isFav: Boolean
+)
+
+@Serializable
+data class MovieCard(
+    @SerialName("adult") val adult: Boolean,
+    @SerialName("agelimits") val ageLimits: Int,
+    @SerialName("available") val available: Boolean,
+    @SerialName("cover") val cover: String,
+    @SerialName("cover_alt") val coverAlt: String,
+    @SerialName("cover_colors") val coverColors: CoverColors,
+    @SerialName("cover_h") val coverH: Int,
+    @SerialName("cover_lq") val coverLq: String,
+    @SerialName("cover_w") val coverW: Int,
+    @SerialName("id") val id: Int,
+    @SerialName("id_alpha") val idAlpha: String,
+    @SerialName("imdb") val imdb: Boolean,
+    @SerialName("imdb_rating") val imdbRating: Double?,
+    @SerialName("kp") val kp: Boolean,
+    @SerialName("kp_rating") val kpRating: Double?,
+    @SerialName("link") val link: String,
+    @SerialName("origin_title") val originTitle: String,
+    @SerialName("progress") val progress: Boolean,
+    @SerialName("release_date") val releaseDate: String,
+    @SerialName("ru_title") val ruTitle: String,
+    @SerialName("runtime") val runtime: Int,
+    @SerialName("user") val user: User
+)

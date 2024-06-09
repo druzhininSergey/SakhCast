@@ -28,6 +28,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,7 +59,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.sakhcast.R
 import com.example.sakhcast.data.MovieSample
-import com.example.sakhcast.data.Samples
 import com.example.sakhcast.model.Cast
 import com.example.sakhcast.model.Download
 import com.example.sakhcast.model.Genre
@@ -203,7 +203,7 @@ fun MovieInfo(movie: Movie) {
         MovieOverview(movie.overview)
         MovieProductionCompanies(movie.productionCompanies)
         MovieExpandableCastTab(movie.cast)
-        MovieRecomendations(Samples.getAllMovies())
+//        MovieRecomendations(Samples.getAllMovies()) // TODO Раскоментировать и поставить рекомендации фильмы->catalog->рекомендации
         MovieViewsCountInfo(movie.views, movie.favorites)
     }
 }
@@ -215,11 +215,11 @@ fun MovieViewsCountInfo(views: Int, favorites: Int) {
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column (
+        Column(
             modifier = Modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
-        ){
+        ) {
             Text(
                 text = "Просмотры",
                 color = Color.Gray,
@@ -232,10 +232,10 @@ fun MovieViewsCountInfo(views: Int, favorites: Int) {
                 color = MaterialTheme.colorScheme.onPrimary
             )
         }
-        Column (
+        Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
-        ){
+        ) {
             Text(
                 text = "Подписки",
                 color = Color.Gray,
@@ -487,7 +487,7 @@ fun MovieExpandableCastTab(cast: Cast) {
             color = MaterialTheme.colorScheme.onPrimary
         )
         Icon(
-            imageVector = Icons.Filled.KeyboardArrowRight,
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier

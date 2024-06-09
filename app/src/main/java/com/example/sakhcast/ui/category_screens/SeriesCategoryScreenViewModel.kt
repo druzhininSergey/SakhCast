@@ -16,7 +16,7 @@ class SeriesCategoryScreenViewModel @Inject constructor() : ViewModel() {
 
     init {
         _seriesCategoryScreenState.value = seriesCategoryScreenState.value?.copy(
-            seriesList = getSeriesList()
+//            seriesList = getSeriesList()
         )
     }
 
@@ -25,7 +25,7 @@ class SeriesCategoryScreenViewModel @Inject constructor() : ViewModel() {
         var categoryName: String = "",
     )
 
-    fun getSeriesList() = Samples.getAllSeries()
+//    fun getSeriesList() = Samples.getAllSeries()
 
     fun getSelectedCategoryName(categoryName: String) {
         _seriesCategoryScreenState.value =

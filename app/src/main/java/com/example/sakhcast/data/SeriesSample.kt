@@ -6,8 +6,7 @@ import com.example.sakhcast.model.Network
 import com.example.sakhcast.model.PosterColors
 import com.example.sakhcast.model.Season
 import com.example.sakhcast.model.Series
-import com.example.sakhcast.model.Trailer
-import com.example.sakhcast.model.UserFavorite
+import com.example.sakhcast.model.UserFavoriteInSeries
 
 object SeriesSample {
     val series = Series(
@@ -56,52 +55,6 @@ object SeriesSample {
         views = 188708,
         about = "История молодого талантливого врача с синдромом саванта, обладающего уникальными способностями — невероятной памятью и фантастической чувствительностью к проблемам, вспыхивающим внутри человеческого организма. Герой становится блестящим хирургом, несмотря на то, в личностном плане его развитие соответствует развитию десятилетнего ребёнка…",
         aboutPlain = "История молодого талантливого врача с синдромом саванта, обладающего уникальными способностями — невероятной памятью и фантастической чувствительностью к проблемам, вспыхивающим внутри человеческого организма. Герой становится блестящим хирургом, несмотря на то, в личностном плане его развитие соответствует развитию десятилетнего ребёнка…",
-        trailers = listOf(
-            Trailer(
-                id = 3775,
-                serialId = 1961,
-                site = "YouTube",
-                path = "DQ4akh9CQhc",
-                name = "Тизер №1. Сезон 4",
-                lang = "ru",
-                type = "Teaser",
-                size = 1080,
-                isDeleted = 0
-            ),
-            Trailer(
-                id = 3815,
-                serialId = 1961,
-                site = "YouTube",
-                path = "wAIQ7EXVjWw",
-                name = "Трейлер №1. Сезон 4",
-                lang = "ru",
-                type = "Trailer",
-                size = 1080,
-                isDeleted = 0
-            ),
-            Trailer(
-                id = 7812,
-                serialId = 1961,
-                site = "YouTube",
-                path = "lnY9FWUTY84",
-                name = "The Good Doctor – Official Trailer",
-                lang = "en",
-                type = "Trailer",
-                size = 1080,
-                isDeleted = 0
-            ),
-            Trailer(
-                id = 1479,
-                serialId = 1961,
-                site = "YouTube",
-                path = "fYlZDTru55g",
-                name = "The Good Doctor - Official Trailer - Coming to ABC September 25",
-                lang = "en",
-                type = "Trailer",
-                size = 720,
-                isDeleted = 0
-            )
-        ),
         favAmount = 883,
         userRating = null,
         userLastMedia = "/watch/the.good.doctor/07/09/lostfilm/",
@@ -109,7 +62,7 @@ object SeriesSample {
         userLastMediaTime = 2554,
         userLastSeason = "7",
         userLastSeasonId = 12142,
-        userFavorite = UserFavorite(id = 208504, kind = "watching", notify = 1, voices = listOf()),
+        userFavoriteInSeries = UserFavoriteInSeries(id = 208504, kind = "watching", notify = 1, voices = listOf()),
         seasons = listOf(
             Season(id = 5359, index = "01"),
             Season(id = 6055, index = "02"),

@@ -3,9 +3,11 @@ package com.example.sakhcast.data.repository
 import android.util.Log
 import com.example.sakhcast.data.api_service.SackCastApiService
 import com.example.sakhcast.model.CurentUser
+import com.example.sakhcast.model.LastWatched
 import com.example.sakhcast.model.LoginResponse
+import com.example.sakhcast.model.MovieList
 import com.example.sakhcast.model.ResultLogout
-import com.example.sakhcast.model.last_watched.LastWatched
+import com.example.sakhcast.model.SeriesList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -23,7 +25,7 @@ class SakhCastRepository @Inject constructor(
             try {
                 val loginCall = sackCastApiService.userLogin(loginInput, passwordInput)
                 val responseBody = loginCall.execute()
-                Log.i("!!!", "Login response body: ${responseBody.body()}")
+//                Log.i("!!!", "Login response body: ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
                 null
@@ -36,10 +38,10 @@ class SakhCastRepository @Inject constructor(
             try {
                 val logoutCall = sackCastApiService.userLogout()
                 val responseBody = logoutCall.execute()
-                Log.i("!!!", "Logout response body: ${responseBody.body()}")
+//                Log.i("!!!", "Logout response body: ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
-                Log.i("!!!", "Logout exception = null запрос не отправлен")
+//                Log.i("!!!", "Logout exception = null запрос не отправлен")
                 null
             }
         }
@@ -50,7 +52,7 @@ class SakhCastRepository @Inject constructor(
             try {
                 val loginStatusCall = sackCastApiService.checkLoginStatus()
                 val responseBody = loginStatusCall.execute()
-                Log.i("!!!", "userCheck = ${responseBody.body()}")
+//                Log.i("!!!", "userCheck = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
                 null
@@ -63,13 +65,45 @@ class SakhCastRepository @Inject constructor(
             try {
                 val lastWatchedCall = sackCastApiService.getContinueWatchMovieAndSerias()
                 val responseBody = lastWatchedCall.execute()
-                Log.i("!!!", "LastWatched = ${responseBody.body()}")
+//                Log.i("!!!", "LastWatched = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
-                Log.i("!!!", "LastWatched = exeprion")
+//                Log.i("!!!", "LastWatched = exeption")
+//                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
+    suspend fun getSeriesListPopular(categoryName: String, page: Int): SeriesList? {
+        return withContext(ioDispatcher) {
+            try {
+                val seriesListCall =
+                    sackCastApiService.getSeriesListByCategoryName(categoryName, page)
+                val responseBody = seriesListCall.execute()
+//                Log.i("!!!", "SeriesList from repo = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+                Log.i("!!!", "series homescreen list = exeption")
                 Log.i("!!!", "${e.message}")
                 null
             }
         }
     }
+
+    suspend fun getMoviesListByCategoryName(categoryName: String, page: Int): MovieList? {
+        return withContext(ioDispatcher) {
+            try {
+                val moviesListCall = sackCastApiService.getMoviesByCategoryName(categoryName, page)
+                val responseBody = moviesListCall.execute()
+                Log.i("!!!", "SeriesList from repo = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception){
+                Log.i("!!!", "movies homescreen list = exeption")
+                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
 }

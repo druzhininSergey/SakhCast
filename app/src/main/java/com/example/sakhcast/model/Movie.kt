@@ -44,7 +44,7 @@ data class Movie(
     @SerialName("subtitles") val subtitles: List<Subtitle>,
     @SerialName("tagline") val tagline: String,
     @SerialName("url") val url: String,
-    @SerialName("user") val user: User,
+    @SerialName("user") val userFavourite: UserFavourite,
     @SerialName("views") val views: Int,
     @SerialName("cast") val cast: Cast,
 )
@@ -177,7 +177,7 @@ data class Track(
 )
 
 @Serializable
-data class User(
+data class UserFavourite(
     @SerialName("fav_kind") val favKind: String,
     @SerialName("is_fav") val isFav: Boolean,
     @SerialName("position") val position: Int,

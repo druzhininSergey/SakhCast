@@ -3,13 +3,11 @@ package com.example.sakhcast.ui.main_screens.home_screen.movie
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import com.example.sakhcast.model.MovieCard
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,9 +17,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sakhcast.Dimens
+import com.example.sakhcast.model.MovieList
 
 @Composable
-fun MovieCategoryView(movieCardList: List<MovieCard>) {
+fun MovieCategoryView(movieList: MovieList?) {
     Row(
         modifier = Modifier.padding(top = Dimens.mainPadding, start = Dimens.mainPadding),
         verticalAlignment = Alignment.CenterVertically,
@@ -43,8 +42,11 @@ fun MovieCategoryView(movieCardList: List<MovieCard>) {
         contentPadding = PaddingValues(start = Dimens.mainPadding, end = Dimens.mainPadding),
         horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding)
     ) {
-        itemsIndexed(movieCardList) { _, item ->
-            MovieItemView(movieCard = item)
+        if (movieList?.items != null){
+            itemsIndexed(movieList.items) { _, item ->
+                MovieItemView(movieCard = item)
+            }
         }
+
     }
 }

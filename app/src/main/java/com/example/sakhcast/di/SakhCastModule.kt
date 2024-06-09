@@ -70,12 +70,12 @@ class SakhCastModul() {
     }
 
     @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideRetrofit(okHttpClient: OkHttpClient, json: Json): Retrofit {
         val contentType = "application/json".toMediaType()
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
-            .addConverterFactory(Json.asConverterFactory(contentType))
+            .addConverterFactory(json.asConverterFactory(contentType))
             .build()
         return retrofit
     }

@@ -16,7 +16,7 @@ class MovieCategoryScreenViewModel @Inject constructor() : ViewModel() {
 
     init {
         _moviesCategoryScreenState.value = moviesCategoryScreenState.value?.copy(
-            moviesList = getMoviesList()
+//            moviesList = getMoviesList()
         )
     }
 
@@ -25,7 +25,7 @@ class MovieCategoryScreenViewModel @Inject constructor() : ViewModel() {
         var categoryName: String = "",
     )
 
-    fun getMoviesList() = Samples.getAllMovies()
+//    fun getMoviesList() = Samples.getAllMovies()
 
     fun getSelectedCategoryName(categoryName: String) {
         _moviesCategoryScreenState.value =

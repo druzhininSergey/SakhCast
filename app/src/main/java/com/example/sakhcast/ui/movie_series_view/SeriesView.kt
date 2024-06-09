@@ -59,7 +59,7 @@ import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.Genre
 import com.example.sakhcast.model.Season
 import com.example.sakhcast.model.Series
-import com.example.sakhcast.model.UserFavorite
+import com.example.sakhcast.model.UserFavoriteInSeries
 import com.example.sakhcast.ui.DividerBase
 import java.util.Locale
 import kotlin.math.min
@@ -176,7 +176,7 @@ fun SeriesView(
                 SeriesInfo(series, seriesEpisodes)
             }
         }
-        TopSeriesBar(scrollState, series.name, paddingValues, series.userFavorite, navHostController)
+        TopSeriesBar(scrollState, series.name, paddingValues, series.userFavoriteInSeries, navHostController)
     }
 }
 
@@ -276,12 +276,12 @@ fun TopSeriesBar(
     scrollState: ScrollState,
     ruTitle: String,
     paddingValues: PaddingValues,
-    userFavorite: UserFavorite?,
+    userFavoriteInSeries: UserFavoriteInSeries?,
     navHostController: NavHostController
 ) {
     val alpha = min(1f, (scrollState.value.toFloat() / scrollState.maxValue) * 1.5f)
     val primaryColor = MaterialTheme.colorScheme.primary
-    val isFavorite = userFavorite != null
+    val isFavorite = userFavoriteInSeries != null
     val favIcon = if (isFavorite) painterResource(R.drawable.ic_star_full2)
     else painterResource(R.drawable.ic_star_empty2)
 

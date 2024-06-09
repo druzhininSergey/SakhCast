@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.main_screens.home_screen.recently_watched
 
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.sakhcast.Dimens
-import com.example.sakhcast.model.last_watched.MovieRecent
+import com.example.sakhcast.model.MovieRecent
 
 @Preview(showBackground = true)
 @Composable
@@ -37,9 +38,15 @@ fun Preview2() {
 @Preview(showBackground = true)
 @Composable
 fun ContinueWatchMovieView(movieCard: MovieRecent, lastWatchedMovieTime: String) {
+    val context = LocalContext.current
+    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        movieCard.data.backdropAlt + ".avif"
+    } else {
+        movieCard.data.backdropAlt + ".webp"
+    }
     val backdropPainter: Painter =
         rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current).data(data = movieCard.data.backdrop)
+            ImageRequest.Builder(context).data(data = imageUrl)
                 .apply(block = fun ImageRequest.Builder.() {
                     crossfade(true)
                     //            placeholder(R.drawable.placeholder) // Укажите ресурс-заполнитель
@@ -73,7 +80,7 @@ fun ContinueWatchMovieView(movieCard: MovieRecent, lastWatchedMovieTime: String)
                 Text(
                     modifier = Modifier
                         .align(Alignment.Start),
-                    text = movieCard.data.ru_title,
+                    text = movieCard.data.ruTitle,
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold

@@ -16,7 +16,7 @@ import com.example.sakhcast.model.ProductionCountry
 import com.example.sakhcast.model.Sources
 import com.example.sakhcast.model.Subtitle
 import com.example.sakhcast.model.Track
-import com.example.sakhcast.model.User
+import com.example.sakhcast.model.UserFavourite
 import com.example.sakhcast.model.Variant
 
 object MovieSample {
@@ -245,7 +245,7 @@ object MovieSample {
         ),
         tagline = "«Выбор за тобой»",
         url = "/movie/the_matrix_resurrections-2021/",
-        user = User(favKind = "", isFav = false, position = 5319),
+        userFavourite = UserFavourite(favKind = "", isFav = false, position = 5319),
         views = 142,
         cast = Cast(
             voiceActor = listOf(

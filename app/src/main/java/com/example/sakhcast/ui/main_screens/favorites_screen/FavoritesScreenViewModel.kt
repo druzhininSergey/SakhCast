@@ -28,10 +28,10 @@ class FavoritesScreenViewModel @Inject constructor(): ViewModel() {
 
     fun getAllContent(){
         _favoritesScreenState.value = favoritesScreenState.value?.copy(
-            seriesCardWatching = Samples.getAllSeries(),
-            seriesCardWillWatch = Samples.getAllSeries(),
-            seriesCardFinishedWatching = Samples.getAllSeries(),
-            movieCardsWillWatch = Samples.getAllMovies(),
+//            seriesCardWatching = Samples.getAllSeries(),
+//            seriesCardWillWatch = Samples.getAllSeries(),
+//            seriesCardFinishedWatching = Samples.getAllSeries(),
+//            movieCardsWillWatch = Samples.getAllMovies(),
         )
     }
 

@@ -1,14 +1,14 @@
 package com.example.sakhcast.ui.main_screens.home_screen
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sakhcast.data.Samples
 import com.example.sakhcast.data.repository.SakhCastRepository
-import com.example.sakhcast.model.MovieCard
-import com.example.sakhcast.model.SeriesCard
-import com.example.sakhcast.model.last_watched.LastWatched
+import com.example.sakhcast.model.LastWatched
+import com.example.sakhcast.model.MovieList
+import com.example.sakhcast.model.SeriesList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,30 +20,34 @@ class HomeScreenViewModel @Inject constructor(private val sakhCastRepository: Sa
     private var _homeScreenState = MutableLiveData(HomeScreenState())
     val homeScreenState: LiveData<HomeScreenState> = _homeScreenState
 
-    init {
-        _homeScreenState.value = homeScreenState.value?.copy(
-            seriesList = getSetiesListSample(),
-            moviesList = getMoviesListSample(),
-        )
-    }
-
     data class HomeScreenState(
-        var seriesList: List<SeriesCard> = emptyList(),
-        var moviesList: List<MovieCard> = emptyList(),
+        var seriesList: SeriesList? = null,
+        var moviesList: MovieList? = null,
         var lastWatched: LastWatched? = null,
         var lastWatchedMovieTime: String = "",
     )
 
-    fun getLastWatched() {
+    fun getAllScreenData() {
         viewModelScope.launch {
             val lastWatched = sakhCastRepository.getContinueWatchMovieAndSerias()
+            val seriesList =
+                sakhCastRepository.getSeriesListPopular(categoryName = "all", page = 0)
+            val moviesList =
+                sakhCastRepository.getMoviesListByCategoryName(categoryName = "all", page = 0)
+            lastWatched?.movie?.data?.userFavourite?.position?.let { convertSeconds(it) }
+
             _homeScreenState.value = homeScreenState.value?.copy(
-                lastWatched = lastWatched
+                lastWatched = lastWatched,
+                seriesList = seriesList,
+                moviesList = moviesList,
             )
+
         }
     }
 
-    fun convertSeconds(seconds: Int) {
+
+    private fun convertSeconds(seconds: Int) {
+        Log.e("!!!", "seconds = $seconds")
         viewModelScope.launch {
             val hours = seconds / 3600
             val remainingSecondsAfterHours = seconds % 3600
@@ -59,9 +63,5 @@ class HomeScreenViewModel @Inject constructor(private val sakhCastRepository: Sa
                 homeScreenState.value?.copy(lastWatchedMovieTime = "$hoursPart$minutesPart$secondsPart".trim())
         }
     }
-
-    private fun getSetiesListSample() = Samples.getAllSeries()
-
-    private fun getMoviesListSample() = Samples.getAllMovies()
 
 }

@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.main_screens.home_screen.recently_watched
 
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.sakhcast.Dimens
-import com.example.sakhcast.model.last_watched.SeriesRecent
+import com.example.sakhcast.model.SeriesRecent
 
 @Preview(showBackground = true)
 @Composable
@@ -37,9 +38,15 @@ fun Preview1() {
 @Preview(showBackground = true)
 @Composable
 fun ContinueWatchSeriesView(seriesCard: SeriesRecent) {
+    val context = LocalContext.current
+    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        seriesCard.data.backdropAlt + ".avif"
+    } else {
+        seriesCard.data.backdropAlt + ".webp"
+    }
     val backdropPainter: Painter =
         rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current).data(data = seriesCard.data.backdrop)
+            ImageRequest.Builder(context).data(data = imageUrl)
                 .apply(block = fun ImageRequest.Builder.() {
                     crossfade(true)
                     //            placeholder(R.drawable.placeholder) // Укажите ресурс-заполнитель
@@ -80,7 +87,7 @@ fun ContinueWatchSeriesView(seriesCard: SeriesRecent) {
                 Text(
                     modifier = Modifier
                         .align(Alignment.Start),
-                    text = "Сезон " + seriesCard.data.user_last_season + " эпизод " + seriesCard.data.user_last_ep,
+                    text = "Сезон " + seriesCard.data.userLastSeason + " эпизод " + seriesCard.data.userLastEp,
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 12.sp,
                 )

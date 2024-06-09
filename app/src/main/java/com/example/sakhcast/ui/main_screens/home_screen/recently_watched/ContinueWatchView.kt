@@ -17,8 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.sakhcast.Dimens
-import com.example.sakhcast.model.last_watched.MovieRecent
-import com.example.sakhcast.model.last_watched.SeriesRecent
+import com.example.sakhcast.model.MovieRecent
+import com.example.sakhcast.model.SeriesRecent
 
 @OptIn(ExperimentalFoundationApi::class)
 @Preview
