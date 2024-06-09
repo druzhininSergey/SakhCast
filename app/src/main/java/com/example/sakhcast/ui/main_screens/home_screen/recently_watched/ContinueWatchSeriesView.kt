@@ -16,26 +16,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.sakhcast.Dimens
-import com.example.sakhcast.R
-import com.example.sakhcast.data.Samples
-import com.example.sakhcast.model.SeriesCard
+import com.example.sakhcast.model.last_watched.SeriesRecent
 
 @Preview(showBackground = true)
 @Composable
 fun Preview1() {
-    ContinueWatchSeriesView(seriesCard = Samples.getOneSeries())
+//    ContinueWatchSeriesView(seriesCard = Samples.getOneSeries())
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ContinueWatchSeriesView(seriesCard: SeriesCard) {
+fun ContinueWatchSeriesView(seriesCard: SeriesRecent) {
+    val backdropPainter: Painter =
+        rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current).data(data = seriesCard.data.backdrop)
+                .apply(block = fun ImageRequest.Builder.() {
+                    crossfade(true)
+                    //            placeholder(R.drawable.placeholder) // Укажите ресурс-заполнитель
+                    //            error(R.drawable.error) // Укажите ресурс ошибки
+                }).build()
+        )
     Card(
         modifier = Modifier
             .height(234.dp)
@@ -45,7 +55,7 @@ fun ContinueWatchSeriesView(seriesCard: SeriesCard) {
         Box {
             Image(
                 modifier = Modifier.fillMaxSize(),
-                painter = painterResource(id = R.drawable.backdrop_series),
+                painter = backdropPainter,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
             )
@@ -62,7 +72,7 @@ fun ContinueWatchSeriesView(seriesCard: SeriesCard) {
                 Text(
                     modifier = Modifier
                         .align(Alignment.Start),
-                    text = seriesCard.name,
+                    text = seriesCard.data.name,
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
@@ -70,10 +80,9 @@ fun ContinueWatchSeriesView(seriesCard: SeriesCard) {
                 Text(
                     modifier = Modifier
                         .align(Alignment.Start),
-                    text = seriesCard.totalSeasonsAndSeries,
+                    text = "Сезон " + seriesCard.data.user_last_season + " эпизод " + seriesCard.data.user_last_ep,
                     color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 12.sp,
                 )
             }
         }

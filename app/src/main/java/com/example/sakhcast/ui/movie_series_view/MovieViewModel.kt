@@ -1,4 +1,4 @@
-package com.example.sakhcast.ui
+package com.example.sakhcast.ui.movie_series_view
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

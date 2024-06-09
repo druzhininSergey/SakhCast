@@ -16,26 +16,37 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.sakhcast.Dimens
-import com.example.sakhcast.R
-import com.example.sakhcast.data.Samples
-import com.example.sakhcast.model.MovieCard
+import com.example.sakhcast.model.last_watched.MovieRecent
 
 @Preview(showBackground = true)
 @Composable
 fun Preview2() {
-    ContinueWatchMovieView(movieCard = Samples.getOneMovie())
+//    ContinueWatchMovieView(movieCard = Samples.getOneMovie())
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ContinueWatchMovieView(movieCard: MovieCard) {
+fun ContinueWatchMovieView(movieCard: MovieRecent, lastWatchedMovieTime: String) {
+    val backdropPainter: Painter =
+        rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current).data(data = movieCard.data.backdrop)
+                .apply(block = fun ImageRequest.Builder.() {
+                    crossfade(true)
+                    //            placeholder(R.drawable.placeholder) // Укажите ресурс-заполнитель
+                    //            error(R.drawable.error) // Укажите ресурс ошибки
+                }).build()
+        )
+
     Card(
         modifier = Modifier
             .height(234.dp)
@@ -45,7 +56,7 @@ fun ContinueWatchMovieView(movieCard: MovieCard) {
         Box {
             Image(
                 modifier = Modifier.fillMaxSize(),
-                painter = painterResource(id = R.drawable.backdrop_movie),
+                painter = backdropPainter,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
             )
@@ -62,7 +73,7 @@ fun ContinueWatchMovieView(movieCard: MovieCard) {
                 Text(
                     modifier = Modifier
                         .align(Alignment.Start),
-                    text = movieCard.ruTitle,
+                    text = movieCard.data.ru_title,
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
@@ -70,10 +81,9 @@ fun ContinueWatchMovieView(movieCard: MovieCard) {
                 Text(
                     modifier = Modifier
                         .align(Alignment.Start),
-                    text = movieCard.duration,
+                    text = lastWatchedMovieTime,
                     color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 12.sp,
                 )
             }
         }

@@ -42,8 +42,6 @@ class LogInScreenViewModel @Inject constructor(
     data class UserDataState(
         var userToken: String = "",
         var curentUser: CurentUser? = null,
-//        var userLogin: String = "", // удалить
-//        var userPassword: String = "", //удалить
         var isLogged: Boolean? = null,
     )
 

@@ -11,7 +11,6 @@ import androidx.navigation.compose.composable
 import com.example.sakhcast.CATALOG_SCREEN
 import com.example.sakhcast.FAVORITES_SCREEN
 import com.example.sakhcast.HOME_SCREEN
-import com.example.sakhcast.LOG_IN_SCREEN
 import com.example.sakhcast.MOVIE_CATEGORY_SCREEN
 import com.example.sakhcast.MOVIE_VIEW
 import com.example.sakhcast.NOTIFICATION_SCREEN
@@ -22,7 +21,6 @@ import com.example.sakhcast.ui.category_screens.MovieCategoryScreen
 import com.example.sakhcast.ui.category_screens.MovieCategoryScreenViewModel
 import com.example.sakhcast.ui.category_screens.SeriesCategoryScreen
 import com.example.sakhcast.ui.category_screens.SeriesCategoryScreenViewModel
-import com.example.sakhcast.ui.log_in_screen.LogInScreen
 import com.example.sakhcast.ui.main_screens.catalog_screen.CatalogScreen
 import com.example.sakhcast.ui.main_screens.catalog_screen.CatalogScreenViewModel
 import com.example.sakhcast.ui.main_screens.favorites_screen.FavoritesScreen
@@ -33,6 +31,7 @@ import com.example.sakhcast.ui.main_screens.notifications_screen.NotificationScr
 import com.example.sakhcast.ui.main_screens.notifications_screen.NotificationScreenViewModel
 import com.example.sakhcast.ui.main_screens.search_screen.SearchScreen
 import com.example.sakhcast.ui.movie_series_view.MovieView
+import com.example.sakhcast.ui.movie_series_view.MovieViewModel
 import com.example.sakhcast.ui.movie_series_view.SeriesView
 import com.example.sakhcast.ui.movie_series_view.SeriesViewModel
 
@@ -45,18 +44,18 @@ fun AuthNavGraph(
     NavHost(
         navController = navHostController,
         startDestination = HOME_SCREEN
-//        if
-//                (isLogged == false ||
-//            isLogged == null) LOG_IN_SCREEN else HOME_SCREEN
     ) {
-//        composable(LOG_IN_SCREEN) {
-//            LogInScreen(navController = navHostController)
-//        }
+
         composable(HOME_SCREEN) {
             val homeScreenViewModel = hiltViewModel<HomeScreenViewModel>()
+            homeScreenViewModel.getLastWatched()
             val homeScreenState by
             homeScreenViewModel.homeScreenState.observeAsState(HomeScreenViewModel.HomeScreenState())
-
+            homeScreenState.lastWatched?.movie?.data?.user?.position?.let { it1 ->
+                homeScreenViewModel.convertSeconds(
+                    it1
+                )
+            }
             HomeScreen(paddingValues = paddingValues, homeScreenState)
         }
         composable(CATALOG_SCREEN) {
