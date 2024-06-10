@@ -16,11 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.sakhcast.Dimens
 import com.example.sakhcast.model.MovieList
 
 @Composable
-fun MovieCategoryView(movieList: MovieList?) {
+fun MovieCategoryView(movieList: MovieList, navHostController: NavHostController) {
     Row(
         modifier = Modifier.padding(top = Dimens.mainPadding, start = Dimens.mainPadding),
         verticalAlignment = Alignment.CenterVertically,
@@ -42,11 +43,8 @@ fun MovieCategoryView(movieList: MovieList?) {
         contentPadding = PaddingValues(start = Dimens.mainPadding, end = Dimens.mainPadding),
         horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding)
     ) {
-        if (movieList?.items != null){
-            itemsIndexed(movieList.items) { _, item ->
-                MovieItemView(movieCard = item)
-            }
+        itemsIndexed(movieList.items) { _, item ->
+            MovieItemView(movieCard = item, navHostController)
         }
-
     }
 }

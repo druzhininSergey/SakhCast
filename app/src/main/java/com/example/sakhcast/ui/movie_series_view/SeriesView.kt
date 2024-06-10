@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.movie_series_view
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -22,6 +23,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.twotone.PlayArrow
 import androidx.compose.material3.DropdownMenu
@@ -57,11 +59,13 @@ import com.example.sakhcast.data.SeriesEpisodesSample
 import com.example.sakhcast.data.SeriesSample
 import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.Genre
+import com.example.sakhcast.model.Network
 import com.example.sakhcast.model.Season
 import com.example.sakhcast.model.Series
 import com.example.sakhcast.model.UserFavoriteInSeries
 import com.example.sakhcast.ui.DividerBase
 import java.util.Locale
+import kotlin.math.max
 import kotlin.math.min
 
 @Preview
@@ -82,7 +86,8 @@ fun SeriesView(
     navHostController: NavHostController,
     seriesState: State<SeriesViewModel.SeriesState>
 ) {
-    val series = seriesState.value.series ?: throw IllegalStateException("Series is null")
+    val series = seriesState.value.series //?: throw IllegalStateException("Series is null")
+    Log.i("!!!", "series = $series")
     val seriesEpisodes = seriesState.value.episodeList
     val scrollState = rememberScrollState()
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
@@ -158,25 +163,34 @@ fun SeriesView(
                             .padding(16.dp)
                     ) {
                         Column {
-                            Text(
-                                text = series.name,
-                                fontSize = 25.sp,
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                            Text(
-                                text = series.eName,
-                                fontSize = 18.sp,
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
+                            series?.name?.let {
+                                Text(
+                                    text = it,
+                                    fontSize = 25.sp,
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
+                            series?.eName?.let {
+                                Text(
+                                    text = it,
+                                    fontSize = 18.sp,
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
                         }
                     }
                 }
             }
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.primary)) {
-                SeriesInfo(series, seriesEpisodes)
+                series?.let { SeriesInfo(it, seriesEpisodes) }
             }
         }
-        TopSeriesBar(scrollState, series.name, paddingValues, series.userFavoriteInSeries, navHostController)
+        series?.name?.let {
+            TopSeriesBar(
+                scrollState,
+                it, paddingValues, series.userFavoriteInSeries, navHostController
+            )
+        }
     }
 }
 
@@ -196,7 +210,7 @@ fun SeriesInfo(series: Series, seriesEpisodes: List<Episode>) {
         SeriesContryYearStatus(series.country, year, series.status)
         SeriesDownloads(series.seasons, seriesEpisodes)
         SeriesOverview(series.about)
-        SeriesProductionCompanies(series.network)
+        SeriesProductionCompanies(series.networks)
         SeriesViewsCountInfo(series.views, series.favAmount)
     }
 }
@@ -204,7 +218,9 @@ fun SeriesInfo(series: Series, seriesEpisodes: List<Episode>) {
 @Composable
 fun SeriesViewsCountInfo(views: Int, favorites: Int) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -245,7 +261,7 @@ fun SeriesViewsCountInfo(views: Int, favorites: Int) {
 }
 
 @Composable
-fun SeriesProductionCompanies(productionCompanies: List<String>) {
+fun SeriesProductionCompanies(productionCompanies: List<Network>) {
     Text(
         modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
         text = "Кинокомпании",
@@ -259,7 +275,7 @@ fun SeriesProductionCompanies(productionCompanies: List<String>) {
     ) {
         itemsIndexed(productionCompanies) { _, company ->
             Text(
-                text = company,
+                text = company.name,
                 color = Color.Gray,
                 fontSize = 14.sp,
                 modifier = Modifier
@@ -279,7 +295,11 @@ fun TopSeriesBar(
     userFavoriteInSeries: UserFavoriteInSeries?,
     navHostController: NavHostController
 ) {
-    val alpha = min(1f, (scrollState.value.toFloat() / scrollState.maxValue) * 1.5f)
+    val alpha = if (scrollState.maxValue > 0) {
+        min(1f, (scrollState.value.toFloat() / scrollState.maxValue) * 1.5f)
+    } else {
+        0f
+    }
     val primaryColor = MaterialTheme.colorScheme.primary
     val isFavorite = userFavoriteInSeries != null
     val favIcon = if (isFavorite) painterResource(R.drawable.ic_star_full2)
@@ -290,12 +310,12 @@ fun TopSeriesBar(
             .padding(paddingValues)
             .fillMaxWidth()
             .height(60.dp)
-            .background(primaryColor.copy(alpha = alpha)),
+            .background(color = primaryColor.copy(alpha = alpha)),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = Icons.Filled.KeyboardArrowLeft,
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
             contentDescription = null,
             modifier = Modifier
                 .padding(8.dp)
@@ -390,7 +410,7 @@ fun SeriesDownloads(seasons: List<Season>, seriesEpisodes: List<Episode>) {
 
 @Composable
 fun SeriesContryYearStatus(
-    country: List<String>,
+    country: String,
     releaseDate: String,
     movieStatus: String
 ) {
@@ -402,7 +422,7 @@ fun SeriesContryYearStatus(
     ) {
         infoColums.forEachIndexed { index, columnName ->
             val info = when (index) {
-                0 -> country.joinToString(", ")
+                0 -> country
                 1 -> releaseDate.take(4)
                 2 -> movieStatus
                 else -> ""

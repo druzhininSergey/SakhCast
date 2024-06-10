@@ -3,6 +3,7 @@ package com.example.sakhcast.ui.main_screens.home_screen.movie
 import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,8 +31,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.example.sakhcast.MOVIE_VIEW
 import com.example.sakhcast.R
 import com.example.sakhcast.model.MovieCard
 import java.util.Locale
@@ -54,9 +57,12 @@ fun PreviewMovieItemView() {
 }
 
 @Composable
-fun MovieItemView(movieCard: MovieCard) {
-    Box {
+fun MovieItemView(movieCard: MovieCard, navHostController: NavHostController) {
+    Box(
+        Modifier.clickable { navHostController.navigate("${MOVIE_VIEW}/${movieCard.idAlpha}") }
+    ) {
         Column() {
+
             MovieCard(movieCard)
             Text(
                 text = movieCard.ruTitle,

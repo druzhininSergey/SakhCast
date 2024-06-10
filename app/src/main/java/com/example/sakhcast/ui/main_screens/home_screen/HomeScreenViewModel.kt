@@ -41,13 +41,11 @@ class HomeScreenViewModel @Inject constructor(private val sakhCastRepository: Sa
                 seriesList = seriesList,
                 moviesList = moviesList,
             )
-
         }
     }
 
 
     private fun convertSeconds(seconds: Int) {
-        Log.e("!!!", "seconds = $seconds")
         viewModelScope.launch {
             val hours = seconds / 3600
             val remainingSecondsAfterHours = seconds % 3600

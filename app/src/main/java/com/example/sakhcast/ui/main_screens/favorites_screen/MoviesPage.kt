@@ -17,12 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.sakhcast.Dimens
 import com.example.sakhcast.model.MovieCard
 import com.example.sakhcast.ui.main_screens.home_screen.movie.MovieItemView
 
 @Composable
-fun MoviesPage(movieCardsWillWatch: List<MovieCard>) {
+fun MoviesPage(movieCardsWillWatch: List<MovieCard>, navHostController: NavHostController) {
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -48,7 +49,7 @@ fun MoviesPage(movieCardsWillWatch: List<MovieCard>) {
             horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding)
         ) {
             itemsIndexed(movieCardsWillWatch) { _, movie ->
-                MovieItemView(movieCard = movie)
+                MovieItemView(movieCard = movie, navHostController = navHostController)
             }
         }
     }
