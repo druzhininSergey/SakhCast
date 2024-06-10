@@ -34,8 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -145,6 +143,15 @@ fun LogInScreen(
         if (!logInScreenState.value.isPasswordCorrect) {
             Text(
                 text = "Неверный логин или пароль",
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .background(shape = RoundedCornerShape(10.dp), color = Colors.errorColor)
+                    .padding(8.dp),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        } else if (!logInScreenState.value.isUserPro) {
+            Text(
+                text = "У вас не активна PRO подписка",
                 modifier = Modifier
                     .padding(top = 20.dp)
                     .background(shape = RoundedCornerShape(10.dp), color = Colors.errorColor)

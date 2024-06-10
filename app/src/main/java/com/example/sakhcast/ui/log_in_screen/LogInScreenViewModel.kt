@@ -30,6 +30,7 @@ class LogInScreenViewModel @Inject constructor(
         var curentUser: CurentUser? = null,
         var isLogged: Boolean? = null,
         var isPasswordCorrect: Boolean = true,
+        var isUserPro: Boolean = true,
     )
 
     private fun generateToken(length: Int = 36): String {
@@ -63,16 +64,27 @@ class LogInScreenViewModel @Inject constructor(
         viewModelScope.launch {
             val token = generateToken()
             saveUserTokenInSharedPrefs(token)
-            val state: LoginResponse? = sakhCastRepository.userLogin(loginInput, passwordInput)
-            Log.e("!!!", "userResponse = $state")
-            if (state != null && state.user.pro) {
-                val user = state.user
+            val loginResponse: LoginResponse? =
+                sakhCastRepository.userLogin(loginInput, passwordInput)
+            Log.e("!!!", "userResponse = $loginResponse")
+            if (loginResponse != null && loginResponse.user.pro) {
+                val user = loginResponse.user
                 _userDataState.value = userDataState.value?.copy(
                     curentUser = user,
                     isLogged = true,
-                    isPasswordCorrect = true
+                    isPasswordCorrect = true,
+                    isUserPro = true
                 )
-            } else if (state == null) {
+            } else if (loginResponse != null && !loginResponse.user.pro) {
+                Log.i("!!!!", "userPro = ${loginResponse.user.pro}")
+                _userDataState.value = userDataState.value?.copy(
+                    curentUser = null,
+                    isLogged = false,
+                    isPasswordCorrect = true,
+                    isUserPro = false
+                )
+                saveUserTokenInSharedPrefs("")
+            } else if (loginResponse == null) {
                 Log.i("!!!", "Сработала ветка где isPassCorr = false")
                 _userDataState.value = userDataState.value?.copy(isPasswordCorrect = false)
                 saveUserTokenInSharedPrefs("")
