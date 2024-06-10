@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.sakhcast.Dimens
 import com.example.sakhcast.model.SeriesCard
 import com.example.sakhcast.ui.main_screens.home_screen.series.SeriesItemView
@@ -27,7 +28,8 @@ import com.example.sakhcast.ui.main_screens.home_screen.series.SeriesItemView
 fun SeriesPage(
     seriesCardWatching: List<SeriesCard>,
     seriesCardWillWatch: List<SeriesCard>,
-    seriesCardFinishedWatching: List<SeriesCard>
+    seriesCardFinishedWatching: List<SeriesCard>,
+    navHostController: NavHostController
 ) {
     val categoryNames = listOf("Cмотрю", "Буду смотреть", "Досмотрел")
     val scrollState = rememberScrollState()
@@ -67,7 +69,7 @@ fun SeriesPage(
                         else -> emptyList()
                     }
                 ) { _, series ->
-                    SeriesItemView(seriesCard = series)
+                    SeriesItemView(seriesCard = series, navHostController = navHostController)
                 }
             }
         }

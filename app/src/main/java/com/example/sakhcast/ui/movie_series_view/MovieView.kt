@@ -29,7 +29,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -252,7 +251,7 @@ fun MovieViewsCountInfo(views: Int, favorites: Int) {
 }
 
 @Composable
-fun MovieRecomendations(movieRecomendations: List<MovieCard>) {
+fun MovieRecomendations(movieRecomendations: List<MovieCard>, navHostController: NavHostController) {
     Text(
         modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
         text = "Рекомендации",
@@ -266,7 +265,7 @@ fun MovieRecomendations(movieRecomendations: List<MovieCard>) {
         contentPadding = PaddingValues(16.dp)
     ) {
         itemsIndexed(movieRecomendations) { _, movie ->
-            MovieItemView(movieCard = movie)
+            MovieItemView(movieCard = movie, navHostController = navHostController)
         }
     }
     DividerBase()

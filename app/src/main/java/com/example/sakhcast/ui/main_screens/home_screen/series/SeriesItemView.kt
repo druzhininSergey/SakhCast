@@ -3,11 +3,11 @@ package com.example.sakhcast.ui.main_screens.home_screen.series
 import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,9 +31,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.sakhcast.R
+import com.example.sakhcast.SERIES_VIEW
 import com.example.sakhcast.model.SeriesCard
 import java.util.Locale
 
@@ -55,8 +57,10 @@ fun PreviewSeriesItemView() {
 }
 
 @Composable
-fun SeriesItemView(seriesCard: SeriesCard) {
-    Box() {
+fun SeriesItemView(seriesCard: SeriesCard, navHostController: NavHostController) {
+    Box(
+        modifier = Modifier.clickable { navHostController.navigate("${SERIES_VIEW}/${seriesCard.id}") }
+    ) {
         Column() {
             SeriesCard(seriesCard)
             Text(

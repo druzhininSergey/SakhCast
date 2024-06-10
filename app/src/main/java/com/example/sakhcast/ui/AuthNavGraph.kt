@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,7 +47,9 @@ fun AuthNavGraph(
     ) {
 
         composable(HOME_SCREEN) {
-            HomeScreen(paddingValues = paddingValues)
+            HomeScreen(
+                paddingValues = paddingValues, navHostController = navHostController
+            )
         }
         composable(CATALOG_SCREEN) {
             val catalogScreenViewModel = hiltViewModel<CatalogScreenViewModel>()
@@ -60,7 +63,7 @@ fun AuthNavGraph(
             val favoritesScreenState = favoritesScreenViewModel.favoritesScreenState.observeAsState(
                 FavoritesScreenViewModel.FavoritesScreenState()
             )
-            FavoritesScreen(paddingValues = paddingValues, favoritesScreenState)
+            FavoritesScreen(paddingValues, favoritesScreenState, navHostController)
         }
         composable(NOTIFICATION_SCREEN) {
             val notificationScreenViewModel: NotificationScreenViewModel = hiltViewModel()
@@ -68,20 +71,23 @@ fun AuthNavGraph(
                 notificationScreenViewModel.notificationScreenState.observeAsState(
                     NotificationScreenViewModel.NotificationScreenState()
                 )
-            NotificationScreen(paddingValues = paddingValues, notificationScreenState)
+            NotificationScreen(paddingValues, notificationScreenState)
         }
         composable(SEARCH_SCREEN) {
             SearchScreen()
         }
-        composable(MOVIE_VIEW) {
+        composable("$MOVIE_VIEW/{movieId}") {
             val movieViewModel: MovieViewModel = hiltViewModel()
             val movieState = movieViewModel.movieState.observeAsState(MovieViewModel.MovieState())
             MovieView(paddingValues, navHostController, movieState)
         }
-        composable(SERIES_VIEW) {
+        composable("$SERIES_VIEW/{seriesId}") {
             val seriesViewModel: SeriesViewModel = hiltViewModel()
             val seriesState =
                 seriesViewModel.seriesState.observeAsState(SeriesViewModel.SeriesState())
+            val seriesId = 1 //navHostController.currentBackStackEntry?.arguments?.getInt("seriesId")
+            Log.i("!!!", "series id = $seriesId")
+            seriesViewModel.getFullSeries(seriesId)
             SeriesView(paddingValues, navHostController, seriesState)
         }
         composable("$MOVIE_CATEGORY_SCREEN/{category}") {

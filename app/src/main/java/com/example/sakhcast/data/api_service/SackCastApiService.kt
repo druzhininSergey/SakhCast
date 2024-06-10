@@ -3,12 +3,15 @@ package com.example.sakhcast.data.api_service
 import com.example.sakhcast.model.CurentUser
 import com.example.sakhcast.model.LastWatched
 import com.example.sakhcast.model.LoginResponse
+import com.example.sakhcast.model.Movie
 import com.example.sakhcast.model.MovieList
 import com.example.sakhcast.model.ResultLogout
+import com.example.sakhcast.model.Series
 import com.example.sakhcast.model.SeriesList
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SackCastApiService {
@@ -41,4 +44,14 @@ interface SackCastApiService {
         @Query("page") page: Int,
         @Query("amount") amount: Int = 40
     ): Call<MovieList>
+
+    @GET("serials/get")
+    fun getSeriesById(
+        @Query("id") id: Int
+    ): Call<Series>
+
+    @GET("v2/movie/{movie}")
+    fun getMovieByAlphaId(
+        @Path("movie") movieAlphaId: String
+    ): Call<Movie>
 }

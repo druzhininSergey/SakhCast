@@ -25,7 +25,7 @@ import com.example.sakhcast.ui.profile_screen.ProfileScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(user: CurentUser?) {
-    Log.i("!!!","user isNull?? = $user")
+//    Log.i("!!!","user isNull?? = $user")
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val avatarPainter: Painter =
         rememberAsyncImagePainter(

@@ -5,8 +5,10 @@ import com.example.sakhcast.data.api_service.SackCastApiService
 import com.example.sakhcast.model.CurentUser
 import com.example.sakhcast.model.LastWatched
 import com.example.sakhcast.model.LoginResponse
+import com.example.sakhcast.model.Movie
 import com.example.sakhcast.model.MovieList
 import com.example.sakhcast.model.ResultLogout
+import com.example.sakhcast.model.Series
 import com.example.sakhcast.model.SeriesList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -84,8 +86,8 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "SeriesList from repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
-                Log.i("!!!", "series homescreen list = exeption")
-                Log.i("!!!", "${e.message}")
+//                Log.i("!!!", "series homescreen list = exeption")
+//                Log.i("!!!", "${e.message}")
                 null
             }
         }
@@ -96,11 +98,43 @@ class SakhCastRepository @Inject constructor(
             try {
                 val moviesListCall = sackCastApiService.getMoviesByCategoryName(categoryName, page)
                 val responseBody = moviesListCall.execute()
-                Log.i("!!!", "SeriesList from repo = ${responseBody.body()}")
+//                Log.i("!!!", "MoviesList from repo = ${responseBody.body()}")
+//                Log.i("!!!", "MoviesList code from repo = ${responseBody.code()}")
+
                 responseBody.body()
-            } catch (e: Exception){
-                Log.i("!!!", "movies homescreen list = exeption")
+            } catch (e: Exception) {
+//                Log.i("!!!", "movies homescreen list = exeption")
+//                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
+    suspend fun getSeriesById(seriesId: Int): Series? {
+        return withContext(ioDispatcher) {
+            try {
+                val seriesCall = sackCastApiService.getSeriesById(seriesId)
+                val responseBody = seriesCall.execute()
+                Log.i("!!!", "SeriesById = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+                Log.i("!!!", "seriesById = exeption")
                 Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
+    suspend fun getMovieByAlphaId(movieAlphaId: String): Movie? {
+        return withContext(ioDispatcher) {
+            try {
+                val movieCall = sackCastApiService.getMovieByAlphaId(movieAlphaId)
+                val responseBody = movieCall.execute()
+//                Log.i("!!!", "MovieById from repo = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+//                Log.i("!!!", "movieById = exeption")
+//                Log.i("!!!", "${e.message}")
                 null
             }
         }

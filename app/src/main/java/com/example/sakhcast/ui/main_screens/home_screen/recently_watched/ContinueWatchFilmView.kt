@@ -3,6 +3,7 @@ package com.example.sakhcast.ui.main_screens.home_screen.recently_watched
 import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,9 +25,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.sakhcast.Dimens
+import com.example.sakhcast.MOVIE_VIEW
 import com.example.sakhcast.model.MovieRecent
 
 @Preview(showBackground = true)
@@ -37,7 +40,12 @@ fun Preview2() {
 
 @Preview(showBackground = true)
 @Composable
-fun ContinueWatchMovieView(movieCard: MovieRecent, lastWatchedMovieTime: String) {
+fun ContinueWatchMovieView(
+    movieCard: MovieRecent,
+    lastWatchedMovieTime: String,
+    navHostController: NavHostController
+) {
+
     val context = LocalContext.current
     val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         movieCard.data.backdropAlt + ".avif"
@@ -58,7 +66,8 @@ fun ContinueWatchMovieView(movieCard: MovieRecent, lastWatchedMovieTime: String)
         modifier = Modifier
             .height(234.dp)
             .width(416.dp)
-            .padding(Dimens.mainPadding),
+            .padding(Dimens.mainPadding)
+            .clickable { navHostController.navigate("${MOVIE_VIEW}/${movieCard.data.idAlpha}") },
     ) {
         Box {
             Image(

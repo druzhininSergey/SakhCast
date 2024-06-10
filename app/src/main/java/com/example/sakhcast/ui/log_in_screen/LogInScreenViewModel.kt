@@ -35,7 +35,7 @@ class LogInScreenViewModel @Inject constructor(
             val token = generateToken()
             _userDataState.value = userDataState.value?.copy(userToken = token)
             val x = getIsLoggedInDataStore()
-            Log.i("!!!", "is logged = ${x}")
+//            Log.i("!!!", "is logged = ${x}")
         }
     }
 
@@ -58,7 +58,7 @@ class LogInScreenViewModel @Inject constructor(
             val state = sakhCastRepository.userLogin(loginInput, passwordInput)
             val user = state?.user
             val isLogged = state?.user?.authorized
-            Log.i("!!!", "isLogged = $isLogged")
+//            Log.i("!!!", "isLogged = $isLogged")
             _userDataState.value = userDataState.value?.copy(
                 curentUser = user,
                 isLogged = isLogged,
@@ -73,7 +73,7 @@ class LogInScreenViewModel @Inject constructor(
             _userDataState.value = userDataState.value?.copy(
                 curentUser = curentUser
             )
-            Log.e("!!!", "userState = ${_userDataState.value?.curentUser}")
+//            Log.e("!!!", "userState = ${_userDataState.value?.curentUser}")
         }
     }
 
@@ -82,16 +82,16 @@ class LogInScreenViewModel @Inject constructor(
             dataStore.edit { preferences ->
                 preferences[booleanPreferencesKey(IS_LOGGED_IN_KEY)] = isLogged
             }
-            Log.i("!!!", "datastore saved preferences")
+//            Log.i("!!!", "datastore saved preferences")
         }
     }
 
     private suspend fun getIsLoggedInDataStore(): Boolean {
         val preferences = dataStore.data.map { preferences ->
-            Log.i("!!!", "datastore inside ${preferences[booleanPreferencesKey(IS_LOGGED_IN_KEY)]}")
+//            Log.i("!!!", "datastore inside ${preferences[booleanPreferencesKey(IS_LOGGED_IN_KEY)]}")
             preferences[booleanPreferencesKey(IS_LOGGED_IN_KEY)] ?: false
         }.first()
-        Log.i("!!!", "datastore $preferences")
+//        Log.i("!!!", "datastore $preferences")
         return preferences
     }
 

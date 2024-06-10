@@ -26,6 +26,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.sakhcast.model.MovieCard
 import com.example.sakhcast.model.SeriesCard
 import kotlinx.coroutines.launch
@@ -34,7 +35,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun FavoritesScreen(
     paddingValues: PaddingValues,
-    favoritesScreenState: State<FavoritesScreenViewModel.FavoritesScreenState>
+    favoritesScreenState: State<FavoritesScreenViewModel.FavoritesScreenState>,
+    navHostController: NavHostController
 ) {
     val seriesCardWatching: List<SeriesCard> = favoritesScreenState.value.seriesCardWatching
     val seriesCardWillWatch: List<SeriesCard> = favoritesScreenState.value.seriesCardWillWatch
@@ -91,8 +93,8 @@ fun FavoritesScreen(
             userScrollEnabled = false
         ) { index ->
             if (index == 0)
-                SeriesPage(seriesCardWatching, seriesCardWillWatch, seriesCardFinishedWatching)
-            else MoviesPage(movieCardsWillWatch = movieCardsWillWatch)
+                SeriesPage(seriesCardWatching, seriesCardWillWatch, seriesCardFinishedWatching, navHostController)
+            else MoviesPage(movieCardsWillWatch = movieCardsWillWatch, navHostController)
         }
     }
 }

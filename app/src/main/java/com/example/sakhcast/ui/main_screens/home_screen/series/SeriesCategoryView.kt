@@ -16,11 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.sakhcast.Dimens
 import com.example.sakhcast.model.SeriesList
 
 @Composable
-fun SeriesCategoryView(seriesList: SeriesList?) {
+fun SeriesCategoryView(seriesList: SeriesList, navHostController: NavHostController) {
     Row(
         modifier = Modifier.padding(start = Dimens.mainPadding),
         verticalAlignment = Alignment.CenterVertically,
@@ -42,11 +43,8 @@ fun SeriesCategoryView(seriesList: SeriesList?) {
         contentPadding = PaddingValues(start = Dimens.mainPadding, end = Dimens.mainPadding),
         horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding)
     ) {
-        if (seriesList?.items != null){
-            itemsIndexed(seriesList.items) { _, item ->
-                SeriesItemView(seriesCard = item)
-            }
+        itemsIndexed(seriesList.items) { _, item ->
+            SeriesItemView(seriesCard = item, navHostController)
         }
-
     }
 }
