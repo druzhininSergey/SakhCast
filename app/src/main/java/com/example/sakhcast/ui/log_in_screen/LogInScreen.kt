@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,13 +34,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.sakhcast.Colors
@@ -49,7 +47,7 @@ import com.example.sakhcast.R
 @Composable
 fun LogInScreen(
     navController: NavHostController,
-    logInScreenViewModel: LogInScreenViewModel = hiltViewModel()
+    logInScreenViewModel: LogInScreenViewModel = hiltViewModel(),
 ) {
     val logInScreenState =
         logInScreenViewModel.userDataState.observeAsState(LogInScreenViewModel.UserDataState())
@@ -57,6 +55,7 @@ fun LogInScreen(
     var password by remember { mutableStateOf("") }
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
     val focusManager = LocalFocusManager.current
+
     Column(
         modifier = Modifier
             .padding()
@@ -64,11 +63,14 @@ fun LogInScreen(
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            modifier = Modifier.padding(top = 50.dp),
-            text = stringResource(id = R.string.sakh_cast),
-            fontSize = 40.sp,
-            fontWeight = FontWeight.Bold
+        Icon(
+            painter = painterResource(id = R.drawable.ic_sakh_tv_logo),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier
+                .padding(top = 80.dp)
+                .width(191.dp)
+                .height(68.dp)
         )
         OutlinedTextField(
             colors = TextFieldDefaults.colors(
@@ -95,7 +97,6 @@ fun LogInScreen(
                 Text(
                     "Логин",
                     color = MaterialTheme.colorScheme.onPrimary,
-//                    modifier = Modifier.clip(CircleShape).background(color = Color.Green)
                 )
             },
             leadingIcon = { Icon(imageVector = Icons.TwoTone.Person, contentDescription = null) },
@@ -138,9 +139,19 @@ fun LogInScreen(
                 }
             }
         )
-        if (logInScreenState.value.isLogged == false) {
+        Log.e("!!!", "isPasswordCorrect = ${logInScreenState.value.isPasswordCorrect}")
+        if (!logInScreenState.value.isPasswordCorrect) {
             Text(
                 text = "Неверный логин или пароль",
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .background(shape = RoundedCornerShape(10.dp), color = Colors.errorColor)
+                    .padding(8.dp),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        } else if (!logInScreenState.value.isUserPro) {
+            Text(
+                text = "У вас не активна PRO подписка",
                 modifier = Modifier
                     .padding(top = 20.dp)
                     .background(shape = RoundedCornerShape(10.dp), color = Colors.errorColor)

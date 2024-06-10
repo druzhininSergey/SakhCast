@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.example.sakhcast.BASE_URL
+import com.example.sakhcast.SHARED_PREFS_TOKEN_KEY
 import com.example.sakhcast.data.api_service.SackCastApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -33,6 +34,12 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class SakhCastModul() {
 
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences("my_prefs", Context.MODE_PRIVATE)
+    }
+
     @Singleton
     @Provides
     fun providePreferencesDataStore(@ApplicationContext appContext: Context): DataStore<Preferences> {
@@ -53,11 +60,12 @@ class SakhCastModul() {
     }
 
     @Provides
-    fun provideHttpClient(): OkHttpClient {
+    fun provideHttpClient(sharedPreferences: SharedPreferences): OkHttpClient {
         val loggingInterceptor =
             HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
         val headerInterceptor = Interceptor { chain ->
             val original = chain.request()
+            val token = sharedPreferences.getString(SHARED_PREFS_TOKEN_KEY, "")
             val requestBuilder = original.newBuilder()
                 .header("Authorization", "f3669e22-82dd-492a-8ed1-8a921fbb9932")
                 .header("X-Force-Code", "1")
