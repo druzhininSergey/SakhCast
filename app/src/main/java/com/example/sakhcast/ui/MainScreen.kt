@@ -28,6 +28,7 @@ fun MainScreen() {
         LogInScreenViewModel.UserDataState()
     )
     logInScreenViewModel.checkLoggedUser()
+    logInScreenViewModel.checkTokenExist()
     val isLogged = loginScreenState.value.isLogged
     val user = loginScreenState.value.curentUser
 
@@ -39,7 +40,10 @@ fun MainScreen() {
 }
 
 @Composable
-fun AuthenticatedMainScreen(navController: NavHostController, user: CurentUser?) {
+fun AuthenticatedMainScreen(
+    navController: NavHostController,
+    user: CurentUser?,
+) {
     val backStackState = navController.currentBackStackEntryAsState().value
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination?.route

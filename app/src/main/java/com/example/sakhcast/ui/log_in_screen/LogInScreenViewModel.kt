@@ -1,20 +1,16 @@
 package com.example.sakhcast.ui.log_in_screen
 
+import android.content.SharedPreferences
 import android.util.Log
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sakhcast.IS_LOGGED_IN_KEY
+import com.example.sakhcast.SHARED_PREFS_TOKEN_KEY
 import com.example.sakhcast.data.repository.SakhCastRepository
 import com.example.sakhcast.model.CurentUser
+import com.example.sakhcast.model.LoginResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.security.SecureRandom
 import java.util.Base64
@@ -22,30 +18,21 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LogInScreenViewModel @Inject constructor(
-    private val dataStore: DataStore<Preferences>,
+    private val sharedPreferences: SharedPreferences,
     private val sakhCastRepository: SakhCastRepository
-) :
-    ViewModel() {
+) : ViewModel() {
 
     private var _userDataState = MutableLiveData(UserDataState())
     val userDataState: LiveData<UserDataState> = _userDataState
 
-    init {
-        viewModelScope.launch {
-            val token = generateToken()
-            _userDataState.value = userDataState.value?.copy(userToken = token)
-            val x = getIsLoggedInDataStore()
-//            Log.i("!!!", "is logged = ${x}")
-        }
-    }
-
     data class UserDataState(
-        var userToken: String = "",
+//        var userToken: String = "",
         var curentUser: CurentUser? = null,
         var isLogged: Boolean? = null,
+        var isPasswordCorrect: Boolean = true,
     )
 
-    fun generateToken(length: Int = 36): String {
+    private fun generateToken(length: Int = 36): String {
         val random = SecureRandom()
         val bytes = ByteArray((length * 3) / 4)
         random.nextBytes(bytes)
@@ -53,54 +40,74 @@ class LogInScreenViewModel @Inject constructor(
             .encodeToString(bytes)
     }
 
-    fun checkUserData(loginInput: String, passwordInput: String) {
-        viewModelScope.launch {
-            val state = sakhCastRepository.userLogin(loginInput, passwordInput)
-            val user = state?.user
-            val isLogged = state?.user?.authorized
-//            Log.i("!!!", "isLogged = $isLogged")
-            _userDataState.value = userDataState.value?.copy(
-                curentUser = user,
-                isLogged = isLogged,
-            )
-            saveIsLoggedInDataStore(isLogged)
+    private fun saveUserTokenInSharedPrefs(userToken: String) {
+        with(sharedPreferences.edit()) {
+            putString(SHARED_PREFS_TOKEN_KEY, userToken)
+            apply()
         }
     }
 
-    fun checkLoggedUser(){
+    fun checkTokenExist() {
         viewModelScope.launch {
-            val curentUser = sakhCastRepository.checkLoginStatus()
-            _userDataState.value = userDataState.value?.copy(
-                curentUser = curentUser
-            )
-//            Log.e("!!!", "userState = ${_userDataState.value?.curentUser}")
+            val token = sharedPreferences.getString(SHARED_PREFS_TOKEN_KEY, "")
+            if (token == "") _userDataState.value =
+                userDataState.value?.copy(isLogged = false)
+            else _userDataState.value = userDataState.value?.copy(isLogged = true)
         }
     }
 
-    private suspend fun saveIsLoggedInDataStore(isLogged: Boolean?) {
-        if (isLogged != null) {
-            dataStore.edit { preferences ->
-                preferences[booleanPreferencesKey(IS_LOGGED_IN_KEY)] = isLogged
+    fun checkUserData(
+        loginInput: String,
+        passwordInput: String
+    ) {
+        viewModelScope.launch {
+            val token = generateToken()
+            saveUserTokenInSharedPrefs(token)
+            val state: LoginResponse? = sakhCastRepository.userLogin(loginInput, passwordInput)
+            Log.e("!!!", "userResponse = $state")
+            if (state != null && state.user.pro) {
+                val user = state.user
+                _userDataState.value = userDataState.value?.copy(
+                    curentUser = user,
+                    isLogged = true,
+                    isPasswordCorrect = true
+                )
+            } else if (state == null) {
+                Log.i("!!!", "Сработала ветка где isPassCorr = false")
+                _userDataState.value = userDataState.value?.copy(isPasswordCorrect = false)
+                saveUserTokenInSharedPrefs("")
             }
-//            Log.i("!!!", "datastore saved preferences")
         }
     }
 
-    private suspend fun getIsLoggedInDataStore(): Boolean {
-        val preferences = dataStore.data.map { preferences ->
-//            Log.i("!!!", "datastore inside ${preferences[booleanPreferencesKey(IS_LOGGED_IN_KEY)]}")
-            preferences[booleanPreferencesKey(IS_LOGGED_IN_KEY)] ?: false
-        }.first()
-//        Log.i("!!!", "datastore $preferences")
-        return preferences
+    fun checkLoggedUser() {
+        viewModelScope.launch {
+//            while (true) {
+            val curentUser = sakhCastRepository.checkLoginStatus()
+            if (curentUser == null) {
+                saveUserTokenInSharedPrefs("")
+                _userDataState.value =
+                    userDataState.value?.copy(isLogged = false)
+//                    break
+            } else {
+                _userDataState.value =
+                    userDataState.value?.copy(
+                        curentUser = curentUser,
+                        isLogged = true,
+                    )
+            }
+//                delay(5000)
+//            }
+        }
     }
 
     fun onLogoutButtonPushed() {
         viewModelScope.launch {
             sakhCastRepository.userLogout()
-            saveIsLoggedInDataStore(false)
+            saveUserTokenInSharedPrefs("")
             _userDataState.value = userDataState.value?.copy(
-                isLogged = false
+                isLogged = false,
+//                isPasswordCorrect = true
             )
         }
     }

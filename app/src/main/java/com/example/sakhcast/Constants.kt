@@ -17,3 +17,7 @@ const val SERIES_VIEW = "series_view"
 const val IS_LOGGED_IN_KEY = "is_logged_in"
 
 const val BASE_URL = "https://api.sakh.tv"
+
+const val USER_TOKEN_KEY = "user_token"
+
+const val SHARED_PREFS_TOKEN_KEY = "shared_preferences_token"
