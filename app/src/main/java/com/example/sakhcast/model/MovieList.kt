@@ -36,7 +36,7 @@ data class MovieCard(
     @SerialName("kp_rating") val kpRating: Double?,
     @SerialName("link") val link: String,
     @SerialName("origin_title") val originTitle: String,
-    @SerialName("progress") val progress: Boolean,
+    @SerialName("progress") val progress: Boolean?,
     @SerialName("release_date") val releaseDate: String,
     @SerialName("ru_title") val ruTitle: String,
     @SerialName("runtime") val runtime: Int,

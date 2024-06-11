@@ -44,13 +44,21 @@ data class SeriesCard(
     @SerialName("new_episodes")
     val newEpisodes: Int,
     @SerialName("progress")
-    val progress: Boolean,
+    val progress: Progress?,
     @SerialName("seasons")
     val seasons: String,
     @SerialName("tvshow")
     val tvshow: String,
     @SerialName("year")
     val year: Int
+)
+
+@Serializable
+data class Progress(
+    val viewed: Int,
+    val amount: Int,
+    val perc: Int,
+    val variant: String,
 )
 
 @Serializable
