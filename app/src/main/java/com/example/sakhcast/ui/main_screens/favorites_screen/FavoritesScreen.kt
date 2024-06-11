@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
@@ -27,8 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.sakhcast.model.MovieCard
-import com.example.sakhcast.model.SeriesCard
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -38,11 +35,11 @@ fun FavoritesScreen(
     favoritesScreenState: State<FavoritesScreenViewModel.FavoritesScreenState>,
     navHostController: NavHostController
 ) {
-    val seriesCardWatching: List<SeriesCard> = favoritesScreenState.value.seriesCardWatching
-    val seriesCardWillWatch: List<SeriesCard> = favoritesScreenState.value.seriesCardWillWatch
-    val seriesCardFinishedWatching: List<SeriesCard> =
+    val seriesCardWatching = favoritesScreenState.value.seriesCardWatching
+    val seriesCardWillWatch = favoritesScreenState.value.seriesCardWillWatch
+    val seriesCardFinishedWatching =
         favoritesScreenState.value.seriesCardFinishedWatching
-    val movieCardsWillWatch: List<MovieCard> = favoritesScreenState.value.movieCardsWillWatch
+    val movieCardsWillWatch = favoritesScreenState.value.movieCardsWillWatch
 
     val tabList = listOf("Сериалы", "Фильмы")
     var tabIndex by remember {
@@ -93,8 +90,13 @@ fun FavoritesScreen(
             userScrollEnabled = false
         ) { index ->
             if (index == 0)
-                SeriesPage(seriesCardWatching, seriesCardWillWatch, seriesCardFinishedWatching, navHostController)
-            else MoviesPage(movieCardsWillWatch = movieCardsWillWatch, navHostController)
+                SeriesPage(
+                    seriesCardWatching,
+                    seriesCardWillWatch,
+                    seriesCardFinishedWatching,
+                    navHostController
+                )
+            else MoviesPage(movieCardsWillWatch, navHostController)
         }
     }
 }

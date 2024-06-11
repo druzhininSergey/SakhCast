@@ -68,4 +68,18 @@ interface SackCastApiService {
         @Query("ref_movie_id") refMovieId: Int
     ): Call<MovieList>
 
+    @GET("v2/catalog/movies/items")
+    fun getMovieFavories(
+        @Query("category") category: String = "favorites",
+        @Query("page") page: Int,
+        @Query("amount") amount: Int = 40,
+    ): Call<MovieList>
+
+    @GET("catalog.items")
+    fun getSeriesFavorites(
+        @Query("category") category: String = "favorites",
+        @Query("page") page: Int,
+        @Query("amount") amount: Int = 40,
+        @Query("kind") kind: String,
+    ): Call<SeriesList>
 }

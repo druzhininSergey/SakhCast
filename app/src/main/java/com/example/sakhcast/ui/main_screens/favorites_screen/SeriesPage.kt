@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -11,7 +12,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,18 +23,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.sakhcast.Colors
 import com.example.sakhcast.Dimens
-import com.example.sakhcast.model.SeriesCard
+import com.example.sakhcast.model.SeriesList
 import com.example.sakhcast.ui.main_screens.home_screen.series.SeriesItemView
 
 @Composable
 fun SeriesPage(
-    seriesCardWatching: List<SeriesCard>,
-    seriesCardWillWatch: List<SeriesCard>,
-    seriesCardFinishedWatching: List<SeriesCard>,
+    seriesCardWatching: SeriesList?,
+    seriesCardWillWatch: SeriesList?,
+    seriesCardFinishedWatching: SeriesList?,
     navHostController: NavHostController
 ) {
-    val categoryNames = listOf("Cмотрю", "Буду смотреть", "Досмотрел")
+    val categoryNames = listOf("Cмотрю", "Буду смотреть", "Перестал")
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
@@ -57,21 +61,43 @@ fun SeriesPage(
                     contentDescription = null
                 )
             }
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = Dimens.mainPadding),
-                horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding)
+            if (
+                seriesCardWatching != null &&
+                seriesCardWillWatch != null &&
+                seriesCardFinishedWatching != null
             ) {
-                itemsIndexed(
-                    when (index) {
-                        0 -> seriesCardWatching
-                        1 -> seriesCardWillWatch
-                        2 -> seriesCardFinishedWatching
-                        else -> emptyList()
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = Dimens.mainPadding),
+                    horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding)
+                ) {
+
+                    itemsIndexed(
+                        when (index) {
+                            0 -> seriesCardWatching.items
+                            1 -> seriesCardWillWatch.items
+                            2 -> seriesCardFinishedWatching.items
+                            else -> emptyList()
+                        }
+                    ) { _, series ->
+                        SeriesItemView(seriesCard = series, navHostController = navHostController)
                     }
-                ) { _, series ->
-                    SeriesItemView(seriesCard = series, navHostController = navHostController)
+
+                }
+            } else{
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        trackColor = Colors.blueColor
+                    )
                 }
             }
         }
     }
 }
+
