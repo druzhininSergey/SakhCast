@@ -5,14 +5,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Movie(
-    @SerialName("ad") val ad: Boolean,
+    @SerialName("ad") val ad: Boolean?,
     @SerialName("adult") val adult: Boolean,
     @SerialName("agelimits") val agelimits: Int,
     @SerialName("audio_tracks") val audioTracks: List<AudioTrack>,
     @SerialName("backdrop") val backdrop: String,
     @SerialName("backdrop_alt") val backdropAlt: String,
     @SerialName("backdrop_colors") val backdropColors: BackdropColors,
-    @SerialName("budget") val budget: Int,
+    @SerialName("budget") val budget: Int?,
     @SerialName("create_date") val createDate: String,
     @SerialName("downloads") val downloads: List<Download>,
     @SerialName("favorites") val favorites: Int,
@@ -33,16 +33,16 @@ data class Movie(
     @SerialName("poster") val poster: String,
     @SerialName("poster_alt") val posterAlt: String,
     @SerialName("poster_colors") val posterColors: PosterColors,
-    @SerialName("production_companies") val productionCompanies: List<ProductionCompany>,
+    @SerialName("production_companies") val productionCompanies: List<ProductionCompany>?,
     @SerialName("production_countries") val productionCountries: List<ProductionCountry>,
     @SerialName("release_date") val releaseDate: String,
-    @SerialName("revenue") val revenue: Int,
+    @SerialName("revenue") val revenue: Int?,
     @SerialName("ru_title") val ruTitle: String,
     @SerialName("runtime") val runtime: Int,
     @SerialName("sources") val sources: Sources,
     @SerialName("status") val status: String,
     @SerialName("subtitles") val subtitles: List<Subtitle>,
-    @SerialName("tagline") val tagline: String,
+    @SerialName("tagline") val tagline: String?,
     @SerialName("url") val url: String,
     @SerialName("user") val userFavourite: UserFavourite,
     @SerialName("views") val views: Int,
@@ -78,15 +78,15 @@ data class Download(
 
 @Serializable
 data class Cast(
-    @SerialName("voice_actor") val voiceActor: List<Person>?,
-    @SerialName("designer") val designer: List<Person>?,
-    @SerialName("actor") val actor: List<Person>?,
-    @SerialName("composer") val composer: List<Person>?,
-    @SerialName("director") val director: List<Person>?,
-    @SerialName("producer") val producer: List<Person>?,
-    @SerialName("writer") val writer: List<Person>?,
-    @SerialName("editor") val editor: List<Person>?,
-    @SerialName("operator") val operator: List<Person>?,
+    @SerialName("voice_actor") val voiceActor: List<Person>? = null,
+    @SerialName("designer") val designer: List<Person>? = null,
+    @SerialName("actor") val actor: List<Person>? = null,
+    @SerialName("composer") val composer: List<Person>? = null,
+    @SerialName("director") val director: List<Person>? = null,
+    @SerialName("producer") val producer: List<Person>? = null,
+    @SerialName("writer") val writer: List<Person>? = null,
+    @SerialName("editor") val editor: List<Person>? = null,
+    @SerialName("operator") val operator: List<Person>? = null,
 )
 
 @Serializable
@@ -142,8 +142,8 @@ data class PosterColors(
 @Serializable
 data class ProductionCompany(
     @SerialName("id") val id: Int,
-    @SerialName("logo") val logo: String,
-    @SerialName("logo_alt") val logoAlt: String,
+    @SerialName("logo") val logo: String?,
+    @SerialName("logo_alt") val logoAlt: String?,
     @SerialName("name") val name: String,
     @SerialName("origin_country") val originCountry: String,
 )

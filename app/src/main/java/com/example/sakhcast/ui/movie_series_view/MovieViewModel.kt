@@ -3,28 +3,35 @@ package com.example.sakhcast.ui.movie_series_view
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.sakhcast.data.MovieSample
+import androidx.lifecycle.viewModelScope
+import com.example.sakhcast.data.repository.SakhCastRepository
 import com.example.sakhcast.model.Movie
+import com.example.sakhcast.model.MovieList
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MovieViewModel @Inject constructor() : ViewModel() {
+class MovieViewModel @Inject constructor(private val sakhCastRepository: SakhCastRepository) :
+    ViewModel() {
 
     private var _movieState = MutableLiveData(MovieState())
     val movieState: LiveData<MovieState> = _movieState
 
-    init {
-        getFullMovie()
-    }
-
     data class MovieState(
-        var movie: Movie? = null
+        var movie: Movie? = null,
+        var movieRecomendationsList: MovieList? = null
     )
 
-    fun getFullMovie() {
-        _movieState.value = _movieState.value?.copy(
-            movie = MovieSample.getFullMovie()
-        )
+    fun getFullMovieWithRecomendations(alphaId: String) {
+        viewModelScope.launch {
+            val movie = sakhCastRepository.getMovieByAlphaId(alphaId)
+            val movieRecomendationsList =
+                movie?.id?.let { sakhCastRepository.getMovieRecomendationsByRefId(it) }
+            _movieState.value = movieState.value?.copy(
+                movie = movie,
+                movieRecomendationsList = movieRecomendationsList
+            )
+        }
     }
 }

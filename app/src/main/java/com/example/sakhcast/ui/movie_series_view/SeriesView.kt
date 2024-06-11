@@ -62,8 +62,6 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.sakhcast.R
-import com.example.sakhcast.data.SeriesEpisodesSample
-import com.example.sakhcast.data.SeriesSample
 import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.Genre
 import com.example.sakhcast.model.Network
@@ -101,7 +99,7 @@ fun SeriesView(
             seriesViewModel.getFullSeries(seriesId)
         }
     }
-    seriesViewModel.getFullSeries(seriesId)
+//    seriesViewModel.getFullSeries(seriesId)
     val series = seriesState.value.series //?: throw IllegalStateException("Series is null")
     var seasonId by remember { mutableIntStateOf(series?.seasons?.get(0)?.id ?: 0) }
     Log.e("!!!!", "seasonID = $seasonId")
@@ -137,7 +135,7 @@ fun SeriesView(
     Box() {
         Column(
             modifier = Modifier
-                .padding(paddingValues)
+                .padding(bottom = paddingValues.calculateBottomPadding())
                 .fillMaxSize()
                 .verticalScroll(scrollState)
         ) {
@@ -355,37 +353,43 @@ fun TopSeriesBar(
     val favIcon = if (isFavorite) painterResource(R.drawable.ic_star_full2)
     else painterResource(R.drawable.ic_star_empty2)
 
-    Row(
+    Column(
         modifier = Modifier
-            .padding(paddingValues)
             .fillMaxWidth()
-            .height(60.dp)
-            .background(color = primaryColor.copy(alpha = alpha)),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .height(60.dp + paddingValues.calculateTopPadding())
+            .background(color = primaryColor.copy(alpha = alpha))
     ) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-            contentDescription = null,
+        Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding()))
+        Row(
             modifier = Modifier
-                .padding(8.dp)
-                .size(30.dp)
-                .clickable { navHostController.popBackStack() },
-            tint = Color.White,
-        )
-        Text(
-            text = ruTitle,
-            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = alpha),
-        )
-        Icon(
-            painter = favIcon,
-            contentDescription = null,
-            modifier = Modifier
-                .padding(8.dp)
-                .size(40.dp),
-            tint = if (isFavorite) Color(0xFFFFD700) else Color.White
-        )
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(30.dp)
+                    .clickable { navHostController.popBackStack() },
+                tint = Color.White,
+            )
+            Text(
+                text = ruTitle,
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = alpha),
+            )
+            Icon(
+                painter = favIcon,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(40.dp),
+                tint = if (isFavorite) Color(0xFFFFD700) else Color.White
+            )
+        }
     }
+
 }
 
 @Composable
@@ -404,49 +408,50 @@ fun SeriesDownloads(
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
-    ) {if(seasons.size > 1) {
-        Box(
-            modifier = Modifier
-                .background(color = Color.Transparent)
-        ) {
-            Text(
-                text = seasonSelected,
-                color = MaterialTheme.colorScheme.onSecondary,
+    ) {
+        if (seasons.size > 1) {
+            Box(
                 modifier = Modifier
-                    .background(
-                        color = Color.Gray.copy(alpha = 0.5f),
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .padding(6.dp)
-                    .clickable { isExpanded = true }
-            )
-            DropdownMenu(
-                modifier = Modifier.background(
-                    color = Color.Gray.copy(alpha = 0.5f)
-                ),
-                offset = DpOffset(0.dp, 8.dp),
-                expanded = isExpanded,
-                onDismissRequest = { isExpanded = false },
+                    .background(color = Color.Transparent)
             ) {
-                seasons.forEach { season ->
-                    DropdownMenuItem(
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        text = { Text("Сезон ${season.index}") },
-                        onClick = {
-                            seasonSelected = "Сезон ${season.index}"
-                            isExpanded = false
-                            onSeasonChanged(season.id)
-                        },
-                    )
+                Text(
+                    text = seasonSelected,
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    modifier = Modifier
+                        .background(
+                            color = Color.Gray.copy(alpha = 0.5f),
+                            shape = MaterialTheme.shapes.small
+                        )
+                        .padding(6.dp)
+                        .clickable { isExpanded = true }
+                )
+                DropdownMenu(
+                    modifier = Modifier.background(
+                        color = Color.Gray.copy(alpha = 0.5f)
+                    ),
+                    offset = DpOffset(0.dp, 8.dp),
+                    expanded = isExpanded,
+                    onDismissRequest = { isExpanded = false },
+                ) {
+                    seasons.forEach { season ->
+                        DropdownMenuItem(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            text = { Text("Сезон ${season.index}") },
+                            onClick = {
+                                seasonSelected = "Сезон ${season.index}"
+                                isExpanded = false
+                                onSeasonChanged(season.id)
+                            },
+                        )
+                    }
                 }
-            }
-            LaunchedEffect(isExpanded) {
-                if (isExpanded) {
-                    scrollState.scrollTo(scrollState.maxValue)
+                LaunchedEffect(isExpanded) {
+                    if (isExpanded) {
+                        scrollState.scrollTo(scrollState.maxValue)
+                    }
                 }
             }
         }
-    }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
