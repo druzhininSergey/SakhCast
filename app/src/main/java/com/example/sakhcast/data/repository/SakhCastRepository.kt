@@ -3,6 +3,7 @@ package com.example.sakhcast.data.repository
 import android.util.Log
 import com.example.sakhcast.data.api_service.SackCastApiService
 import com.example.sakhcast.model.CurentUser
+import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.LastWatched
 import com.example.sakhcast.model.LoginResponse
 import com.example.sakhcast.model.Movie
@@ -115,11 +116,11 @@ class SakhCastRepository @Inject constructor(
             try {
                 val seriesCall = sackCastApiService.getSeriesById(seriesId)
                 val responseBody = seriesCall.execute()
-                Log.i("!!!", "SeriesById = ${responseBody.body()}")
+//                Log.i("!!!", "SeriesById = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
-                Log.i("!!!", "seriesById = exeption")
-                Log.i("!!!", "${e.message}")
+//                Log.i("!!!", "seriesById = exeption")
+//                Log.i("!!!", "${e.message}")
                 null
             }
         }
@@ -130,10 +131,26 @@ class SakhCastRepository @Inject constructor(
             try {
                 val movieCall = sackCastApiService.getMovieByAlphaId(movieAlphaId)
                 val responseBody = movieCall.execute()
-//                Log.i("!!!", "MovieById from repo = ${responseBody.body()}")
+                Log.i("!!!", "MovieById from repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
-//                Log.i("!!!", "movieById = exeption")
+                Log.i("!!!", "movieById = exeption")
+                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
+    suspend fun getSeriesEpisodesBySeasonId(seasonId: Int): List<Episode>? {
+        return withContext(ioDispatcher) {
+            try {
+                val episodesListCall = sackCastApiService.getSeriesEpisodesBySeasonId(seasonId)
+                val responseBody = episodesListCall.execute()
+//                Log.i("!!!", "Episodes from repo = ${responseBody.body()}")
+//                Log.i("!!!", "SEASONID REPO = ${seasonId}")
+                responseBody.body()
+            } catch (e: Exception) {
+//                Log.i("!!!", "Episodes = exeption")
 //                Log.i("!!!", "${e.message}")
                 null
             }

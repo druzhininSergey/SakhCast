@@ -1,6 +1,7 @@
 package com.example.sakhcast.data.api_service
 
 import com.example.sakhcast.model.CurentUser
+import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.LastWatched
 import com.example.sakhcast.model.LoginResponse
 import com.example.sakhcast.model.Movie
@@ -54,4 +55,9 @@ interface SackCastApiService {
     fun getMovieByAlphaId(
         @Path("movie") movieAlphaId: String
     ): Call<Movie>
+
+    @GET("v1/serials/get_episodes")
+    fun getSeriesEpisodesBySeasonId(
+        @Query("season_id") seasonId: Int
+    ): Call<List<Episode>>
 }
