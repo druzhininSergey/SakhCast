@@ -157,4 +157,21 @@ class SakhCastRepository @Inject constructor(
         }
     }
 
+    suspend fun getMovieRecomendationsByRefId(refMovieId: Int): MovieList? {
+        return withContext(ioDispatcher) {
+            try {
+                val movieRecomendationsListCall =
+                    sackCastApiService.getMovieRecomendationsByRefId(refMovieId = refMovieId)
+                val responseBody = movieRecomendationsListCall.execute()
+                Log.i("!!!", "Recomendations list from repo = ${responseBody.body()}")
+                Log.i("!!!", "refMovieId REPO = ${refMovieId}")
+                responseBody.body()
+            } catch (e: Exception) {
+                Log.i("!!!", "Episodes = exeption")
+                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
 }

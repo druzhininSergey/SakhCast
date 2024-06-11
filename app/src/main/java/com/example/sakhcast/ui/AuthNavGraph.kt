@@ -77,9 +77,7 @@ fun AuthNavGraph(
             SearchScreen()
         }
         composable("$MOVIE_VIEW/{movieId}") {
-            val movieViewModel: MovieViewModel = hiltViewModel()
-            val movieState = movieViewModel.movieState.observeAsState(MovieViewModel.MovieState())
-            MovieView(paddingValues, navHostController, movieState)
+            MovieView(paddingValues, navHostController)
         }
         composable("$SERIES_VIEW/{seriesId}") {
             SeriesView(paddingValues, navHostController)

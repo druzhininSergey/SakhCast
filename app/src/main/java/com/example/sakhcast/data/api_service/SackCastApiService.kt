@@ -60,4 +60,12 @@ interface SackCastApiService {
     fun getSeriesEpisodesBySeasonId(
         @Query("season_id") seasonId: Int
     ): Call<List<Episode>>
+
+    @GET("v2/catalog/movies/items")
+    fun getMovieRecomendationsByRefId(
+        @Query("category") category: String = "recommendations",
+        @Query("amount") amount: Int = 40,
+        @Query("ref_movie_id") refMovieId: Int
+    ): Call<MovieList>
+
 }

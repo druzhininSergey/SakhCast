@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.movie_series_view
 
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -35,8 +36,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -47,25 +49,30 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.sakhcast.R
-import com.example.sakhcast.data.MovieSample
 import com.example.sakhcast.model.Cast
 import com.example.sakhcast.model.Download
 import com.example.sakhcast.model.Genre
 import com.example.sakhcast.model.Movie
-import com.example.sakhcast.model.MovieCard
+import com.example.sakhcast.model.MovieList
 import com.example.sakhcast.model.Person
 import com.example.sakhcast.model.ProductionCompany
 import com.example.sakhcast.model.ProductionCountry
+import com.example.sakhcast.model.UserFavourite
 import com.example.sakhcast.ui.DividerBase
 import com.example.sakhcast.ui.main_screens.home_screen.movie.MovieItemView
 import java.util.Locale
@@ -80,23 +87,47 @@ fun PreviewMovieView() {
 @Preview
 @Composable
 fun PreviewMovieInfo() {
-    MovieInfo(MovieSample.getFullMovie())
+//    MovieInfo(MovieSample.getFullMovie(), recomendationList, navHostController)
 }
 
 @Composable
 fun MovieView(
     paddingValues: PaddingValues,
     navHostController: NavHostController,
-    movieState: State<MovieViewModel.MovieState>
+    movieViewModel: MovieViewModel = hiltViewModel()
 ) {
-    val movie = movieState.value.movie ?: throw IllegalStateException("Movie is null")
+    val movieState = movieViewModel.movieState.observeAsState(MovieViewModel.MovieState())
+    val movie = movieState.value.movie //?: throw IllegalStateException("Movie is null")
+    val recomendationList =
+        movieState.value.movieRecomendationsList //?: throw IllegalStateException("Movie is null")
+    val alphaId = navHostController.currentBackStackEntry?.arguments?.getString("movieId")
+    LaunchedEffect(alphaId) {
+        if (alphaId != null) movieViewModel.getFullMovieWithRecomendations(alphaId)
+    }
+
     val scrollState = rememberScrollState()
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
+
+    val context = LocalContext.current
+    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        movie?.posterAlt + ".avif"
+    } else {
+        movie?.posterAlt + ".webp"
+    }
+    val posterPainter: Painter =
+        rememberAsyncImagePainter(
+            ImageRequest.Builder(context).data(data = imageUrl)
+                .apply(block = fun ImageRequest.Builder.() {
+                    crossfade(true)
+                    placeholder(R.drawable.series_poster) // Укажите ресурс-заполнитель
+                    //            error(R.drawable.error) // Укажите ресурс ошибки
+                }).build()
+        )
 
     Box() {
         Column(
             modifier = Modifier
-                .padding(paddingValues)
+                .padding(bottom = paddingValues.calculateBottomPadding())
                 .fillMaxSize()
                 .verticalScroll(scrollState)
         ) {
@@ -108,7 +139,7 @@ fun MovieView(
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.movie_poster),
+                    painter = posterPainter,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxSize()
@@ -164,32 +195,46 @@ fun MovieView(
                             .padding(16.dp)
                     ) {
                         Column {
-                            Text(
-                                text = movie.ruTitle,
-                                fontSize = 25.sp,
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                            Text(
-                                text = movie.originTitle,
-                                fontSize = 18.sp,
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
+                            movie?.ruTitle?.let {
+                                Text(
+                                    text = it,
+                                    fontSize = 25.sp,
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
+                            movie?.originTitle?.let {
+                                Text(
+                                    text = it,
+                                    fontSize = 18.sp,
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
                         }
                     }
                 }
             }
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.primary)) {
-                MovieInfo(movie)
+                if (movie != null && recomendationList != null) {
+                    MovieInfo(movie, recomendationList, navHostController)
+                }
             }
         }
-        TopMovieBar(scrollState, movie.ruTitle, paddingValues = paddingValues, navHostController)
+        movie?.ruTitle?.let {
+            TopMovieBar(
+                scrollState = scrollState,
+                ruTitle = it,
+                paddingValues = paddingValues,
+                navHostController = navHostController,
+                movie.userFavourite
+            )
+        }
 
     }
 }
 
 
 @Composable
-fun MovieInfo(movie: Movie) {
+fun MovieInfo(movie: Movie, recomendationList: MovieList, navHostController: NavHostController) {
     val imdbRating = String.format(Locale.US, "%.1f", movie.imdbRating)
     val kinopoiskRating = String.format(Locale.US, "%.1f", movie.kpRating)
     Column(
@@ -200,9 +245,12 @@ fun MovieInfo(movie: Movie) {
         MovieContryYearStatus(movie.productionCountries, movie.releaseDate, movie.status)
         MovieDownloads(movie.downloads)
         MovieOverview(movie.overview)
-        MovieProductionCompanies(movie.productionCompanies)
+        movie.productionCompanies?.let { MovieProductionCompanies(it) }
         MovieExpandableCastTab(movie.cast)
-//        MovieRecomendations(Samples.getAllMovies()) // TODO Раскоментировать и поставить рекомендации фильмы->catalog->рекомендации
+        MovieRecomendations(
+            navHostController = navHostController,
+            movieRecomendations = recomendationList
+        )
         MovieViewsCountInfo(movie.views, movie.favorites)
     }
 }
@@ -251,7 +299,10 @@ fun MovieViewsCountInfo(views: Int, favorites: Int) {
 }
 
 @Composable
-fun MovieRecomendations(movieRecomendations: List<MovieCard>, navHostController: NavHostController) {
+fun MovieRecomendations(
+    movieRecomendations: MovieList,
+    navHostController: NavHostController
+) {
     Text(
         modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
         text = "Рекомендации",
@@ -264,7 +315,7 @@ fun MovieRecomendations(movieRecomendations: List<MovieCard>, navHostController:
         verticalAlignment = Alignment.CenterVertically,
         contentPadding = PaddingValues(16.dp)
     ) {
-        itemsIndexed(movieRecomendations) { _, movie ->
+        itemsIndexed(movieRecomendations.items) { _, movie ->
             MovieItemView(movieCard = movie, navHostController = navHostController)
         }
     }
@@ -303,41 +354,54 @@ fun TopMovieBar(
     scrollState: ScrollState,
     ruTitle: String,
     paddingValues: PaddingValues,
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    userFavourite: UserFavourite
 ) {
-    val alpha = min(1f, (scrollState.value.toFloat() / scrollState.maxValue) * 2.5f)
+    val alpha = if (scrollState.maxValue > 0) {
+        min(1f, (scrollState.value.toFloat() / scrollState.maxValue) * 1.5f)
+    } else {
+        0f
+    }
     val primaryColor = MaterialTheme.colorScheme.primary
+    val isFavorite = userFavourite.isFav
+    val favIcon = if (isFavorite) painterResource(R.drawable.ic_star_full2)
+    else painterResource(R.drawable.ic_star_empty2)
 
-    Row(
+    Column(
         modifier = Modifier
-            .padding(paddingValues)
             .fillMaxWidth()
-            .height(60.dp)
-            .background(primaryColor.copy(alpha = alpha)),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .height(60.dp + paddingValues.calculateTopPadding())
+            .background(color = primaryColor.copy(alpha = alpha))
     ) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-            contentDescription = null,
+        Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding()))
+        Row(
             modifier = Modifier
-                .padding(8.dp)
-                .size(30.dp)
-                .clickable { navHostController.popBackStack() },
-            tint = Color.White,
-        )
-        Text(
-            text = ruTitle,
-            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = alpha),
-        )
-        Icon(
-            painter = painterResource(id = R.drawable.ic_star_empty2),
-            contentDescription = null,
-            modifier = Modifier
-                .padding(8.dp)
-                .size(40.dp),
-            tint = Color.White
-        )
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(30.dp)
+                    .clickable { navHostController.popBackStack() },
+                tint = Color.White,
+            )
+            Text(
+                text = ruTitle,
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = alpha),
+            )
+            Icon(
+                painter = favIcon,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(40.dp),
+                tint = if (isFavorite) Color(0xFFFFD700) else Color.White
+            )
+        }
     }
 }
 
@@ -472,6 +536,7 @@ fun MovieExpandableCastTab(cast: Cast) {
         targetValue = if (isExpanded) 90f else 0f,
         animationSpec = tween(durationMillis = 300)
     )
+
     Row(
         modifier = Modifier
             .padding(bottom = 40.dp)
@@ -535,6 +600,21 @@ fun MovieExpandableCastTab(cast: Cast) {
 
 @Composable
 fun PersonItem(person: Person) {
+    val context = LocalContext.current
+    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        person.photoAlt + ".avif"
+    } else {
+        person.photoAlt + ".webp"
+    }
+    val personPainter: Painter =
+        rememberAsyncImagePainter(
+            ImageRequest.Builder(context).data(data = imageUrl)
+                .apply(block = fun ImageRequest.Builder.() {
+                    crossfade(true)
+                    placeholder(R.drawable.cast) // Укажите ресурс-заполнитель
+                    //            error(R.drawable.error) // Укажите ресурс ошибки
+                }).build()
+        )
     Column(
         modifier = Modifier
             .width(70.dp)
@@ -543,7 +623,7 @@ fun PersonItem(person: Person) {
         verticalArrangement = Arrangement.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.cast),
+            painter = personPainter,
             contentDescription = null,
             modifier = Modifier
                 .clip(CircleShape)
