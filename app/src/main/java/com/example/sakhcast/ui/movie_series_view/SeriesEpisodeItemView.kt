@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.movie_series_view
 
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,12 +22,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.sakhcast.R
 import com.example.sakhcast.data.SeriesEpisodesSample
 import com.example.sakhcast.model.Episode
@@ -61,11 +66,26 @@ fun SeriesEpisodeView(episodes: List<Episode>) {
 
 @Composable
 fun SeriesEpisodeItemView(seriesEpisode: Episode) {
+    val context = LocalContext.current
+    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        seriesEpisode.previewAlt + ".avif"
+    } else {
+        seriesEpisode.previewAlt + ".webp"
+    }
+    val previewPainter: Painter =
+        rememberAsyncImagePainter(
+            ImageRequest.Builder(context).data(data = imageUrl)
+                .apply(block = fun ImageRequest.Builder.() {
+                    crossfade(true)
+                    placeholder(R.drawable.series_episode_preview) // Укажите ресурс-заполнитель
+                    //            error(R.drawable.error) // Укажите ресурс ошибки
+                }).build()
+        )
     Card(modifier = Modifier.width(190.dp)) {
         Box() {
             Image(
                 modifier = Modifier.height(123.dp),
-                painter = painterResource(id = R.drawable.series_episode_preview),
+                painter = previewPainter,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
             )

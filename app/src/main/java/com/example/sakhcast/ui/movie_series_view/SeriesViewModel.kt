@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sakhcast.data.SeriesEpisodesSample
-import com.example.sakhcast.data.SeriesSample
 import com.example.sakhcast.data.repository.SakhCastRepository
 import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.Series
@@ -14,7 +12,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SeriesViewModel @Inject constructor(private val sakhCastRepository: SakhCastRepository) : ViewModel() {
+class SeriesViewModel @Inject constructor(private val sakhCastRepository: SakhCastRepository) :
+    ViewModel() {
 
     private var _seriesState = MutableLiveData(SeriesState())
     val seriesState: LiveData<SeriesState> = _seriesState
@@ -25,12 +24,20 @@ class SeriesViewModel @Inject constructor(private val sakhCastRepository: SakhCa
     )
 
     fun getFullSeries(seriesId: Int?) {
-        if (seriesId != null)
+        if (seriesId != null) {
+            viewModelScope.launch {
+                val series = sakhCastRepository.getSeriesById(seriesId)
+                _seriesState.value = seriesState.value?.copy(
+                    series = series
+                )
+            }
+        }
+    }
+
+    fun getSeriesEpisodesBySeasonId(seasonId: Int) {
         viewModelScope.launch {
-            val series = sakhCastRepository.getSeriesById(seriesId)
-            _seriesState.value = seriesState.value?.copy(
-                series = series
-            )
+            val episodeList = sakhCastRepository.getSeriesEpisodesBySeasonId(seasonId)
+            _seriesState.value = episodeList?.let { seriesState.value?.copy(episodeList = it) }
         }
     }
 

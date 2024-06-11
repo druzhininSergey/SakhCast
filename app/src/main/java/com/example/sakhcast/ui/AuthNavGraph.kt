@@ -82,13 +82,7 @@ fun AuthNavGraph(
             MovieView(paddingValues, navHostController, movieState)
         }
         composable("$SERIES_VIEW/{seriesId}") {
-            val seriesViewModel: SeriesViewModel = hiltViewModel()
-            val seriesState =
-                seriesViewModel.seriesState.observeAsState(SeriesViewModel.SeriesState())
-            val seriesId = 1 //navHostController.currentBackStackEntry?.arguments?.getInt("seriesId")
-            Log.i("!!!", "series id = $seriesId")
-            seriesViewModel.getFullSeries(seriesId)
-            SeriesView(paddingValues, navHostController, seriesState)
+            SeriesView(paddingValues, navHostController)
         }
         composable("$MOVIE_CATEGORY_SCREEN/{category}") {
             val movieCategoryScreenViewModel = hiltViewModel<MovieCategoryScreenViewModel>()

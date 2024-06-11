@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.movie_series_view
 
+import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -24,7 +25,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.twotone.PlayArrow
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -35,8 +35,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,15 +47,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.sakhcast.R
 import com.example.sakhcast.data.SeriesEpisodesSample
 import com.example.sakhcast.data.SeriesSample
@@ -65,7 +72,6 @@ import com.example.sakhcast.model.Series
 import com.example.sakhcast.model.UserFavoriteInSeries
 import com.example.sakhcast.ui.DividerBase
 import java.util.Locale
-import kotlin.math.max
 import kotlin.math.min
 
 @Preview
@@ -77,20 +83,56 @@ fun PreviewSeriesView() {
 @Preview
 @Composable
 fun PreviewSeriesInfo() {
-    SeriesInfo(SeriesSample.getFullSeries(), SeriesEpisodesSample.getSeriesEpisodesList())
+//    SeriesInfo(SeriesSample.getFullSeries(), SeriesEpisodesSample.getSeriesEpisodesList())
 }
 
 @Composable
 fun SeriesView(
     paddingValues: PaddingValues,
     navHostController: NavHostController,
-    seriesState: State<SeriesViewModel.SeriesState>
+    seriesViewModel: SeriesViewModel = hiltViewModel(),
 ) {
+    val seriesState =
+        seriesViewModel.seriesState.observeAsState(SeriesViewModel.SeriesState())
+    val seriesId =
+        navHostController.currentBackStackEntry?.arguments?.getString("seriesId")?.toIntOrNull()
+    LaunchedEffect(seriesId) {
+        if (seriesId != null) {
+            seriesViewModel.getFullSeries(seriesId)
+        }
+    }
+    seriesViewModel.getFullSeries(seriesId)
     val series = seriesState.value.series //?: throw IllegalStateException("Series is null")
-    Log.i("!!!", "series = $series")
+    var seasonId by remember { mutableIntStateOf(series?.seasons?.get(0)?.id ?: 0) }
+    Log.e("!!!!", "seasonID = $seasonId")
+    LaunchedEffect(series) {
+        seasonId = series?.seasons?.getOrNull(0)?.id ?: 0
+    }
+
+    SideEffect {
+        if (seasonId != 0) {
+            seriesViewModel.getSeriesEpisodesBySeasonId(seasonId)
+        }
+    }
     val seriesEpisodes = seriesState.value.episodeList
     val scrollState = rememberScrollState()
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
+
+    val context = LocalContext.current
+    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        series?.posterAlt + ".avif"
+    } else {
+        series?.posterAlt + ".webp"
+    }
+    val posterPainter: Painter =
+        rememberAsyncImagePainter(
+            ImageRequest.Builder(context).data(data = imageUrl)
+                .apply(block = fun ImageRequest.Builder.() {
+                    crossfade(true)
+                    placeholder(R.drawable.series_poster) // Укажите ресурс-заполнитель
+                    //            error(R.drawable.error) // Укажите ресурс ошибки
+                }).build()
+        )
 
     Box() {
         Column(
@@ -107,7 +149,7 @@ fun SeriesView(
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.series_poster),
+                    painter = posterPainter,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxSize()
@@ -182,7 +224,11 @@ fun SeriesView(
                 }
             }
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.primary)) {
-                series?.let { SeriesInfo(it, seriesEpisodes) }
+                series?.let {
+                    SeriesInfo(it, seriesEpisodes) { newSeasonId ->
+                        seasonId = newSeasonId
+                    }
+                }
             }
         }
         series?.name?.let {
@@ -196,7 +242,11 @@ fun SeriesView(
 
 
 @Composable
-fun SeriesInfo(series: Series, seriesEpisodes: List<Episode>) {
+fun SeriesInfo(
+    series: Series,
+    seriesEpisodes: List<Episode>,
+    onSeasonChanged: (Int) -> Unit
+) {
     val imdbRating = String.format(Locale.US, "%.1f", series.imdbRating)
     val kinopoiskRating = String.format(Locale.US, "%.1f", series.kpRating)
     val year = if (series.yearEnd == 0) "${series.year} - ..."
@@ -208,7 +258,7 @@ fun SeriesInfo(series: Series, seriesEpisodes: List<Episode>) {
         SeriesGenres(series.genres)
         SeriesRating(imdbRating = imdbRating, kinopoiskRating = kinopoiskRating)
         SeriesContryYearStatus(series.country, year, series.status)
-        SeriesDownloads(series.seasons, seriesEpisodes)
+        SeriesDownloads(series.seasons, seriesEpisodes, onSeasonChanged)
         SeriesOverview(series.about)
         SeriesProductionCompanies(series.networks)
         SeriesViewsCountInfo(series.views, series.favAmount)
@@ -339,7 +389,12 @@ fun TopSeriesBar(
 }
 
 @Composable
-fun SeriesDownloads(seasons: List<Season>, seriesEpisodes: List<Episode>) {
+fun SeriesDownloads(
+    seasons: List<Season>,
+    seriesEpisodes: List<Episode>,
+    onSeasonChanged: (Int) -> Unit,
+) {
+
     var isExpanded by remember { mutableStateOf(false) }
     var seasonSelected by remember { mutableStateOf("Сезон ${seasons[0].index}") }
     val scrollState = rememberScrollState()
@@ -349,7 +404,7 @@ fun SeriesDownloads(seasons: List<Season>, seriesEpisodes: List<Episode>) {
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
-    ) {
+    ) {if(seasons.size > 1) {
         Box(
             modifier = Modifier
                 .background(color = Color.Transparent)
@@ -380,6 +435,7 @@ fun SeriesDownloads(seasons: List<Season>, seriesEpisodes: List<Episode>) {
                         onClick = {
                             seasonSelected = "Сезон ${season.index}"
                             isExpanded = false
+                            onSeasonChanged(season.id)
                         },
                     )
                 }
@@ -390,6 +446,7 @@ fun SeriesDownloads(seasons: List<Season>, seriesEpisodes: List<Episode>) {
                 }
             }
         }
+    }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
