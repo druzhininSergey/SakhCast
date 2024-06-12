@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.main_screens.home_screen
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -31,7 +30,7 @@ class HomeScreenViewModel @Inject constructor(private val sakhCastRepository: Sa
         viewModelScope.launch {
             val lastWatched = sakhCastRepository.getContinueWatchMovieAndSerias()
             val seriesList =
-                sakhCastRepository.getSeriesListPopular(categoryName = "all", page = 0)
+                sakhCastRepository.getSeriesListByCategoryName(categoryName = "all", page = 0)
             val moviesList =
                 sakhCastRepository.getMoviesListByCategoryName(categoryName = "all", page = 0)
             lastWatched?.movie?.data?.userFavourite?.position?.let { convertSeconds(it) }

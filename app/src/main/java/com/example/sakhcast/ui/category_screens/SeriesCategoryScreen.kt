@@ -64,9 +64,10 @@ fun SeriesCategoryScreen(
             verticalArrangement = Arrangement.spacedBy(Dimens.mainPadding),
             contentPadding = PaddingValues(Dimens.mainPadding)
         ) {
-            itemsIndexed(seriesList) { _, series ->
-                SeriesCategoryCardItem(series, navHostController)
-            }
+            if (seriesList != null)
+                itemsIndexed(seriesList.items) { _, series ->
+                    SeriesCategoryCardItem(series, navHostController)
+                }
         }
     }
 }

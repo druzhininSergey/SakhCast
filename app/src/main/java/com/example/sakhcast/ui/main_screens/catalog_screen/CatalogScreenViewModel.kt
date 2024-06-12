@@ -3,6 +3,7 @@ package com.example.sakhcast.ui.main_screens.catalog_screen
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.sakhcast.data.repository.SakhCastRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -23,19 +24,27 @@ class CatalogScreenViewModel @Inject constructor() : ViewModel() {
             "Свежее",
             "Новинки",
             "Сейчас смотрят",
-            "Мировой топ",
             "Российский топ",
-            "Жанры"
+            "Мировой топ",
+            "Боевики",
+            "Комедии",
+            "Мультфильмы",
+            "Стендап"
         )
 
         fun getSeriesCategories(): List<String> = listOf(
             "Все",
-            "Свежее",
             "Новинки",
-            "Сейчас смотрят",
-            "Мировой топ",
             "Российский топ",
-            "Жанры"
+            "Мировой топ",
+            "Сейчас смотрят",
+            "По алфавиту",
+            "Мини-сериалы",
+            "Документальные",
+            "Подкасты",
+            "Аниме",
+            "Мультсериалы",
+            "Комедии"
         )
     }
 

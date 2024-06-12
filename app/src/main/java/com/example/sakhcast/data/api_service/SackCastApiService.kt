@@ -39,6 +39,14 @@ interface SackCastApiService {
         @Query("amount") amount: Int = 40,
     ): Call<SeriesList>
 
+    @GET("v1/catalog/items")
+    fun getSeriesListByGenre(
+        @Query("category") category: String = "genre",
+        @Query("page") page: Int,
+        @Query("amount") amount: Int = 40,
+        @Query("genres") genres: String,
+    ): Call<SeriesList>
+
     @GET("v2/catalog/movies/items")
     fun getMoviesByCategoryName(
         @Query("category") category: String,
