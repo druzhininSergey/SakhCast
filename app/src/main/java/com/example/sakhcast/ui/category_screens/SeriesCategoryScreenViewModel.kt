@@ -3,13 +3,16 @@ package com.example.sakhcast.ui.category_screens
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.sakhcast.data.Samples
-import com.example.sakhcast.model.SeriesCard
+import androidx.lifecycle.viewModelScope
+import com.example.sakhcast.data.repository.SakhCastRepository
+import com.example.sakhcast.model.SeriesList
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SeriesCategoryScreenViewModel @Inject constructor() : ViewModel() {
+class SeriesCategoryScreenViewModel @Inject constructor(private val sakhCastRepository: SakhCastRepository) :
+    ViewModel() {
 
     private var _seriesCategoryScreenState = MutableLiveData(SeriesCategoryScreenState())
     val seriesCategoryScreenState: LiveData<SeriesCategoryScreenState> = _seriesCategoryScreenState
@@ -21,15 +24,42 @@ class SeriesCategoryScreenViewModel @Inject constructor() : ViewModel() {
     }
 
     data class SeriesCategoryScreenState(
-        var seriesList: List<SeriesCard> = emptyList(),
+        var seriesList: SeriesList? = null,
         var categoryName: String = "",
     )
 
 //    fun getSeriesList() = Samples.getAllSeries()
 
     fun getSelectedCategoryName(categoryName: String) {
-        _seriesCategoryScreenState.value =
-            seriesCategoryScreenState.value?.copy(categoryName = categoryName)
+        viewModelScope.launch {
+            val categoryList = mapOf(
+                "Все" to "all",
+                "Новинки" to "new",
+                "Российский топ" to "top_kp",
+                "Мировой топ" to "top_imdb",
+                "Сейчас смотрят" to "popular",
+                "По алфавиту" to "abc",
+            )
+            var categoryNameUrl = ""
+            val seriesList: SeriesList? =
+                if (categoryName in categoryList) {
+                    categoryNameUrl = categoryList[categoryName] ?: ""
+                    sakhCastRepository.getSeriesListByCategoryName(
+                        categoryName = categoryNameUrl,
+                        page = 0
+                    )
+                } else {
+                    categoryNameUrl = categoryName.lowercase()
+                    sakhCastRepository.getSeriesListByGenre(page = 0, genre = categoryNameUrl)
+                }
+
+            _seriesCategoryScreenState.value =
+                seriesCategoryScreenState.value?.copy(
+                    seriesList = seriesList,
+                    categoryName = categoryName,
+                )
+        }
+
     }
 
 }
