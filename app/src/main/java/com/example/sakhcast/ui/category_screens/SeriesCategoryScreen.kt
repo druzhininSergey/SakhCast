@@ -46,9 +46,7 @@ fun SeriesCategoryScreen(
         seriesCategoryScreenViewModel.initCategory(categoryName)
     }
     val lazyGridState = rememberLazyGridState()
-//    val seriesList = seriesCategoryScreenState.seriesList
 
-//    Log.e("!!!", "seriesList = $seriesList")
     Column {
         CenterAlignedTopAppBar(
             title = {

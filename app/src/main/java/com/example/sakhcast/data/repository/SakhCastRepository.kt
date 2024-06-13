@@ -1,6 +1,5 @@
 package com.example.sakhcast.data.repository
 
-import android.util.Log
 import com.example.sakhcast.data.api_service.SakhCastApiService
 import com.example.sakhcast.model.CurentUser
 import com.example.sakhcast.model.Episode
@@ -82,13 +81,13 @@ class SakhCastRepository @Inject constructor(
                 val seriesListCall =
                     sakhCastApiService.getSeriesListByCategoryName(categoryName, page)
                 val responseBody = seriesListCall.execute()
-                Log.i("!!!", "SeriesList from repo = ${responseBody.body()}")
-                Log.i("!!!", "Call repo = $seriesListCall")
-                Log.i("!!!", "SeriesList from repo = $responseBody")
+//                Log.i("!!!", "SeriesList from repo = ${responseBody.body()}")
+//                Log.i("!!!", "Call repo = $seriesListCall")
+//                Log.i("!!!", "SeriesList from repo = $responseBody")
                 responseBody.body()
             } catch (e: Exception) {
-                Log.i("!!!", "series homeScreen list = exception")
-                Log.i("!!!", "${e.message}")
+//                Log.i("!!!", "series homeScreen list = exception")
+//                Log.i("!!!", "${e.message}")
                 null
             }
         }
@@ -100,11 +99,11 @@ class SakhCastRepository @Inject constructor(
                 val seriesListCall =
                     sakhCastApiService.getSeriesListByGenre(page = page, genres = genre)
                 val responseBody = seriesListCall.execute()
-                Log.i("!!!", "SeriesList BY GENRE from repo = ${responseBody.body()}")
+//                Log.i("!!!", "SeriesList BY GENRE from repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
-                Log.i("!!!", "series list BY GENRE = exception")
-                Log.i("!!!", "${e.message}")
+//                Log.i("!!!", "series list BY GENRE = exception")
+//                Log.i("!!!", "${e.message}")
                 null
             }
         }
