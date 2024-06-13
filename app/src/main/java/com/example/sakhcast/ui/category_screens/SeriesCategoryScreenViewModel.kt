@@ -4,9 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.sakhcast.data.repository.SakhCastRepository
-import com.example.sakhcast.model.SeriesList
+import com.example.sakhcast.model.SeriesCard
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,20 +22,18 @@ class SeriesCategoryScreenViewModel @Inject constructor(private val sakhCastRepo
     private var _seriesCategoryScreenState = MutableLiveData(SeriesCategoryScreenState())
     val seriesCategoryScreenState: LiveData<SeriesCategoryScreenState> = _seriesCategoryScreenState
 
-    init {
-        _seriesCategoryScreenState.value = seriesCategoryScreenState.value?.copy(
-//            seriesList = getSeriesList()
-        )
-    }
-
     data class SeriesCategoryScreenState(
-        var seriesList: SeriesList? = null,
-        var categoryName: String = "",
+        var seriesPagingData: Flow<PagingData<SeriesCard>>? = null,
     )
 
-//    fun getSeriesList() = Samples.getAllSeries()
+    fun initCategory(categoryName: String) {
+        if (_seriesCategoryScreenState.value?.seriesPagingData == null) {
+            getSeriesByCategoryName(categoryName)
+        }
+    }
 
-    fun getSelectedCategoryName(categoryName: String) {
+    fun getSeriesByCategoryName(categoryName: String) {
+
         viewModelScope.launch {
             val categoryList = mapOf(
                 "Все" to "all",
@@ -40,26 +43,74 @@ class SeriesCategoryScreenViewModel @Inject constructor(private val sakhCastRepo
                 "Сейчас смотрят" to "popular",
                 "По алфавиту" to "abc",
             )
-            var categoryNameUrl = ""
-            val seriesList: SeriesList? =
+            val genreList = mapOf(
+                "Мини–сериалы" to "мини–сериал",
+                "Документальные" to "документальный",
+                "Подкасты" to "подкаст",
+                "Аниме" to "аниме",
+                "Мультсериалы" to "мультфильм",
+                "Комедии" to "комедия"
+            )
+            var categoryNameUrl =
                 if (categoryName in categoryList) {
-                    categoryNameUrl = categoryList[categoryName] ?: ""
-                    sakhCastRepository.getSeriesListByCategoryName(
-                        categoryName = categoryNameUrl,
-                        page = 0
-                    )
+                    categoryList[categoryName] ?: ""
                 } else {
-                    categoryNameUrl = categoryName.lowercase()
-                    sakhCastRepository.getSeriesListByGenre(page = 0, genre = categoryNameUrl)
+                    genreList[categoryName] ?: ""
                 }
+            val seriesPagingData = Pager(
+                config = PagingConfig(
+                    pageSize = 20,
+                    enablePlaceholders = true
+                ), // Настройте PagingConfig
+                pagingSourceFactory = {
+                    sakhCastRepository.getSeriesByCategoryName(categoryNameUrl)
+                }
+            ).flow.cachedIn(viewModelScope) // Закешируйте данные
 
             _seriesCategoryScreenState.value =
                 seriesCategoryScreenState.value?.copy(
-                    seriesList = seriesList,
-                    categoryName = categoryName,
+                    seriesPagingData = seriesPagingData
                 )
         }
-
     }
+
+//    fun getSeriesListByCategoryName(page: Int, categoryName: String) {
+//        viewModelScope.launch {
+//            val categoryList = mapOf(
+//                "Все" to "all",
+//                "Новинки" to "new",
+//                "Российский топ" to "top_kp",
+//                "Мировой топ" to "top_imdb",
+//                "Сейчас смотрят" to "popular",
+//                "По алфавиту" to "abc",
+//            )
+//            val genreList = mapOf(
+//                "Мини–сериалы" to "мини–сериал",
+//                "Документальные" to "документальный",
+//                "Подкасты" to "подкаст",
+//                "Аниме" to "аниме",
+//                "Мультсериалы" to "мультфильм",
+//                "Комедии" to "комедия"
+//            )
+//            var categoryNameUrl = ""
+//            val seriesList: SeriesList? =
+//                if (categoryName in categoryList) {
+//                    categoryNameUrl = categoryList[categoryName] ?: ""
+//                    sakhCastRepository.getSeriesListByCategoryName(
+//                        categoryName = categoryNameUrl,
+//                        page = 0
+//                    )
+//                } else {
+//                    categoryNameUrl = genreList[categoryName] ?: ""
+//                    sakhCastRepository.getSeriesListByGenre(page = page, genre = categoryNameUrl)
+//                }
+//
+//            _seriesCategoryScreenState.value =
+//                seriesCategoryScreenState.value?.copy(
+//                    seriesList = seriesList,
+//                )
+//        }
+//
+//    }
 
 }

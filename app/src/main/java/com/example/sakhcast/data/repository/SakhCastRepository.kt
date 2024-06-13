@@ -1,7 +1,9 @@
 package com.example.sakhcast.data.repository
 
 import android.util.Log
+import androidx.paging.PagingSource
 import com.example.sakhcast.data.api_service.SackCastApiService
+import com.example.sakhcast.data.paging.SeriesPagingSource
 import com.example.sakhcast.model.CurentUser
 import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.Genre
@@ -11,6 +13,7 @@ import com.example.sakhcast.model.Movie
 import com.example.sakhcast.model.MovieList
 import com.example.sakhcast.model.ResultLogout
 import com.example.sakhcast.model.Series
+import com.example.sakhcast.model.SeriesCard
 import com.example.sakhcast.model.SeriesList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -84,6 +87,8 @@ class SakhCastRepository @Inject constructor(
                     sackCastApiService.getSeriesListByCategoryName(categoryName, page)
                 val responseBody = seriesListCall.execute()
                 Log.i("!!!", "SeriesList from repo = ${responseBody.body()}")
+                Log.i("!!!", "Сall repo = ${seriesListCall}")
+                Log.i("!!!", "SeriesList from repo = ${responseBody}")
                 responseBody.body()
             } catch (e: Exception) {
                 Log.i("!!!", "series homescreen list = exeption")
@@ -219,6 +224,10 @@ class SakhCastRepository @Inject constructor(
                 null
             }
         }
+    }
+
+    fun getSeriesByCategoryName(categoryName: String): PagingSource<Int, SeriesCard> {
+        return SeriesPagingSource(categoryName, sackCastApiService)
     }
 
 }

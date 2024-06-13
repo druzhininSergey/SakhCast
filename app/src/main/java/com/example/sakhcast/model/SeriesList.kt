@@ -13,20 +13,10 @@ data class SeriesList(
 
 @Serializable
 data class SeriesCard(
-    @SerialName("available")
-    val available: Boolean,
-    @SerialName("cover")
-    val cover: String,
     @SerialName("cover_alt")
     val coverAlt: String,
     @SerialName("cover_colors")
-    val coverColors: CoverColors,
-    @SerialName("cover_h")
-    val coverH: Int,
-    @SerialName("cover_lq")
-    val coverLq: String,
-    @SerialName("cover_w")
-    val coverW: Int,
+    val coverColors: CoverColors?,
     @SerialName("id")
     val id: Int,
     @SerialName("imdb")
@@ -37,8 +27,6 @@ data class SeriesCard(
     val kp: Boolean,
     @SerialName("kp_rating")
     val kpRating: Double?,
-    @SerialName("link")
-    val link: String,
     @SerialName("name")
     val name: String,
     @SerialName("new_episodes")
@@ -47,8 +35,6 @@ data class SeriesCard(
     val progress: Progress?,
     @SerialName("seasons")
     val seasons: String,
-    @SerialName("tvshow")
-    val tvshow: String,
     @SerialName("year")
     val year: Int
 )

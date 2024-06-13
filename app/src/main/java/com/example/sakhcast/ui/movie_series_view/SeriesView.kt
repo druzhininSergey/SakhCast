@@ -372,7 +372,7 @@ fun TopSeriesBar(
                 modifier = Modifier
                     .padding(8.dp)
                     .size(30.dp)
-                    .clickable { navHostController.popBackStack() },
+                    .clickable { navHostController.navigateUp() },
                 tint = Color.White,
             )
             Text(

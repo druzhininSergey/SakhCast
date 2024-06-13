@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.category_screens
 
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,16 +23,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.sakhcast.R
 import com.example.sakhcast.SERIES_VIEW
 import com.example.sakhcast.model.SeriesCard
+import java.util.Locale
 
 @Preview(showBackground = true)
 @Composable
@@ -88,11 +94,26 @@ fun SeriesCategoryCard(seriesCard: SeriesCard) {
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(),
     ) {
+        val context = LocalContext.current
+        val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            seriesCard.coverAlt + ".avif"
+        } else {
+            seriesCard.coverAlt + ".webp"
+        }
+        val coverPainter: Painter =
+            rememberAsyncImagePainter(
+                ImageRequest.Builder(context).data(data = imageUrl)
+                    .apply(block = fun ImageRequest.Builder.() {
+                        crossfade(true)
+                        placeholder(R.drawable.series_poster) // Укажите ресурс-заполнитель
+                        //            error(R.drawable.error) // Укажите ресурс ошибки
+                    }).build()
+            )
         Box {
             Image(
                 modifier = Modifier
                     .fillMaxSize(),
-                painter = painterResource(id = R.drawable.series_poster),
+                painter = coverPainter,
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds
             )
@@ -103,52 +124,56 @@ fun SeriesCategoryCard(seriesCard: SeriesCard) {
                 horizontalArrangement = Arrangement.SpaceBetween,
 
                 ) {
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = Color.Gray.copy(alpha = 0.8f),
-                            shape = RoundedCornerShape(8.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        modifier = Modifier.padding(5.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                if (seriesCard.imdb) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = Color.Gray.copy(alpha = 0.8f),
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_imdb),
-                            contentDescription = null
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = 3.dp),
-                            text = seriesCard.imdbRating.toString(),
-                            color = Color.White,
-                            fontSize = 8.sp
-                        )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_imdb),
+                                contentDescription = null
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 3.dp),
+                                text = String.format(Locale.US, "%.1f", seriesCard.imdbRating),
+                                color = Color.White,
+                                fontSize = 8.sp
+                            )
+                        }
                     }
                 }
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = Color.Gray.copy(alpha = 0.7f),
-                            shape = RoundedCornerShape(8.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        modifier = Modifier.padding(5.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                if (seriesCard.kp) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = Color.Gray.copy(alpha = 0.7f),
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_kinopoisk),
-                            contentDescription = null,
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = 3.dp),
-                            text = seriesCard.kpRating.toString(),
-                            color = Color.White,
-                            fontSize = 8.sp
-                        )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_kinopoisk),
+                                contentDescription = null,
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 3.dp),
+                                text = String.format(Locale.US, "%.1f", seriesCard.kpRating),
+                                color = Color.White,
+                                fontSize = 8.sp
+                            )
+                        }
                     }
                 }
             }

@@ -45,7 +45,7 @@ fun MovieCategoryScreen(
                 )
             },
             navigationIcon = {
-                IconButton(onClick = { navHostController.popBackStack() }) {
+                IconButton(onClick = { navHostController.navigateUp() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                         contentDescription = null,

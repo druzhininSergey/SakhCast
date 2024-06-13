@@ -95,16 +95,8 @@ fun AuthNavGraph(
             MovieCategoryScreen(paddingValues, navHostController, moviesCategoryScreenState)
         }
         composable("$SERIES_CATEGORY_SCREEN/{category}") {
-            val seriesCategoryScreenViewModel = hiltViewModel<SeriesCategoryScreenViewModel>()
-            seriesCategoryScreenViewModel.getSelectedCategoryName(
-                navHostController.currentBackStackEntry?.arguments?.getString(
-                    "category"
-                ) ?: "Все"
-            )
-            val seriesCategoryScreenState by seriesCategoryScreenViewModel.seriesCategoryScreenState.observeAsState(
-                SeriesCategoryScreenViewModel.SeriesCategoryScreenState()
-            )
-            SeriesCategoryScreen(paddingValues, navHostController, seriesCategoryScreenState)
+
+            SeriesCategoryScreen(paddingValues, navHostController)
         }
     }
 }
