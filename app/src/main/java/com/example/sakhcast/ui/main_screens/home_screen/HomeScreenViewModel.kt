@@ -28,7 +28,7 @@ class HomeScreenViewModel @Inject constructor(private val sakhCastRepository: Sa
 
     fun getAllScreenData() {
         viewModelScope.launch {
-            val lastWatched = sakhCastRepository.getContinueWatchMovieAndSerias()
+            val lastWatched = sakhCastRepository.getContinueWatchMovieAndSeries()
             val seriesList =
                 sakhCastRepository.getSeriesListByCategoryName(categoryName = "all", page = 0)
             val moviesList =

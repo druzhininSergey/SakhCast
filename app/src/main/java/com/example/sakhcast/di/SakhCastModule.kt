@@ -4,15 +4,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
-import androidx.datastore.migrations.SharedPreferencesMigration
-import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.example.sakhcast.BASE_URL
 import com.example.sakhcast.SHARED_PREFS_TOKEN_KEY
-import com.example.sakhcast.data.api_service.SackCastApiService
+import com.example.sakhcast.data.api_service.SakhCastApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -32,7 +30,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class SakhCastModul() {
+class SakhCastModule {
 
     @Provides
     @Singleton
@@ -89,6 +87,7 @@ class SakhCastModul() {
     }
 
     @Provides
-    fun provideSakhCastApiServise(retrofit: Retrofit): SackCastApiService =
-        retrofit.create(SackCastApiService::class.java)
+    fun provideSakhCastApiService(retrofit: Retrofit): SakhCastApiService =
+        retrofit.create(SakhCastApiService::class.java)
+
 }

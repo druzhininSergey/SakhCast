@@ -15,7 +15,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface SackCastApiService {
+interface SakhCastApiService {
 
     @POST("v1/users/login")
     fun userLogin(
@@ -30,20 +30,20 @@ interface SackCastApiService {
     fun checkLoginStatus(): Call<CurentUser>
 
     @GET("v2/users/continue")
-    fun getContinueWatchMovieAndSerias(): Call<LastWatched>
+    fun getContinueWatchMovieAndSeries(): Call<LastWatched>
 
     @GET("catalog.items")
     fun getSeriesListByCategoryName(
         @Query("category") category: String,
         @Query("page") page: Int,
-        @Query("amount") amount: Int = 40,
+        @Query("amount") amount: Int = 20,
     ): Call<SeriesList>
 
     @GET("v1/catalog/items")
     fun getSeriesListByGenre(
         @Query("category") category: String = "genre",
         @Query("page") page: Int,
-        @Query("amount") amount: Int = 40,
+        @Query("amount") amount: Int = 20,
         @Query("genres") genres: String,
     ): Call<SeriesList>
 
@@ -70,14 +70,14 @@ interface SackCastApiService {
     ): Call<List<Episode>>
 
     @GET("v2/catalog/movies/items")
-    fun getMovieRecomendationsByRefId(
+    fun getMovieRecommendationsByRefId(
         @Query("category") category: String = "recommendations",
         @Query("amount") amount: Int = 40,
         @Query("ref_movie_id") refMovieId: Int
     ): Call<MovieList>
 
     @GET("v2/catalog/movies/items")
-    fun getMovieFavories(
+    fun getMovieFavorites(
         @Query("category") category: String = "favorites",
         @Query("page") page: Int,
         @Query("amount") amount: Int = 40,

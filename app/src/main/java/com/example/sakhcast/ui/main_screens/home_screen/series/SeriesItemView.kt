@@ -1,7 +1,6 @@
 package com.example.sakhcast.ui.main_screens.home_screen.series
 
 import android.os.Build
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -59,7 +58,6 @@ fun PreviewSeriesItemView() {
 
 @Composable
 fun SeriesItemView(seriesCard: SeriesCard, navHostController: NavHostController) {
-//    Log.i("!!!!","seriesId = ${seriesCard.id}")
     Box(
         modifier = Modifier.clickable { navHostController.navigate("${SERIES_VIEW}/${seriesCard.id}") }
     ) {
