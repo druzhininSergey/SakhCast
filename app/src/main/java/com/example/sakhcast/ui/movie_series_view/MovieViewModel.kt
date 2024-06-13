@@ -27,7 +27,7 @@ class MovieViewModel @Inject constructor(private val sakhCastRepository: SakhCas
         viewModelScope.launch {
             val movie = sakhCastRepository.getMovieByAlphaId(alphaId)
             val movieRecomendationsList =
-                movie?.id?.let { sakhCastRepository.getMovieRecomendationsByRefId(it) }
+                movie?.id?.let { sakhCastRepository.getMovieRecommendationsByRefId(it) }
             _movieState.value = movieState.value?.copy(
                 movie = movie,
                 movieRecomendationsList = movieRecomendationsList

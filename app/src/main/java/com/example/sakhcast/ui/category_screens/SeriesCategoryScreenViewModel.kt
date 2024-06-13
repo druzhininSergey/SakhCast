@@ -8,6 +8,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.example.sakhcast.data.paging.SeriesPagingSource
 import com.example.sakhcast.data.repository.SakhCastRepository
 import com.example.sakhcast.model.SeriesCard
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,98 +20,23 @@ import javax.inject.Inject
 class SeriesCategoryScreenViewModel @Inject constructor(private val sakhCastRepository: SakhCastRepository) :
     ViewModel() {
 
-    private var _seriesCategoryScreenState = MutableLiveData(SeriesCategoryScreenState())
+    private val _seriesCategoryScreenState = MutableLiveData(SeriesCategoryScreenState())
     val seriesCategoryScreenState: LiveData<SeriesCategoryScreenState> = _seriesCategoryScreenState
 
     data class SeriesCategoryScreenState(
-        var seriesPagingData: Flow<PagingData<SeriesCard>>? = null,
+        var seriesPagingData: Flow<PagingData<SeriesCard>>? = null
     )
 
     fun initCategory(categoryName: String) {
-        if (_seriesCategoryScreenState.value?.seriesPagingData == null) {
-            getSeriesByCategoryName(categoryName)
-        }
-    }
-
-    fun getSeriesByCategoryName(categoryName: String) {
-
         viewModelScope.launch {
-            val categoryList = mapOf(
-                "Все" to "all",
-                "Новинки" to "new",
-                "Российский топ" to "top_kp",
-                "Мировой топ" to "top_imdb",
-                "Сейчас смотрят" to "popular",
-                "По алфавиту" to "abc",
+            val pagingSource = SeriesPagingSource(sakhCastRepository, categoryName)
+            val pager = Pager(
+                config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+                pagingSourceFactory = { pagingSource }
             )
-            val genreList = mapOf(
-                "Мини–сериалы" to "мини–сериал",
-                "Документальные" to "документальный",
-                "Подкасты" to "подкаст",
-                "Аниме" to "аниме",
-                "Мультсериалы" to "мультфильм",
-                "Комедии" to "комедия"
-            )
-            var categoryNameUrl =
-                if (categoryName in categoryList) {
-                    categoryList[categoryName] ?: ""
-                } else {
-                    genreList[categoryName] ?: ""
-                }
-            val seriesPagingData = Pager(
-                config = PagingConfig(
-                    pageSize = 20,
-                    enablePlaceholders = true
-                ), // Настройте PagingConfig
-                pagingSourceFactory = {
-                    sakhCastRepository.getSeriesByCategoryName(categoryNameUrl)
-                }
-            ).flow.cachedIn(viewModelScope) // Закешируйте данные
-
-            _seriesCategoryScreenState.value =
-                seriesCategoryScreenState.value?.copy(
-                    seriesPagingData = seriesPagingData
-                )
+            val flow = pager.flow.cachedIn(viewModelScope)
+            _seriesCategoryScreenState.value = _seriesCategoryScreenState.value?.copy(seriesPagingData = flow)
         }
     }
-
-//    fun getSeriesListByCategoryName(page: Int, categoryName: String) {
-//        viewModelScope.launch {
-//            val categoryList = mapOf(
-//                "Все" to "all",
-//                "Новинки" to "new",
-//                "Российский топ" to "top_kp",
-//                "Мировой топ" to "top_imdb",
-//                "Сейчас смотрят" to "popular",
-//                "По алфавиту" to "abc",
-//            )
-//            val genreList = mapOf(
-//                "Мини–сериалы" to "мини–сериал",
-//                "Документальные" to "документальный",
-//                "Подкасты" to "подкаст",
-//                "Аниме" to "аниме",
-//                "Мультсериалы" to "мультфильм",
-//                "Комедии" to "комедия"
-//            )
-//            var categoryNameUrl = ""
-//            val seriesList: SeriesList? =
-//                if (categoryName in categoryList) {
-//                    categoryNameUrl = categoryList[categoryName] ?: ""
-//                    sakhCastRepository.getSeriesListByCategoryName(
-//                        categoryName = categoryNameUrl,
-//                        page = 0
-//                    )
-//                } else {
-//                    categoryNameUrl = genreList[categoryName] ?: ""
-//                    sakhCastRepository.getSeriesListByGenre(page = page, genre = categoryNameUrl)
-//                }
-//
-//            _seriesCategoryScreenState.value =
-//                seriesCategoryScreenState.value?.copy(
-//                    seriesList = seriesList,
-//                )
-//        }
-//
-//    }
 
 }

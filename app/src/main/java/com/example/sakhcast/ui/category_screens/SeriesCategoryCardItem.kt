@@ -59,7 +59,7 @@ fun PreviewSeriesCategoryCardItem() {
 
 @Composable
 fun SeriesCategoryCardItem(seriesCard: SeriesCard, navHostController: NavHostController) {
-    Box(modifier = Modifier.clickable { navHostController.navigate(SERIES_VIEW) }) {
+    Box(modifier = Modifier.clickable { navHostController.navigate("${SERIES_VIEW}/${seriesCard.id}") }) {
         Column() {
             SeriesCategoryCard(seriesCard)
             Text(

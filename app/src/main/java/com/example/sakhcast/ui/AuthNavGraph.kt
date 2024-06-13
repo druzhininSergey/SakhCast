@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui
 
-import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,7 +20,6 @@ import com.example.sakhcast.SERIES_VIEW
 import com.example.sakhcast.ui.category_screens.MovieCategoryScreen
 import com.example.sakhcast.ui.category_screens.MovieCategoryScreenViewModel
 import com.example.sakhcast.ui.category_screens.SeriesCategoryScreen
-import com.example.sakhcast.ui.category_screens.SeriesCategoryScreenViewModel
 import com.example.sakhcast.ui.main_screens.catalog_screen.CatalogScreen
 import com.example.sakhcast.ui.main_screens.catalog_screen.CatalogScreenViewModel
 import com.example.sakhcast.ui.main_screens.favorites_screen.FavoritesScreen
@@ -31,9 +29,7 @@ import com.example.sakhcast.ui.main_screens.notifications_screen.NotificationScr
 import com.example.sakhcast.ui.main_screens.notifications_screen.NotificationScreenViewModel
 import com.example.sakhcast.ui.main_screens.search_screen.SearchScreen
 import com.example.sakhcast.ui.movie_series_view.MovieView
-import com.example.sakhcast.ui.movie_series_view.MovieViewModel
 import com.example.sakhcast.ui.movie_series_view.SeriesView
-import com.example.sakhcast.ui.movie_series_view.SeriesViewModel
 
 @Composable
 fun AuthNavGraph(
