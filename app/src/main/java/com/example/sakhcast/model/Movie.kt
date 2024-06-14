@@ -176,9 +176,9 @@ data class Track(
 
 @Serializable
 data class UserFavourite(
-    @SerialName("fav_kind") val favKind: String,
-    @SerialName("is_fav") val isFav: Boolean,
-    @SerialName("position") val position: Int,
+    @SerialName("fav_kind") val favKind: String?,
+    @SerialName("is_fav") val isFav: Boolean?,
+    @SerialName("position") val position: Int?,
 )
 
 @Serializable
