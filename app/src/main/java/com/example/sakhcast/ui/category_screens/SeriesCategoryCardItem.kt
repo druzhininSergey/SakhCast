@@ -88,27 +88,27 @@ fun SeriesCategoryCardItem(seriesCard: SeriesCard, navHostController: NavHostCon
 
 @Composable
 fun SeriesCategoryCard(seriesCard: SeriesCard) {
+    val context = LocalContext.current
+    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        seriesCard.coverAlt + ".avif"
+    } else {
+        seriesCard.coverAlt + ".webp"
+    }
+    val coverPainter: Painter =
+        rememberAsyncImagePainter(
+            ImageRequest.Builder(context).data(data = imageUrl)
+                .apply(block = fun ImageRequest.Builder.() {
+                    crossfade(true)
+                    placeholder(R.drawable.series_poster) // Укажите ресурс-заполнитель
+                    //            error(R.drawable.error) // Укажите ресурс ошибки
+                }).build()
+        )
     Card(
         modifier = Modifier
             .aspectRatio(0.682f),
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(),
     ) {
-        val context = LocalContext.current
-        val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            seriesCard.coverAlt + ".avif"
-        } else {
-            seriesCard.coverAlt + ".webp"
-        }
-        val coverPainter: Painter =
-            rememberAsyncImagePainter(
-                ImageRequest.Builder(context).data(data = imageUrl)
-                    .apply(block = fun ImageRequest.Builder.() {
-                        crossfade(true)
-                        placeholder(R.drawable.series_poster) // Укажите ресурс-заполнитель
-                        //            error(R.drawable.error) // Укажите ресурс ошибки
-                    }).build()
-            )
         Box {
             Image(
                 modifier = Modifier

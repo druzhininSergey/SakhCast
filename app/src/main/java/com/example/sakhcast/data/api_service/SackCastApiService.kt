@@ -1,6 +1,6 @@
 package com.example.sakhcast.data.api_service
 
-import com.example.sakhcast.model.CurentUser
+import com.example.sakhcast.model.CurrentUser
 import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.LastWatched
 import com.example.sakhcast.model.LoginResponse
@@ -16,7 +16,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SakhCastApiService {
-
+    // LOGIN
     @POST("v1/users/login")
     fun userLogin(
         @Query("login") login: String,
@@ -27,26 +27,47 @@ interface SakhCastApiService {
     fun userLogout(): Call<ResultLogout>
 
     @GET("v2/users/current")
-    fun checkLoginStatus(): Call<CurentUser>
+    fun checkLoginStatus(): Call<CurrentUser>
 
+    // HOME
     @GET("v2/users/continue")
     fun getContinueWatchMovieAndSeries(): Call<LastWatched>
 
+    // SERIES
     @GET("catalog.items")
     fun getSeriesListByCategoryName(
         @Query("category") category: String,
         @Query("page") page: Int,
-        @Query("amount") amount: Int = 20,
+        @Query("amount") amount: Int = 40,
     ): Call<SeriesList>
 
     @GET("v1/catalog/items")
     fun getSeriesListByGenre(
         @Query("category") category: String = "genre",
         @Query("page") page: Int,
-        @Query("amount") amount: Int = 20,
+        @Query("amount") amount: Int = 40,
         @Query("genres") genres: String,
     ): Call<SeriesList>
 
+    @GET("serials/get")
+    fun getSeriesById(
+        @Query("id") id: Int
+    ): Call<Series>
+
+    @GET("v1/serials/get_episodes")
+    fun getSeriesEpisodesBySeasonId(
+        @Query("season_id") seasonId: Int
+    ): Call<List<Episode>>
+
+    @GET("catalog.items")
+    fun getSeriesFavorites(
+        @Query("category") category: String = "favorites",
+        @Query("page") page: Int,
+        @Query("amount") amount: Int = 40,
+        @Query("kind") kind: String,
+    ): Call<SeriesList>
+
+    // Movies
     @GET("v2/catalog/movies/items")
     fun getMoviesByCategoryName(
         @Query("category") category: String,
@@ -54,20 +75,10 @@ interface SakhCastApiService {
         @Query("amount") amount: Int = 40
     ): Call<MovieList>
 
-    @GET("serials/get")
-    fun getSeriesById(
-        @Query("id") id: Int
-    ): Call<Series>
-
     @GET("v2/movie/{movie}")
     fun getMovieByAlphaId(
         @Path("movie") movieAlphaId: String
     ): Call<Movie>
-
-    @GET("v1/serials/get_episodes")
-    fun getSeriesEpisodesBySeasonId(
-        @Query("season_id") seasonId: Int
-    ): Call<List<Episode>>
 
     @GET("v2/catalog/movies/items")
     fun getMovieRecommendationsByRefId(
@@ -83,11 +94,17 @@ interface SakhCastApiService {
         @Query("amount") amount: Int = 40,
     ): Call<MovieList>
 
-    @GET("catalog.items")
-    fun getSeriesFavorites(
-        @Query("category") category: String = "favorites",
+    @GET("v2/catalog/movies/items")
+    fun getMoviesListBySortField(
+        @Query("sf") sortField: String,
         @Query("page") page: Int,
         @Query("amount") amount: Int = 40,
-        @Query("kind") kind: String,
-    ): Call<SeriesList>
+    ): Call<MovieList>
+
+    @GET("v2/catalog/movies/items?page=0&amount=48&genres=20")
+    fun getMoviesListByGenreId(
+        @Query("genres") genresId: String,
+        @Query("page") page: Int,
+        @Query("amount") amount: Int = 40,
+    ): Call<MovieList>
 }

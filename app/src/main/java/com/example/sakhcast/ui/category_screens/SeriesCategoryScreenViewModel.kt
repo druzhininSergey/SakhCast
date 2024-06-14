@@ -31,11 +31,11 @@ class SeriesCategoryScreenViewModel @Inject constructor(private val sakhCastRepo
         viewModelScope.launch {
             val pagingSource = SeriesPagingSource(sakhCastRepository, categoryName)
             val pager = Pager(
-                config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+                config = PagingConfig(pageSize = 40, enablePlaceholders = false),
                 pagingSourceFactory = { pagingSource }
             )
             val flow = pager.flow.cachedIn(viewModelScope)
-            _seriesCategoryScreenState.value = _seriesCategoryScreenState.value?.copy(seriesPagingData = flow)
+            _seriesCategoryScreenState.value = seriesCategoryScreenState.value?.copy(seriesPagingData = flow)
         }
     }
 

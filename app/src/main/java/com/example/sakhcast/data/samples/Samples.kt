@@ -1,7 +1,4 @@
-package com.example.sakhcast.data
-
-import com.example.sakhcast.model.MovieCard
-import com.example.sakhcast.model.SeriesCard
+package com.example.sakhcast.data.samples
 
 object Samples {
 //    val seriesCardList: List<SeriesCard> = listOf(

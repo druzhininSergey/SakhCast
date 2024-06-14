@@ -38,7 +38,7 @@ class SeriesPagingSource(
             Log.i("!!!", "Loaded seriesList size: ${seriesList?.items?.size}")
 
 
-            val nextKey = if (seriesList?.items?.size == 20) page + 1 else null
+            val nextKey = if (seriesList?.items?.size == 40) page + 1 else null
             Log.i("!!!", "nextkey = $nextKey")
 
             return LoadResult.Page(

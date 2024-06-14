@@ -17,14 +17,15 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 
@@ -32,9 +33,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun FavoritesScreen(
     paddingValues: PaddingValues,
-    favoritesScreenState: State<FavoritesScreenViewModel.FavoritesScreenState>,
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    favoritesScreenViewModel: FavoritesScreenViewModel = hiltViewModel()
 ) {
+    val favoritesScreenState = favoritesScreenViewModel.favoritesScreenState.observeAsState(
+        FavoritesScreenViewModel.FavoritesScreenState()
+    )
     val seriesCardWatching = favoritesScreenState.value.seriesCardWatching
     val seriesCardWillWatch = favoritesScreenState.value.seriesCardWillWatch
     val seriesCardFinishedWatching =

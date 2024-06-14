@@ -2,6 +2,7 @@ package com.example.sakhcast.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
@@ -64,8 +65,9 @@ class SakhCastModule {
         val headerInterceptor = Interceptor { chain ->
             val original = chain.request()
             val token = sharedPreferences.getString(SHARED_PREFS_TOKEN_KEY, "")
+            Log.i("!!!", "token sp = $token")
             val requestBuilder = original.newBuilder()
-                .header("Authorization", "f3669e22-82dd-492a-8ed1-8a921fbb9932")
+                .header("Authorization", value = token.toString())
                 .header("X-Force-Code", "1")
                 .method(original.method, original.body)
             val request = requestBuilder.build()

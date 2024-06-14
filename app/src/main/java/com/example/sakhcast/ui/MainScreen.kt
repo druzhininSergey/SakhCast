@@ -3,6 +3,7 @@ package com.example.sakhcast.ui
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
@@ -14,7 +15,7 @@ import com.example.sakhcast.MOVIE_CATEGORY_SCREEN
 import com.example.sakhcast.MOVIE_VIEW
 import com.example.sakhcast.SERIES_CATEGORY_SCREEN
 import com.example.sakhcast.SERIES_VIEW
-import com.example.sakhcast.model.CurentUser
+import com.example.sakhcast.model.CurrentUser
 import com.example.sakhcast.ui.log_in_screen.LogInScreen
 import com.example.sakhcast.ui.log_in_screen.LogInScreenViewModel
 import com.example.sakhcast.ui.top_bottom_bars.bottom_app_bar.BottomBar
@@ -28,10 +29,12 @@ fun MainScreen() {
     val loginScreenState = logInScreenViewModel.userDataState.observeAsState(
         LogInScreenViewModel.UserDataState()
     )
-    logInScreenViewModel.checkLoggedUser()
-    logInScreenViewModel.checkTokenExist()
+    LaunchedEffect(logInScreenViewModel) {
+        logInScreenViewModel.checkLoggedUser()
+        logInScreenViewModel.checkTokenExist()
+    }
     val isLogged = loginScreenState.value.isLogged
-    val user = loginScreenState.value.curentUser
+    val user = loginScreenState.value.currentUser
 
     if (isLogged == false || isLogged == null) {
         LogInScreen(navController)
@@ -43,7 +46,7 @@ fun MainScreen() {
 @Composable
 fun AuthenticatedMainScreen(
     navController: NavHostController,
-    user: CurentUser?,
+    user: CurrentUser?,
 ) {
     val backStackState = navController.currentBackStackEntryAsState().value
     val currentBackStackEntry by navController.currentBackStackEntryAsState()

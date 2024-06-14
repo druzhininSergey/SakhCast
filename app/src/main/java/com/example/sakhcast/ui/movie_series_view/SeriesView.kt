@@ -99,8 +99,7 @@ fun SeriesView(
             seriesViewModel.getFullSeries(seriesId)
         }
     }
-//    seriesViewModel.getFullSeries(seriesId)
-    val series = seriesState.value.series //?: throw IllegalStateException("Series is null")
+    val series = seriesState.value.series
     var seasonId by remember { mutableIntStateOf(series?.seasons?.get(0)?.id ?: 0) }
     Log.e("!!!!", "seasonID = $seasonId")
     LaunchedEffect(series) {
@@ -158,26 +157,26 @@ fun SeriesView(
                         },
                     contentScale = ContentScale.Crop,
                 )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    IconButton(onClick = {}, modifier = Modifier
-                        .size(100.dp)
-                        .graphicsLayer {
-                            alpha =
-                                1f - ((scrollState.value.toFloat() / scrollState.maxValue) * 1.5f)
-                            translationY = 0.5f * scrollState.value
-                        }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_play),
-                            contentDescription = null,
-                            modifier = Modifier.size(100.dp),
-                            tint = Color.White
-                        )
-                    }
-                }
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxWidth(),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    IconButton(onClick = {}, modifier = Modifier
+//                        .size(100.dp)
+//                        .graphicsLayer {
+//                            alpha =
+//                                1f - ((scrollState.value.toFloat() / scrollState.maxValue) * 1.5f)
+//                            translationY = 0.5f * scrollState.value
+//                        }) {
+//                        Icon(
+//                            painter = painterResource(id = R.drawable.ic_play),
+//                            contentDescription = null,
+//                            modifier = Modifier.size(100.dp),
+//                            tint = Color.White
+//                        )
+//                    }
+//                }
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -245,17 +244,17 @@ fun SeriesInfo(
     seriesEpisodes: List<Episode>,
     onSeasonChanged: (Int) -> Unit
 ) {
-    val imdbRating = String.format(Locale.US, "%.1f", series.imdbRating)
-    val kinopoiskRating = String.format(Locale.US, "%.1f", series.kpRating)
+    val isRatingExists = series.imdbRating != null || series.kpRating != null
     val year = if (series.yearEnd == 0) "${series.year} - ..."
     else "${series.year} - ${series.yearEnd}"
 
     Column(
         modifier = Modifier.background(MaterialTheme.colorScheme.primary)
     ) {
+
         SeriesGenres(series.genres)
-        SeriesRating(imdbRating = imdbRating, kinopoiskRating = kinopoiskRating)
-        SeriesContryYearStatus(series.country, year, series.status)
+        if (isRatingExists) SeriesRating(series.imdbRating, series.kpRating)
+        SeriesCountryYearStatus(series.country, year, series.status)
         SeriesDownloads(series.seasons, seriesEpisodes, onSeasonChanged)
         SeriesOverview(series.about)
         SeriesProductionCompanies(series.networks)
@@ -343,6 +342,7 @@ fun TopSeriesBar(
     userFavoriteInSeries: UserFavoriteInSeries?,
     navHostController: NavHostController
 ) {
+    var isExpandedFavorite by remember { mutableStateOf(false) }
     val alpha = if (scrollState.maxValue > 0) {
         min(1f, (scrollState.value.toFloat() / scrollState.maxValue) * 1.5f)
     } else {
@@ -352,6 +352,7 @@ fun TopSeriesBar(
     val isFavorite = userFavoriteInSeries != null
     val favIcon = if (isFavorite) painterResource(R.drawable.ic_star_full2)
     else painterResource(R.drawable.ic_star_empty2)
+    val listFavoriteType = listOf("Смотрю", "Буду смотреть", "Перестал", "Досмотрел")
 
     Column(
         modifier = Modifier
@@ -366,27 +367,43 @@ fun TopSeriesBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .size(30.dp)
-                    .clickable { navHostController.navigateUp() },
-                tint = Color.White,
-            )
+            IconButton(onClick = { navHostController.navigateUp() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(30.dp),
+                    tint = Color.White,
+                )
+            }
             Text(
                 text = ruTitle,
                 color = MaterialTheme.colorScheme.onPrimary.copy(alpha = alpha),
             )
-            Icon(
-                painter = favIcon,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .size(40.dp),
-                tint = if (isFavorite) Color(0xFFFFD700) else Color.White
-            )
+            Box(modifier = Modifier) {
+                Icon(
+                    painter = favIcon,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(40.dp)
+                        .clickable { isExpandedFavorite = true },
+                    tint = if (isFavorite) Color(0xFFFFD700) else Color.White
+                )
+                DropdownMenu(
+                    modifier = Modifier.background(
+                        color = Color.Gray.copy(alpha = 0.5f)
+                    ),
+                    offset = DpOffset(0.dp, 8.dp),
+                    expanded = isExpandedFavorite,
+                    onDismissRequest = { isExpandedFavorite = false },
+                ) {
+                    listFavoriteType.forEach { favType ->
+                        DropdownMenuItem(text = { Text(text = favType) }, onClick = { /*TODO*/ })
+                    }
+                }
+            }
         }
     }
 
@@ -471,18 +488,18 @@ fun SeriesDownloads(
 }
 
 @Composable
-fun SeriesContryYearStatus(
+fun SeriesCountryYearStatus(
     country: String,
     releaseDate: String,
     movieStatus: String
 ) {
-    val infoColums = listOf("Страна", "Год", "Статус")
+    val infoColumns = listOf("Страна", "Год", "Статус")
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        infoColums.forEachIndexed { index, columnName ->
+        infoColumns.forEachIndexed { index, columnName ->
             val info = when (index) {
                 0 -> country
                 1 -> releaseDate.take(4)
@@ -506,17 +523,27 @@ fun SeriesContryYearStatus(
 }
 
 @Composable
-fun SeriesRating(imdbRating: String, kinopoiskRating: String) {
+fun SeriesRating(_imdbRating: Double?, _kinopoiskRating: Double?) {
+    val imdbRating = String.format(Locale.US, "%.1f", _imdbRating)
+    val kinopoiskRating = String.format(Locale.US, "%.1f", _kinopoiskRating)
     Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "IMDb:", color = Color.Gray, fontSize = 14.sp)
-            Spacer(modifier = Modifier.width(10.dp))
-            Text(text = imdbRating, color = Color.Yellow, fontSize = 18.sp)
+        if (_imdbRating != null && _imdbRating != 0.0) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "IMDb:", color = Color.Gray, fontSize = 14.sp)
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = imdbRating, color = MaterialTheme.colorScheme.scrim, fontSize = 18.sp)
+            }
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "Кинопоиск:", color = Color.Gray, fontSize = 14.sp)
-            Spacer(modifier = Modifier.width(10.dp))
-            Text(text = kinopoiskRating, color = Color.Yellow, fontSize = 18.sp)
+        if (_kinopoiskRating != null && _kinopoiskRating != 0.0) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "Кинопоиск:", color = Color.Gray, fontSize = 14.sp)
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = kinopoiskRating,
+                    color = MaterialTheme.colorScheme.scrim,
+                    fontSize = 18.sp
+                )
+            }
         }
     }
     DividerBase()

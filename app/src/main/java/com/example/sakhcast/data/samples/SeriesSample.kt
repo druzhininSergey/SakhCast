@@ -1,4 +1,4 @@
-package com.example.sakhcast.data
+package com.example.sakhcast.data.samples
 
 import com.example.sakhcast.model.BackdropColors
 import com.example.sakhcast.model.Genre
@@ -48,9 +48,7 @@ object SeriesSample {
         website = "https://abc.com/shows/the-good-doctor",
         status = "Завершен",
         imdbRating = 8.0,
-        imdbUrl = "http://www.imdb.com/title/tt6470478/",
         kpRating = 7.997,
-        kpId = 1011528,
         runtime = "43",
         views = 188708,
         about = "История молодого талантливого врача с синдромом саванта, обладающего уникальными способностями — невероятной памятью и фантастической чувствительностью к проблемам, вспыхивающим внутри человеческого организма. Герой становится блестящим хирургом, несмотря на то, в личностном плане его развитие соответствует развитию десятилетнего ребёнка…",

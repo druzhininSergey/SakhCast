@@ -19,6 +19,10 @@ class HomeScreenViewModel @Inject constructor(private val sakhCastRepository: Sa
     private var _homeScreenState = MutableLiveData(HomeScreenState())
     val homeScreenState: LiveData<HomeScreenState> = _homeScreenState
 
+    init {
+        getAllScreenData()
+    }
+
     data class HomeScreenState(
         var seriesList: SeriesList? = null,
         var moviesList: MovieList? = null,
@@ -26,7 +30,7 @@ class HomeScreenViewModel @Inject constructor(private val sakhCastRepository: Sa
         var lastWatchedMovieTime: String = "",
     )
 
-    fun getAllScreenData() {
+    private fun getAllScreenData() {
         viewModelScope.launch {
             val lastWatched = sakhCastRepository.getContinueWatchMovieAndSeries()
             val seriesList =
@@ -35,6 +39,10 @@ class HomeScreenViewModel @Inject constructor(private val sakhCastRepository: Sa
                 sakhCastRepository.getMoviesListByCategoryName(categoryName = "all", page = 0)
             lastWatched?.movie?.data?.userFavourite?.position?.let { convertSeconds(it) }
 
+//            Log.i("!!!", "lastWatched = $lastWatched")
+//            Log.i("!!!", "seriesList = $seriesList")
+//            Log.i("!!!", "moviesList = $moviesList")
+
             _homeScreenState.value = homeScreenState.value?.copy(
                 lastWatched = lastWatched,
                 seriesList = seriesList,
@@ -42,7 +50,6 @@ class HomeScreenViewModel @Inject constructor(private val sakhCastRepository: Sa
             )
         }
     }
-
 
     private fun convertSeconds(seconds: Int) {
         viewModelScope.launch {

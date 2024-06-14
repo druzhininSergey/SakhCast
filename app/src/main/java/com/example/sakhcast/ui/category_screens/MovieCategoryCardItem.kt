@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.category_screens
 
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,16 +23,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.sakhcast.MOVIE_VIEW
 import com.example.sakhcast.R
 import com.example.sakhcast.model.MovieCard
+import java.util.Locale
 
 @Preview(showBackground = true)
 @Composable
@@ -53,14 +60,17 @@ fun PreviewMovieCategoryCardItem() {
 
 @Composable
 fun MovieCategoryCardItem(movieCard: MovieCard, navHostController: NavHostController) {
-    Box(modifier = Modifier.clickable { navHostController.navigate(MOVIE_VIEW) }) {
+    Box(modifier = Modifier.clickable { navHostController.navigate("$MOVIE_VIEW/${movieCard.idAlpha}") }) {
         Column() {
             MovieCategoryCard(movieCard)
             Text(
                 text = movieCard.ruTitle,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+//                modifier = Modifier.width(150.dp)
             )
             Spacer(modifier = Modifier.height(4.dp))
             Row(
@@ -68,20 +78,42 @@ fun MovieCategoryCardItem(movieCard: MovieCard, navHostController: NavHostContro
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = movieCard.releaseDate.toString(), fontSize = 12.sp,
+                    text = movieCard.releaseDate.take(4), fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
-                Text(
-                    text = movieCard.runtime.toString(), fontSize = 12.sp,
+                if (movieCard.runtime != null) Text(
+                    text = convertMinutes(movieCard.runtime), fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
     }
 }
+private fun convertMinutes(minutes: Int): String {
+    val hours = minutes / 60
+    val remainingMinutes = minutes % 60
+    val hoursPart = if (hours > 0) "${hours}час. " else ""
+    val minutesPart = if (remainingMinutes > 0 || hours == 0) "${remainingMinutes}мин." else ""
+    return "$hoursPart$minutesPart".trim()
+}
 
 @Composable
 fun MovieCategoryCard(movieCard: MovieCard) {
+    val context = LocalContext.current
+    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        movieCard.coverAlt + ".avif"
+    } else {
+        movieCard.coverAlt + ".webp"
+    }
+    val coverPainter: Painter =
+        rememberAsyncImagePainter(
+            ImageRequest.Builder(context).data(data = imageUrl)
+                .apply(block = fun ImageRequest.Builder.() {
+                    crossfade(true)
+                    placeholder(R.drawable.series_poster) // Укажите ресурс-заполнитель
+                    //            error(R.drawable.error) // Укажите ресурс ошибки
+                }).build()
+        )
     Card(
         modifier = Modifier
             .aspectRatio(0.682f),
@@ -92,7 +124,7 @@ fun MovieCategoryCard(movieCard: MovieCard) {
             Image(
                 modifier = Modifier
                     .fillMaxSize(),
-                painter = painterResource(id = R.drawable.movie_poster),
+                painter = coverPainter,
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds
             )
@@ -103,52 +135,56 @@ fun MovieCategoryCard(movieCard: MovieCard) {
                 horizontalArrangement = Arrangement.SpaceBetween,
 
                 ) {
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = Color.Gray.copy(alpha = 0.8f),
-                            shape = RoundedCornerShape(8.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 5.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                if (movieCard.imdb) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = Color.Gray.copy(alpha = 0.8f),
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_imdb),
-                            contentDescription = null
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = 3.dp),
-                            text = movieCard.imdbRating.toString(),
-                            color = Color.White,
-                            fontSize = 8.sp
-                        )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_imdb),
+                                contentDescription = null
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 3.dp),
+                                text = String.format(Locale.US, "%.1f", movieCard.imdbRating),
+                                color = Color.White,
+                                fontSize = 8.sp
+                            )
+                        }
                     }
                 }
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = Color.Gray.copy(alpha = 0.8f),
-                            shape = RoundedCornerShape(8.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 5.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                if (movieCard.kp) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = Color.Gray.copy(alpha = 0.8f),
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_kinopoisk),
-                            contentDescription = null,
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = 3.dp),
-                            text = movieCard.kpRating.toString(),
-                            color = Color.White,
-                            fontSize = 8.sp
-                        )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_kinopoisk),
+                                contentDescription = null,
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 3.dp),
+                                text = String.format(Locale.US, "%.1f", movieCard.kpRating),
+                                color = Color.White,
+                                fontSize = 8.sp
+                            )
+                        }
                     }
                 }
             }
