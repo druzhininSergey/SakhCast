@@ -67,6 +67,18 @@ interface SakhCastApiService {
         @Query("kind") kind: String,
     ): Call<SeriesList>
 
+    @POST("v1/serials/set_fav")
+    fun addSeriesInFavorites(
+        @Query("serial_id") seriesId: Int,
+        @Query("kind") kind: String,
+        @Query("notify") notify: Int = 1,
+    ): Call<String>
+
+    @POST("v1/serials/remove_fav?serial_id=1")
+    fun removeSeriesFromFavorites(
+        @Query("serial_id") seriesId: Int,
+    ): Call<String>
+
     // Movies
     @GET("v2/catalog/movies/items")
     fun getMoviesByCategoryName(

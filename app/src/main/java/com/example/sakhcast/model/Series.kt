@@ -29,7 +29,6 @@ data class Series(
     @SerialName("seasons") val seasons: List<Season>,
     @SerialName("status") val status: String,
     @SerialName("titles") val titles: List<String>,
-//    @SerialName("trailers") val trailers: List<Trailer>,
     @SerialName("tvshow") val tvShow: String,
     @SerialName("url") val url: String,
     @SerialName("user_favorite") val userFavoriteInSeries: UserFavoriteInSeries?,
@@ -57,23 +56,10 @@ data class Season(
     @SerialName("index") val index: String
 )
 
-//@Serializable
-//data class Trailer(
-//    @SerialName("id") val id: Int,
-//    @SerialName("is_deleted") val isDeleted: Int,
-//    @SerialName("lang") val lang: String,
-//    @SerialName("name") val name: String,
-//    @SerialName("path") val path: String,
-//    @SerialName("serial_id") val serialId: Int,
-//    @SerialName("site") val site: String,
-//    @SerialName("size") val size: Int,
-//    @SerialName("type") val type: String
-//)
-
 @Serializable
 data class UserFavoriteInSeries(
-    @SerialName("id") val id: Int,
-    @SerialName("kind") val kind: String,
-    @SerialName("notify") val notify: Int,
-    @SerialName("voices") val voices: List<String>
+    @SerialName("id") val id: Int?,
+    @SerialName("kind") val kind: String?,
+    @SerialName("notify") val notify: Int?,
+    @SerialName("voices") val voices: List<String>?
 )

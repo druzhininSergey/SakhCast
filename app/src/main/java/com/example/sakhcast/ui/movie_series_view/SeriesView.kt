@@ -67,7 +67,6 @@ import com.example.sakhcast.model.Genre
 import com.example.sakhcast.model.Network
 import com.example.sakhcast.model.Season
 import com.example.sakhcast.model.Series
-import com.example.sakhcast.model.UserFavoriteInSeries
 import com.example.sakhcast.ui.DividerBase
 import java.util.Locale
 import kotlin.math.min
@@ -100,6 +99,10 @@ fun SeriesView(
         }
     }
     val series = seriesState.value.series
+    val isFavorite = remember { mutableStateOf(series?.userFavoriteInSeries != null) }
+    LaunchedEffect(seriesState.value.isFavorite) {
+        isFavorite.value = seriesState.value.isFavorite ?: false
+    }
     var seasonId by remember { mutableIntStateOf(series?.seasons?.get(0)?.id ?: 0) }
     Log.e("!!!!", "seasonID = $seasonId")
     LaunchedEffect(series) {
@@ -157,26 +160,6 @@ fun SeriesView(
                         },
                     contentScale = ContentScale.Crop,
                 )
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxWidth(),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    IconButton(onClick = {}, modifier = Modifier
-//                        .size(100.dp)
-//                        .graphicsLayer {
-//                            alpha =
-//                                1f - ((scrollState.value.toFloat() / scrollState.maxValue) * 1.5f)
-//                            translationY = 0.5f * scrollState.value
-//                        }) {
-//                        Icon(
-//                            painter = painterResource(id = R.drawable.ic_play),
-//                            contentDescription = null,
-//                            modifier = Modifier.size(100.dp),
-//                            tint = Color.White
-//                        )
-//                    }
-//                }
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -230,8 +213,14 @@ fun SeriesView(
         }
         series?.name?.let {
             TopSeriesBar(
-                scrollState,
-                it, paddingValues, series.userFavoriteInSeries, navHostController
+                scrollState = scrollState,
+                ruTitle = it,
+                paddingValues = paddingValues,
+                isFavorite = isFavorite.value,
+                navHostController = navHostController,
+                onFavoriteButtonPushed = { kind ->
+                    seriesViewModel.onFavoriteButtonPushed(kind)
+                },
             )
         }
     }
@@ -339,8 +328,9 @@ fun TopSeriesBar(
     scrollState: ScrollState,
     ruTitle: String,
     paddingValues: PaddingValues,
-    userFavoriteInSeries: UserFavoriteInSeries?,
-    navHostController: NavHostController
+    isFavorite: Boolean,
+    navHostController: NavHostController,
+    onFavoriteButtonPushed: (String) -> Unit,
 ) {
     var isExpandedFavorite by remember { mutableStateOf(false) }
     val alpha = if (scrollState.maxValue > 0) {
@@ -349,10 +339,14 @@ fun TopSeriesBar(
         0f
     }
     val primaryColor = MaterialTheme.colorScheme.primary
-    val isFavorite = userFavoriteInSeries != null
     val favIcon = if (isFavorite) painterResource(R.drawable.ic_star_full2)
     else painterResource(R.drawable.ic_star_empty2)
-    val listFavoriteType = listOf("Смотрю", "Буду смотреть", "Перестал", "Досмотрел")
+    val listFavoriteType = mapOf(
+        "Смотрю" to "watching",
+        "Буду смотреть" to "will",
+        "Перестал" to "stopped",
+        "Досмотрел" to "watched"
+    )
 
     Column(
         modifier = Modifier
@@ -388,7 +382,11 @@ fun TopSeriesBar(
                     modifier = Modifier
                         .padding(8.dp)
                         .size(40.dp)
-                        .clickable { isExpandedFavorite = true },
+                        .clickable {
+                            if (isFavorite) onFavoriteButtonPushed("")
+                            else isExpandedFavorite = true
+
+                        },
                     tint = if (isFavorite) Color(0xFFFFD700) else Color.White
                 )
                 DropdownMenu(
@@ -399,8 +397,15 @@ fun TopSeriesBar(
                     expanded = isExpandedFavorite,
                     onDismissRequest = { isExpandedFavorite = false },
                 ) {
-                    listFavoriteType.forEach { favType ->
-                        DropdownMenuItem(text = { Text(text = favType) }, onClick = { /*TODO*/ })
+                    listFavoriteType.keys.forEach { favType ->
+                        DropdownMenuItem(text = { Text(text = favType) }, onClick = {
+                            listFavoriteType[favType]?.let {
+                            onFavoriteButtonPushed(
+                                it
+                            )
+                        }
+                            isExpandedFavorite = false
+                        })
                     }
                 }
             }

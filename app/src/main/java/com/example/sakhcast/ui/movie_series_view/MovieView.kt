@@ -364,7 +364,7 @@ fun TopMovieBar(
     }
     val primaryColor = MaterialTheme.colorScheme.primary
     val isFavorite = userFavourite.isFav
-    val favIcon = if (isFavorite) painterResource(R.drawable.ic_star_full2)
+    val favIcon = if (isFavorite == true) painterResource(R.drawable.ic_star_full2)
     else painterResource(R.drawable.ic_star_empty2)
 
     Column(
@@ -400,7 +400,7 @@ fun TopMovieBar(
                 modifier = Modifier
                     .padding(8.dp)
                     .size(40.dp),
-                tint = if (isFavorite) Color(0xFFFFD700) else Color.White
+                tint = if (isFavorite == true) Color(0xFFFFD700) else Color.White
             )
         }
     }
