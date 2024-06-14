@@ -25,17 +25,14 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sakhcast.Colors
-import com.example.sakhcast.R
 import com.example.sakhcast.ui.log_in_screen.LogInScreenViewModel
 import kotlinx.coroutines.launch
 
@@ -49,8 +46,8 @@ fun ProfileScreen(
     val profileScreenState = logInScreenViewModel.userDataState.observeAsState(
         LogInScreenViewModel.UserDataState()
     )
-    val curentUser = profileScreenState.value.curentUser
-    var skipPartiallyExpanded by rememberSaveable { mutableStateOf(false) }
+    val currentUser = profileScreenState.value.currentUser
+    val skipPartiallyExpanded by rememberSaveable { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = skipPartiallyExpanded
     )
@@ -106,11 +103,11 @@ fun ProfileScreen(
                         modifier = Modifier.padding(8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        if (curentUser != null) {
-                            Text(text = curentUser.login)
+                        if (currentUser != null) {
+                            Text(text = currentUser.login)
                             Spacer(modifier = Modifier.height(15.dp))
                             Text(
-                                text = curentUser.proDays.toString() + "дн.",
+                                text = currentUser.proDays.toString() + "дн.",
                                 color = Color.Black,
                                 modifier = Modifier
                                     .clip(MaterialTheme.shapes.small)

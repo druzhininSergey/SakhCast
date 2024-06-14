@@ -18,12 +18,10 @@ import com.example.sakhcast.SEARCH_SCREEN
 import com.example.sakhcast.SERIES_CATEGORY_SCREEN
 import com.example.sakhcast.SERIES_VIEW
 import com.example.sakhcast.ui.category_screens.MovieCategoryScreen
-import com.example.sakhcast.ui.category_screens.MovieCategoryScreenViewModel
 import com.example.sakhcast.ui.category_screens.SeriesCategoryScreen
 import com.example.sakhcast.ui.main_screens.catalog_screen.CatalogScreen
 import com.example.sakhcast.ui.main_screens.catalog_screen.CatalogScreenViewModel
 import com.example.sakhcast.ui.main_screens.favorites_screen.FavoritesScreen
-import com.example.sakhcast.ui.main_screens.favorites_screen.FavoritesScreenViewModel
 import com.example.sakhcast.ui.main_screens.home_screen.HomeScreen
 import com.example.sakhcast.ui.main_screens.notifications_screen.NotificationScreen
 import com.example.sakhcast.ui.main_screens.notifications_screen.NotificationScreenViewModel
@@ -55,11 +53,7 @@ fun AuthNavGraph(
             CatalogScreen(paddingValues = paddingValues, navHostController, catalogScreenState)
         }
         composable(FAVORITES_SCREEN) {
-            val favoritesScreenViewModel: FavoritesScreenViewModel = hiltViewModel()
-            val favoritesScreenState = favoritesScreenViewModel.favoritesScreenState.observeAsState(
-                FavoritesScreenViewModel.FavoritesScreenState()
-            )
-            FavoritesScreen(paddingValues, favoritesScreenState, navHostController)
+            FavoritesScreen(paddingValues, navHostController)
         }
         composable(NOTIFICATION_SCREEN) {
             val notificationScreenViewModel: NotificationScreenViewModel = hiltViewModel()
@@ -79,16 +73,8 @@ fun AuthNavGraph(
             SeriesView(paddingValues, navHostController)
         }
         composable("$MOVIE_CATEGORY_SCREEN/{category}") {
-            val movieCategoryScreenViewModel = hiltViewModel<MovieCategoryScreenViewModel>()
-            movieCategoryScreenViewModel.getSelectedCategoryName(
-                navHostController.currentBackStackEntry?.arguments?.getString(
-                    "category"
-                ) ?: "Все"
-            )
-            val moviesCategoryScreenState by movieCategoryScreenViewModel.moviesCategoryScreenState.observeAsState(
-                MovieCategoryScreenViewModel.MoviesCategoryScreenState()
-            )
-            MovieCategoryScreen(paddingValues, navHostController, moviesCategoryScreenState)
+
+            MovieCategoryScreen(paddingValues, navHostController)
         }
         composable("$SERIES_CATEGORY_SCREEN/{category}") {
 

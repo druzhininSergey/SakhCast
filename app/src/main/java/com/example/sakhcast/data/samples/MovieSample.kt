@@ -1,4 +1,4 @@
-package com.example.sakhcast.data
+package com.example.sakhcast.data.samples
 
 import com.example.sakhcast.model.AudioTrack
 import com.example.sakhcast.model.BackdropColors
@@ -23,7 +23,7 @@ object MovieSample {
     val movie = Movie(
         ad = false,
         adult = false,
-        agelimits = 18,
+        ageLimits = 18,
         audioTracks = listOf(
             AudioTrack(id = 1123, iso6391 = "rus", title = "Russian Dub (Пифагор)"),
             AudioTrack(id = 1124, iso6391 = "rus", title = "Russian (Jaskier)"),
@@ -96,10 +96,8 @@ object MovieSample {
         hidden = false,
         id = 84,
         idAlpha = "the_matrix_resurrections-2021",
-        imdbId = "tt10838180",
         imdbRating = 5.7,
         isDarkBackdrop = false,
-        kpId = 1294123,
         kpRating = 5.727,
         languages = listOf(
             Language(id = 38, name = "английский")

@@ -1,7 +1,8 @@
 package com.example.sakhcast.data.repository
 
+import android.util.Log
 import com.example.sakhcast.data.api_service.SakhCastApiService
-import com.example.sakhcast.model.CurentUser
+import com.example.sakhcast.model.CurrentUser
 import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.LastWatched
 import com.example.sakhcast.model.LoginResponse
@@ -26,8 +27,12 @@ class SakhCastRepository @Inject constructor(
                 val loginCall = sakhCastApiService.userLogin(loginInput, passwordInput)
                 val responseBody = loginCall.execute()
 //                Log.i("!!!", "Login response body: ${responseBody.body()}")
+//                Log.i("!!!", "Login response body: ${responseBody.code()}")
+//                Log.i("!!!", "Login response body: $responseBody")
                 responseBody.body()
             } catch (e: Exception) {
+//                Log.i("!!!", "Login from repo = exception")
+//                Log.i("!!!", "${e.message}")
                 null
             }
         }
@@ -47,7 +52,7 @@ class SakhCastRepository @Inject constructor(
         }
     }
 
-    suspend fun checkLoginStatus(): CurentUser? {
+    suspend fun checkLoginStatus(): CurrentUser? {
         return withContext(ioDispatcher) {
             try {
                 val loginStatusCall = sakhCastApiService.checkLoginStatus()
@@ -93,7 +98,7 @@ class SakhCastRepository @Inject constructor(
         }
     }
 
-    suspend fun getSeriesListByGenre(page: Int, genre: String): SeriesList?{
+    suspend fun getSeriesListByGenre(page: Int, genre: String): SeriesList? {
         return withContext(ioDispatcher) {
             try {
                 val seriesListCall =
@@ -146,11 +151,13 @@ class SakhCastRepository @Inject constructor(
             try {
                 val movieCall = sakhCastApiService.getMovieByAlphaId(movieAlphaId)
                 val responseBody = movieCall.execute()
-//                Log.i("!!!", "MovieById from repo = ${responseBody.body()}")
+                Log.i("!!!", "MovieById from repo = ${responseBody.body()}")
+                Log.i("!!!", "MovieById from repo = ${responseBody.code()}")
+                Log.i("!!!", "MovieById from repo = $responseBody")
                 responseBody.body()
             } catch (e: Exception) {
-//                Log.i("!!!", "movieById = exception")
-//                Log.i("!!!", "${e.message}")
+                Log.i("!!!", "movieById = exception")
+                Log.i("!!!", "${e.message}")
                 null
             }
         }
@@ -221,10 +228,36 @@ class SakhCastRepository @Inject constructor(
         }
     }
 
-//    fun getSeriesPagingData(categoryName: String): Flow<PagingData<SeriesCard>> {
-//        return Pager(PagingConfig(pageSize = 40)) {
-//            SeriesPagingSource(sakhCastApiService, categoryName)
-//        }.flow
-//    }
+    suspend fun getMoviesListBySortField(sortField: String, page: Int): MovieList? {
+        return withContext(ioDispatcher) {
+            try {
+                val seriesFavoritesListCall =
+                    sakhCastApiService.getMoviesListBySortField(sortField = sortField, page = page)
+                val responseBody = seriesFavoritesListCall.execute()
+//                Log.i("!!!", "SeriesFavorites from repo = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+//                Log.i("!!!", "SeriesFavoritesFrom repo = exception, sortField = $sortField")
+//                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
+    suspend fun getMoviesListByGenreId(genresId: String, page: Int): MovieList? {
+        return withContext(ioDispatcher) {
+            try {
+                val seriesFavoritesListCall =
+                    sakhCastApiService.getMoviesListByGenreId(genresId = genresId, page = page)
+                val responseBody = seriesFavoritesListCall.execute()
+//                Log.i("!!!", "SeriesFavorites from repo = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+//                Log.i("!!!", "SeriesFavoritesFrom repo = exception, genresId = $genresId")
+//                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
 
 }

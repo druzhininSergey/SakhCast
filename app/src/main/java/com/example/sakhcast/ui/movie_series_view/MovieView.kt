@@ -234,22 +234,22 @@ fun MovieView(
 
 
 @Composable
-fun MovieInfo(movie: Movie, recomendationList: MovieList, navHostController: NavHostController) {
-    val imdbRating = String.format(Locale.US, "%.1f", movie.imdbRating)
-    val kinopoiskRating = String.format(Locale.US, "%.1f", movie.kpRating)
+fun MovieInfo(movie: Movie, recommendationList: MovieList, navHostController: NavHostController) {
+    val isRatingExists = movie.imdbRating != null || movie.kpRating != null
+
     Column(
         modifier = Modifier.background(MaterialTheme.colorScheme.primary)
     ) {
         MovieGenres(movie.genres)
-        MovieRating(imdbRating = imdbRating, kinopoiskRating = kinopoiskRating)
-        MovieContryYearStatus(movie.productionCountries, movie.releaseDate, movie.status)
+        if (isRatingExists) MovieRating(movie.imdbRating, movie.kpRating)
+        MovieCountryYearStatus(movie.productionCountries, movie.releaseDate, movie.status)
         MovieDownloads(movie.downloads)
-        MovieOverview(movie.overview)
+        movie.overview?.let { MovieOverview(it) }
         movie.productionCompanies?.let { MovieProductionCompanies(it) }
-        MovieExpandableCastTab(movie.cast)
-        MovieRecomendations(
+        movie.cast?.let { MovieExpandableCastTab(it) }
+        MovieRecommendations(
             navHostController = navHostController,
-            movieRecomendations = recomendationList
+            movieRecommendations = recommendationList
         )
         MovieViewsCountInfo(movie.views, movie.favorites)
     }
@@ -299,8 +299,8 @@ fun MovieViewsCountInfo(views: Int, favorites: Int) {
 }
 
 @Composable
-fun MovieRecomendations(
-    movieRecomendations: MovieList,
+fun MovieRecommendations(
+    movieRecommendations: MovieList,
     navHostController: NavHostController
 ) {
     Text(
@@ -315,7 +315,7 @@ fun MovieRecomendations(
         verticalAlignment = Alignment.CenterVertically,
         contentPadding = PaddingValues(16.dp)
     ) {
-        itemsIndexed(movieRecomendations.items) { _, movie ->
+        itemsIndexed(movieRecommendations.items) { _, movie ->
             MovieItemView(movieCard = movie, navHostController = navHostController)
         }
     }
@@ -380,15 +380,16 @@ fun TopMovieBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .size(30.dp)
-                    .clickable { navHostController.navigateUp() },
-                tint = Color.White,
-            )
+            IconButton(onClick = {navHostController.navigateUp()}) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(30.dp),
+                    tint = Color.White,
+                )
+            }
             Text(
                 text = ruTitle,
                 color = MaterialTheme.colorScheme.onPrimary.copy(alpha = alpha),
@@ -438,20 +439,20 @@ fun MovieDownloads(downloads: List<Download>) {
 }
 
 @Composable
-fun MovieContryYearStatus(
+fun MovieCountryYearStatus(
     country: List<ProductionCountry>,
     releaseDate: String,
     movieStatus: String
 ) {
-    val infoColums = listOf("Страна", "Год", "Статус")
+    val infoColumns = listOf("Страна", "Год", "Статус")
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        infoColums.forEachIndexed { index, columnName ->
+        infoColumns.forEachIndexed { index, columnName ->
             val info = when (index) {
-                0 -> country.map { it.name }.joinToString(", ")
+                0 -> country.joinToString(", ") { it.name }
                 1 -> releaseDate.take(4)
                 2 -> movieStatus
                 else -> ""
@@ -473,17 +474,20 @@ fun MovieContryYearStatus(
 }
 
 @Composable
-fun MovieRating(imdbRating: String, kinopoiskRating: String) {
+fun MovieRating(_imdbRating: Double?, _kinopoiskRating: Double?) {
+    val imdbRating = String.format(Locale.US, "%.1f", _imdbRating)
+    val kinopoiskRating = String.format(Locale.US, "%.1f", _kinopoiskRating)
+
     Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        if (_imdbRating != null && _imdbRating != 0.0) Row(verticalAlignment = Alignment.CenterVertically) {
             Text(text = "IMDb:", color = Color.Gray, fontSize = 14.sp)
             Spacer(modifier = Modifier.width(10.dp))
-            Text(text = imdbRating, color = Color.Yellow, fontSize = 18.sp)
+            Text(text = imdbRating, color = MaterialTheme.colorScheme.scrim, fontSize = 18.sp)
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        if (_kinopoiskRating != null && _kinopoiskRating != 0.0) Row(verticalAlignment = Alignment.CenterVertically) {
             Text(text = "Кинопоиск:", color = Color.Gray, fontSize = 14.sp)
             Spacer(modifier = Modifier.width(10.dp))
-            Text(text = kinopoiskRating, color = Color.Yellow, fontSize = 18.sp)
+            Text(text = kinopoiskRating, color = MaterialTheme.colorScheme.scrim, fontSize = 18.sp)
         }
     }
     DividerBase()
@@ -534,7 +538,7 @@ fun MovieExpandableCastTab(cast: Cast) {
     var isExpanded by remember { mutableStateOf(false) }
     val rotationAngle by animateFloatAsState(
         targetValue = if (isExpanded) 90f else 0f,
-        animationSpec = tween(durationMillis = 300)
+        animationSpec = tween(durationMillis = 300), label = ""
     )
 
     Row(

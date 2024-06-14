@@ -3,7 +3,7 @@ package com.example.sakhcast.ui.main_screens.notifications_screen
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.sakhcast.data.NotificationSample
+import com.example.sakhcast.data.samples.NotificationSample
 import com.example.sakhcast.model.NotificationList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

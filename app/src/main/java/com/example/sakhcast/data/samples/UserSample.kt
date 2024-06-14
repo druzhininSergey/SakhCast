@@ -1,11 +1,11 @@
-package com.example.sakhcast.data
+package com.example.sakhcast.data.samples
 
-import com.example.sakhcast.model.CurentUser
+import com.example.sakhcast.model.CurrentUser
 import com.example.sakhcast.model.NewEpisodes
 import com.example.sakhcast.model.Privacy
 
 object UserSample {
-    private val curentUser = CurentUser(
+    private val currentUser = CurrentUser(
         access = true,
         alerts = 0,
         authorized = true,
@@ -36,5 +36,5 @@ object UserSample {
         vpn = false
     )
 
-    fun getUserInfo() = curentUser
+    fun getUserInfo() = currentUser
 }

@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sakhcast.Colors
 import com.example.sakhcast.Dimens
-import com.example.sakhcast.data.NotificationSample
 
 @Preview
 @Composable

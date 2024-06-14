@@ -28,7 +28,7 @@ class FavoritesScreenViewModel @Inject constructor(private val sakhCastRepositor
         var movieCardsWillWatch: MovieList? = null,
     )
 
-    fun getAllContent(){
+    private fun getAllContent(){
         viewModelScope.launch {
             val seriesCardWatching = sakhCastRepository.getSeriesFavorites("watching")
             val seriesCardWillWatch = sakhCastRepository.getSeriesFavorites("will")

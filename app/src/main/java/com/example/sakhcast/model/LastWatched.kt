@@ -1,7 +1,7 @@
 package com.example.sakhcast.model
 
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class LastWatched(
@@ -49,10 +49,10 @@ data class MovieDataRecent(
     @SerialName("id") val id: Int,
     @SerialName("id_alpha") val idAlpha: String,
     @SerialName("imdb") val imdb: Boolean,
-    @SerialName("imdb_rating") val imdbRating: Double,
+    @SerialName("imdb_rating") val imdbRating: Double?,
     @SerialName("is_dark_backdrop") val isDarkBackdrop: Boolean,
     @SerialName("kp") val kp: Boolean,
-    @SerialName("kp_rating") val kpRating: Double,
+    @SerialName("kp_rating") val kpRating: Double?,
     @SerialName("link") val link: String,
     @SerialName("origin_title") val originTitle: String,
     @SerialName("release_date") val releaseDate: String,
@@ -70,11 +70,11 @@ data class SerialDataRecent(
     @SerialName("country") val country: String,
     @SerialName("ename") val ename: String,
     @SerialName("id") val id: Int,
-    @SerialName("imdb_rating") val imdbRating: Int,
+    @SerialName("imdb_rating") val imdbRating: Double?,
     @SerialName("imdb_url") val imdbUrl: String,
     @SerialName("is_dark_backdrop") val isDarkBackdrop: Boolean,
     @SerialName("kp_id") val kpId: Int,
-    @SerialName("kp_rating") val kpRating: Double,
+    @SerialName("kp_rating") val kpRating: Double?,
     @SerialName("name") val name: String,
     @SerialName("network") val network: String,
     @SerialName("poster") val poster: String,

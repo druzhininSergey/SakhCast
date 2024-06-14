@@ -1,4 +1,4 @@
-package com.example.sakhcast.data
+package com.example.sakhcast.data.samples
 
 import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.RG

@@ -79,18 +79,26 @@ fun MovieItemView(movieCard: MovieCard, navHostController: NavHostController) {
                     .width(150.dp)
             ) {
                 Text(
-                    text = movieCard.releaseDate.take(4).toString(),
+                    text = movieCard.releaseDate.take(4),
                     fontSize = 10.sp,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
-                Text(
-                    text = movieCard.runtime.toString() + " мин.",
+                if (movieCard.runtime != null) Text(
+                    text = convertMinutes(movieCard.runtime),
                     fontSize = 8.sp,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
     }
+}
+
+private fun convertMinutes(minutes: Int): String {
+    val hours = minutes / 60
+    val remainingMinutes = minutes % 60
+    val hoursPart = if (hours > 0) "${hours}час. " else ""
+    val minutesPart = if (remainingMinutes > 0 || hours == 0) "${remainingMinutes}мин." else ""
+    return "$hoursPart$minutesPart".trim()
 }
 
 @Composable

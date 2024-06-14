@@ -15,7 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.sakhcast.Colors
@@ -24,14 +23,12 @@ import com.example.sakhcast.ui.main_screens.home_screen.recently_watched.Continu
 import com.example.sakhcast.ui.main_screens.home_screen.series.SeriesCategoryView
 import com.example.sakhcast.ui.theme.SakhCastTheme
 
-@Preview
 @Composable
 fun HomeScreen(
     paddingValues: PaddingValues,
     homeScreenViewModel: HomeScreenViewModel = hiltViewModel(),
     navHostController: NavHostController,
 ) {
-    homeScreenViewModel.getAllScreenData()
     val homeScreenState by
     homeScreenViewModel.homeScreenState.observeAsState(HomeScreenViewModel.HomeScreenState())
 

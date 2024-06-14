@@ -1,7 +1,7 @@
 package com.example.sakhcast.model
 
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class MovieList(
@@ -39,6 +39,6 @@ data class MovieCard(
     @SerialName("progress") val progress: Boolean?,
     @SerialName("release_date") val releaseDate: String,
     @SerialName("ru_title") val ruTitle: String,
-    @SerialName("runtime") val runtime: Int,
+    @SerialName("runtime") val runtime: Int?,
     @SerialName("user") val user: User
 )

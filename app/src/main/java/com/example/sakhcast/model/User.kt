@@ -6,11 +6,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class LoginResponse(
     @SerialName("auth") val auth: String,
-    @SerialName("user") val user: CurentUser,
+    @SerialName("user") val user: CurrentUser,
 )
 
 @Serializable
-data class CurentUser(
+data class CurrentUser(
     @SerialName("access") val access: Boolean,
     @SerialName("alerts") val alerts: Int,
     @SerialName("authorized") val authorized: Boolean,

@@ -16,6 +16,7 @@ private val DarkColorScheme = darkColorScheme(
     tertiary = charcoalGrayTransparent,
     onPrimary = pastelLavender,
     onSecondary = lavenderMist,
+    scrim = ratingDarkMode
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -24,6 +25,7 @@ private val LightColorScheme = lightColorScheme(
     tertiary = pastelLavenderTransition,
     onPrimary = deepCharcoal,
     onSecondary = deepCharcoal,
+    scrim = ratingLightMode
 )
 
 @Composable

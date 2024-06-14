@@ -8,12 +8,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sakhcast.SHARED_PREFS_TOKEN_KEY
 import com.example.sakhcast.data.repository.SakhCastRepository
-import com.example.sakhcast.model.CurentUser
+import com.example.sakhcast.model.CurrentUser
 import com.example.sakhcast.model.LoginResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.security.SecureRandom
-import java.util.Base64
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,18 +26,14 @@ class LogInScreenViewModel @Inject constructor(
 
     data class UserDataState(
 //        var userToken: String = "",
-        var curentUser: CurentUser? = null,
+        var currentUser: CurrentUser? = null,
         var isLogged: Boolean? = null,
         var isPasswordCorrect: Boolean = true,
         var isUserPro: Boolean = true,
     )
 
-    private fun generateToken(length: Int = 36): String {
-        val random = SecureRandom()
-        val bytes = ByteArray((length * 3) / 4)
-        random.nextBytes(bytes)
-        return Base64.getUrlEncoder().withoutPadding()
-            .encodeToString(bytes)
+    private fun generateToken(): String {
+        return UUID.randomUUID().toString()
     }
 
     private fun saveUserTokenInSharedPrefs(userToken: String) {
@@ -47,6 +42,10 @@ class LogInScreenViewModel @Inject constructor(
             apply()
         }
     }
+
+//    private fun getTokenFromSharedPreferences(): String {
+//        return sharedPreferences.getString(SHARED_PREFS_TOKEN_KEY, "") ?: ""
+//    }
 
     fun checkTokenExist() {
         viewModelScope.launch {
@@ -63,6 +62,8 @@ class LogInScreenViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             val token = generateToken()
+            Log.e("!!!", "token VM = $token")
+
             saveUserTokenInSharedPrefs(token)
             val loginResponse: LoginResponse? =
                 sakhCastRepository.userLogin(loginInput, passwordInput)
@@ -70,7 +71,7 @@ class LogInScreenViewModel @Inject constructor(
             if (loginResponse != null && loginResponse.user.pro) {
                 val user = loginResponse.user
                 _userDataState.value = userDataState.value?.copy(
-                    curentUser = user,
+                    currentUser = user,
                     isLogged = true,
                     isPasswordCorrect = true,
                     isUserPro = true
@@ -78,7 +79,7 @@ class LogInScreenViewModel @Inject constructor(
             } else if (loginResponse != null && !loginResponse.user.pro) {
                 Log.i("!!!!", "userPro = ${loginResponse.user.pro}")
                 _userDataState.value = userDataState.value?.copy(
-                    curentUser = null,
+                    currentUser = null,
                     isLogged = false,
                     isPasswordCorrect = true,
                     isUserPro = false
@@ -95,8 +96,8 @@ class LogInScreenViewModel @Inject constructor(
     fun checkLoggedUser() {
         viewModelScope.launch {
 //            while (true) {
-            val curentUser = sakhCastRepository.checkLoginStatus()
-            if (curentUser == null) {
+            val currentUser = sakhCastRepository.checkLoginStatus()
+            if (currentUser == null) {
                 saveUserTokenInSharedPrefs("")
                 _userDataState.value =
                     userDataState.value?.copy(isLogged = false)
@@ -104,7 +105,7 @@ class LogInScreenViewModel @Inject constructor(
             } else {
                 _userDataState.value =
                     userDataState.value?.copy(
-                        curentUser = curentUser,
+                        currentUser = currentUser,
                         isLogged = true,
                     )
             }
