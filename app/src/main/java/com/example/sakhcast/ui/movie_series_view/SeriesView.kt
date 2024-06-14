@@ -99,7 +99,7 @@ fun SeriesView(
         }
     }
     val series = seriesState.value.series
-    val isFavorite = remember { mutableStateOf(series?.userFavoriteInSeries != null) }
+    val isFavorite = remember { mutableStateOf(seriesState.value.isFavorite ?: false) }
     LaunchedEffect(seriesState.value.isFavorite) {
         isFavorite.value = seriesState.value.isFavorite ?: false
     }
@@ -134,7 +134,7 @@ fun SeriesView(
                 }).build()
         )
 
-    Box() {
+    Box {
         Column(
             modifier = Modifier
                 .padding(bottom = paddingValues.calculateBottomPadding())
