@@ -2,7 +2,6 @@ package com.example.sakhcast.ui.movie_series_view
 
 import android.os.Build
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,10 +46,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
@@ -59,8 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
+import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcast.R
 import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.Genre
@@ -118,21 +114,20 @@ fun SeriesView(
     val scrollState = rememberScrollState()
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
 
-    val context = LocalContext.current
     val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         series?.posterAlt + ".avif"
     } else {
         series?.posterAlt + ".webp"
     }
-    val posterPainter: Painter =
-        rememberAsyncImagePainter(
-            ImageRequest.Builder(context).data(data = imageUrl)
-                .apply(block = fun ImageRequest.Builder.() {
-                    crossfade(true)
-                    placeholder(R.drawable.series_poster) // Укажите ресурс-заполнитель
-                    //            error(R.drawable.error) // Укажите ресурс ошибки
-                }).build()
-        )
+
+    val backdropColor1 =
+        if (series != null) Color(android.graphics.Color.parseColor(series.posterColors.background1))
+        else Color.Gray
+    val backdropColor2 =
+        if (series != null) Color(android.graphics.Color.parseColor(series.posterColors.background2))
+        else Color.Blue
+    val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
+
 
     Box {
         Column(
@@ -148,8 +143,8 @@ fun SeriesView(
                     .background(MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = posterPainter,
+                SubcomposeAsyncImage(
+                    model = imageUrl,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxSize()
@@ -159,6 +154,13 @@ fun SeriesView(
                             translationY = 0.5f * scrollState.value
                         },
                     contentScale = ContentScale.Crop,
+                    loading = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(brush = brush)
+                        )
+                    }
                 )
                 Box(
                     modifier = Modifier
@@ -400,10 +402,10 @@ fun TopSeriesBar(
                     listFavoriteType.keys.forEach { favType ->
                         DropdownMenuItem(text = { Text(text = favType) }, onClick = {
                             listFavoriteType[favType]?.let {
-                            onFavoriteButtonPushed(
-                                it
-                            )
-                        }
+                                onFavoriteButtonPushed(
+                                    it
+                                )
+                            }
                             isExpandedFavorite = false
                         })
                     }
@@ -420,7 +422,6 @@ fun SeriesDownloads(
     seriesEpisodes: List<Episode>,
     onSeasonChanged: (Int) -> Unit,
 ) {
-
     var isExpanded by remember { mutableStateOf(false) }
     var seasonSelected by remember { mutableStateOf("Сезон ${seasons[0].index}") }
     val scrollState = rememberScrollState()

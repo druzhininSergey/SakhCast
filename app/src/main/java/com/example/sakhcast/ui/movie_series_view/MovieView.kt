@@ -4,7 +4,6 @@ import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -49,10 +48,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,8 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
+import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcast.R
 import com.example.sakhcast.model.Cast
 import com.example.sakhcast.model.Download
@@ -108,21 +104,18 @@ fun MovieView(
     val scrollState = rememberScrollState()
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
 
-    val context = LocalContext.current
     val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         movie?.posterAlt + ".avif"
     } else {
         movie?.posterAlt + ".webp"
     }
-    val posterPainter: Painter =
-        rememberAsyncImagePainter(
-            ImageRequest.Builder(context).data(data = imageUrl)
-                .apply(block = fun ImageRequest.Builder.() {
-                    crossfade(true)
-                    placeholder(R.drawable.series_poster) // Укажите ресурс-заполнитель
-                    //            error(R.drawable.error) // Укажите ресурс ошибки
-                }).build()
-        )
+    val backdropColor1 =
+        if (movie != null) Color(android.graphics.Color.parseColor(movie.backdropColors.background1))
+        else Color.Gray
+    val backdropColor2 =
+        if (movie != null) Color(android.graphics.Color.parseColor(movie.backdropColors.background2))
+        else Color.Blue
+    val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
 
     Box() {
         Column(
@@ -138,17 +131,24 @@ fun MovieView(
                     .background(MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = posterPainter,
+                SubcomposeAsyncImage(
+                    model = imageUrl,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxSize()
                         .graphicsLayer {
                             alpha =
-                                1f - ((scrollState.value.toFloat() / scrollState.maxValue) * 2.5f)
+                                1f - ((scrollState.value.toFloat() / scrollState.maxValue) * 1.5f)
                             translationY = 0.5f * scrollState.value
                         },
                     contentScale = ContentScale.Crop,
+                    loading = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(brush = brush)
+                        )
+                    }
                 )
                 Box(
                     modifier = Modifier
@@ -380,7 +380,7 @@ fun TopMovieBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = {navHostController.navigateUp()}) {
+            IconButton(onClick = { navHostController.navigateUp() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                     contentDescription = null,
@@ -604,21 +604,14 @@ fun MovieExpandableCastTab(cast: Cast) {
 
 @Composable
 fun PersonItem(person: Person) {
-    val context = LocalContext.current
     val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         person.photoAlt + ".avif"
     } else {
         person.photoAlt + ".webp"
     }
-    val personPainter: Painter =
-        rememberAsyncImagePainter(
-            ImageRequest.Builder(context).data(data = imageUrl)
-                .apply(block = fun ImageRequest.Builder.() {
-                    crossfade(true)
-                    placeholder(R.drawable.cast) // Укажите ресурс-заполнитель
-                    //            error(R.drawable.error) // Укажите ресурс ошибки
-                }).build()
-        )
+    val backdropColor1 = Color.Gray
+    val backdropColor2 = Color.Black
+    val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
     Column(
         modifier = Modifier
             .width(70.dp)
@@ -626,12 +619,20 @@ fun PersonItem(person: Person) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Image(
-            painter = personPainter,
+        SubcomposeAsyncImage(
+            model = imageUrl,
             contentDescription = null,
             modifier = Modifier
                 .clip(CircleShape)
-                .size(60.dp)
+                .size(60.dp),
+            contentScale = ContentScale.FillBounds,
+            loading = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(brush = brush)
+                )
+            }
         )
         Text(
             text = person.ruName,

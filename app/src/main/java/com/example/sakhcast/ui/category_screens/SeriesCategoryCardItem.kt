@@ -22,18 +22,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
+import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcast.R
 import com.example.sakhcast.SERIES_VIEW
 import com.example.sakhcast.model.SeriesCard
@@ -88,21 +86,17 @@ fun SeriesCategoryCardItem(seriesCard: SeriesCard, navHostController: NavHostCon
 
 @Composable
 fun SeriesCategoryCard(seriesCard: SeriesCard) {
-    val context = LocalContext.current
     val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         seriesCard.coverAlt + ".avif"
     } else {
         seriesCard.coverAlt + ".webp"
     }
-    val coverPainter: Painter =
-        rememberAsyncImagePainter(
-            ImageRequest.Builder(context).data(data = imageUrl)
-                .apply(block = fun ImageRequest.Builder.() {
-                    crossfade(true)
-                    placeholder(R.drawable.series_poster) // Укажите ресурс-заполнитель
-                    //            error(R.drawable.error) // Укажите ресурс ошибки
-                }).build()
-        )
+    val backdropColor1 =
+        Color(android.graphics.Color.parseColor(seriesCard.coverColors.background1))
+    val backdropColor2 =
+        Color(android.graphics.Color.parseColor(seriesCard.coverColors.background2))
+    val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
+
     Card(
         modifier = Modifier
             .aspectRatio(0.682f),
@@ -110,12 +104,14 @@ fun SeriesCategoryCard(seriesCard: SeriesCard) {
         colors = CardDefaults.cardColors(),
     ) {
         Box {
-            Image(
-                modifier = Modifier
-                    .fillMaxSize(),
-                painter = coverPainter,
+            SubcomposeAsyncImage(
+                model = imageUrl,
                 contentDescription = null,
-                contentScale = ContentScale.FillBounds
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.FillBounds,
+                loading = { Box(modifier = Modifier
+                    .fillMaxSize()
+                    .background(brush = brush)) }
             )
             Row(
                 modifier = Modifier
