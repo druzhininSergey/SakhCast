@@ -1,12 +1,12 @@
 package com.example.sakhcast.ui.movie_series_view
 
 import android.os.Build
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,17 +21,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import com.example.sakhcast.R
+import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcast.data.samples.SeriesEpisodesSample
 import com.example.sakhcast.model.Episode
 
@@ -65,28 +62,47 @@ fun SeriesEpisodeView(episodes: List<Episode>) {
 
 @Composable
 fun SeriesEpisodeItemView(seriesEpisode: Episode) {
-    val context = LocalContext.current
+
     val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         seriesEpisode.previewAlt + ".avif"
     } else {
         seriesEpisode.previewAlt + ".webp"
     }
-    val previewPainter: Painter =
-        rememberAsyncImagePainter(
-            ImageRequest.Builder(context).data(data = imageUrl)
-                .apply(block = fun ImageRequest.Builder.() {
-                    crossfade(true)
-                    placeholder(R.drawable.series_episode_preview) // Укажите ресурс-заполнитель
-                    //            error(R.drawable.error) // Укажите ресурс ошибки
-                }).build()
-        )
+
+    val backdropColor1 = listOf(
+        Color(0xFF616161),
+        Color(0xFF78909C),
+        Color(0xFF5D4037),
+        Color(0xFF546E7A),
+        Color(0xFF0D47A1),
+        Color(0xFF1B5E20),
+        Color(0xFF212121)
+    ).random()
+    val backdropColor2 = listOf(
+        Color(0xFF757575),
+        Color(0xFF90A4AE),
+        Color(0xFF4E342E),
+        Color(0xFF455A64),
+        Color(0xFF1565C0),
+        Color(0xFF2E7D32),
+        Color(0xFF424242)
+    ).random()
+    val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
+
     Card(modifier = Modifier.width(190.dp)) {
         Box() {
-            Image(
-                modifier = Modifier.height(123.dp),
-                painter = previewPainter,
+            SubcomposeAsyncImage(
+                model = imageUrl,
                 contentDescription = null,
+                modifier = Modifier.height(123.dp),
                 contentScale = ContentScale.Crop,
+                loading = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(brush = brush)
+                    )
+                }
             )
             Box(
                 modifier = Modifier

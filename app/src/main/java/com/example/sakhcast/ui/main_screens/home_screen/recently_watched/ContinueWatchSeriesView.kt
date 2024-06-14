@@ -1,7 +1,6 @@
 package com.example.sakhcast.ui.main_screens.home_screen.recently_watched
 
 import android.os.Build
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -17,17 +16,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
+import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcast.Dimens
 import com.example.sakhcast.SERIES_VIEW
 import com.example.sakhcast.model.SeriesRecent
@@ -38,24 +35,18 @@ fun Preview1() {
 //    ContinueWatchSeriesView(seriesCard = Samples.getOneSeries())
 }
 
-@Preview(showBackground = true)
 @Composable
 fun ContinueWatchSeriesView(seriesCard: SeriesRecent, navHostController: NavHostController) {
-    val context = LocalContext.current
     val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         seriesCard.data.backdropAlt + ".avif"
     } else {
         seriesCard.data.backdropAlt + ".webp"
     }
-    val backdropPainter: Painter =
-        rememberAsyncImagePainter(
-            ImageRequest.Builder(context).data(data = imageUrl)
-                .apply(block = fun ImageRequest.Builder.() {
-                    crossfade(true)
-                    //            placeholder(R.drawable.placeholder) // Укажите ресурс-заполнитель
-                    //            error(R.drawable.error) // Укажите ресурс ошибки
-                }).build()
-        )
+    val backdropColor1 =
+        Color(android.graphics.Color.parseColor(seriesCard.data.backdropColors.background1))
+    val backdropColor2 =
+        Color(android.graphics.Color.parseColor(seriesCard.data.backdropColors.background2))
+    val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
     Card(
         modifier = Modifier
             .height(234.dp)
@@ -64,11 +55,14 @@ fun ContinueWatchSeriesView(seriesCard: SeriesRecent, navHostController: NavHost
             .clickable { navHostController.navigate("${SERIES_VIEW}/${seriesCard.data.id}") }
     ) {
         Box {
-            Image(
-                modifier = Modifier.fillMaxSize(),
-                painter = backdropPainter,
+            SubcomposeAsyncImage(
+                model = imageUrl,
                 contentDescription = null,
-                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.FillBounds,
+                loading = { Box(modifier = Modifier
+                    .fillMaxSize()
+                    .background(brush = brush)) }
             )
             Column(
                 Modifier
