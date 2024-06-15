@@ -6,12 +6,14 @@ import com.example.sakhcast.model.LastWatched
 import com.example.sakhcast.model.LoginResponse
 import com.example.sakhcast.model.Movie
 import com.example.sakhcast.model.MovieList
-import com.example.sakhcast.model.ResultLogout
+import com.example.sakhcast.model.Result
 import com.example.sakhcast.model.Series
 import com.example.sakhcast.model.SeriesList
 import retrofit2.Call
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -24,7 +26,7 @@ interface SakhCastApiService {
     ): Call<LoginResponse>
 
     @POST("v1/users/logout")
-    fun userLogout(): Call<ResultLogout>
+    fun userLogout(): Call<Result>
 
     @GET("v2/users/current")
     fun checkLoginStatus(): Call<CurrentUser>
@@ -119,4 +121,17 @@ interface SakhCastApiService {
         @Query("page") page: Int,
         @Query("amount") amount: Int = 40,
     ): Call<MovieList>
+
+    @PUT("v2/movie/{movie}/fav")
+    fun putMovieInFavorites(
+        @Path("movie") movieAlphaId: String,
+        @Query("kind") kind: String,
+    ): Call<Result>
+
+    @DELETE("v2/movie/{movie}/fav")
+    fun deleteMovieFromFavorites(
+        @Path("movie") movieAlphaId: String,
+    ): Call<Result>
+
+
 }
