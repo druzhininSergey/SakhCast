@@ -54,7 +54,7 @@ fun AuthenticatedMainScreen(
 
     val isTopBarVisible = remember(key1 = backStackState) {
         currentDestination != "$SERIES_CATEGORY_SCREEN/{category}" &&
-                currentDestination != "$MOVIE_CATEGORY_SCREEN/{category}" &&
+                currentDestination != "$MOVIE_CATEGORY_SCREEN/{category}/{genresId}" &&
                 currentDestination != "$MOVIE_VIEW/{movieId}" &&
                 currentDestination != "$SERIES_VIEW/{seriesId}"
     }

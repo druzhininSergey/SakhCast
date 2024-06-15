@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.category_screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,13 +38,16 @@ fun MovieCategoryScreen(
     navHostController: NavHostController,
     movieCategoryScreenViewModel: MovieCategoryScreenViewModel = hiltViewModel()
 ) {
-    val categoryName = navHostController.currentBackStackEntry?.arguments?.getString(
-        "category"
-    ) ?: "Все"
+    val searchCategoryName =
+        navHostController.currentBackStackEntry?.arguments?.getString("category") ?: "Все"
+    val searchGenreId =
+        navHostController.currentBackStackEntry?.arguments?.getString("genresId")
+    Log.e("!!!","searchGenreId = $searchGenreId")
     val moviePagingData: LazyPagingItems<MovieCard>? =
         movieCategoryScreenViewModel.moviesCategoryScreenState.value?.moviesPagingData?.collectAsLazyPagingItems()
-    LaunchedEffect(categoryName) {
-        movieCategoryScreenViewModel.initCategory(categoryName)
+    LaunchedEffect(searchCategoryName, searchGenreId) {
+        if (searchGenreId == null || searchGenreId == "{}") movieCategoryScreenViewModel.initCategory(searchCategoryName)
+        else movieCategoryScreenViewModel.initCategory(searchGenreId)
     }
     val lazyGridState = rememberLazyGridState()
 
@@ -52,7 +56,7 @@ fun MovieCategoryScreen(
             title = {
                 Text(
                     textAlign = TextAlign.Center,
-                    text = categoryName
+                    text = searchCategoryName.replaceFirstChar { it.uppercaseChar() }
                 )
             },
             navigationIcon = {

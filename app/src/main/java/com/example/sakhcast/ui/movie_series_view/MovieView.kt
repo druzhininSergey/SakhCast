@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
+import com.example.sakhcast.MOVIE_CATEGORY_SCREEN
 import com.example.sakhcast.R
 import com.example.sakhcast.model.Cast
 import com.example.sakhcast.model.Download
@@ -93,9 +94,8 @@ fun MovieView(
     movieViewModel: MovieViewModel = hiltViewModel()
 ) {
     val movieState = movieViewModel.movieState.observeAsState(MovieViewModel.MovieState())
-    val movie = movieState.value.movie //?: throw IllegalStateException("Movie is null")
-    val recomendationList =
-        movieState.value.movieRecomendationsList //?: throw IllegalStateException("Movie is null")
+    val movie = movieState.value.movie
+    val recommendationList = movieState.value.movieRecomendationsList
     val alphaId = navHostController.currentBackStackEntry?.arguments?.getString("movieId")
     LaunchedEffect(alphaId) {
         if (alphaId != null) movieViewModel.getFullMovieWithRecomendations(alphaId)
@@ -104,11 +104,9 @@ fun MovieView(
     val scrollState = rememberScrollState()
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
 
-    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        movie?.posterAlt + ".avif"
-    } else {
-        movie?.posterAlt + ".webp"
-    }
+    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) movie?.posterAlt + ".avif"
+    else movie?.posterAlt + ".webp"
+
     val backdropColor1 =
         if (movie != null) Color(android.graphics.Color.parseColor(movie.backdropColors.background1))
         else Color.Gray
@@ -117,7 +115,7 @@ fun MovieView(
         else Color.Blue
     val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
 
-    Box() {
+    Box {
         Column(
             modifier = Modifier
                 .padding(bottom = paddingValues.calculateBottomPadding())
@@ -214,8 +212,8 @@ fun MovieView(
                 }
             }
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.primary)) {
-                if (movie != null && recomendationList != null) {
-                    MovieInfo(movie, recomendationList, navHostController)
+                if (movie != null && recommendationList != null) {
+                    MovieInfo(movie, recommendationList, navHostController)
                 }
             }
         }
@@ -240,7 +238,11 @@ fun MovieInfo(movie: Movie, recommendationList: MovieList, navHostController: Na
     Column(
         modifier = Modifier.background(MaterialTheme.colorScheme.primary)
     ) {
-        MovieGenres(movie.genres)
+        MovieGenres(movie.genres) { genresName: String, genresId: String ->
+            navHostController.navigate(
+                MOVIE_CATEGORY_SCREEN + "/${genresName}/${genresId}"
+            )
+        }
         if (isRatingExists) MovieRating(movie.imdbRating, movie.kpRating)
         MovieCountryYearStatus(movie.productionCountries, movie.releaseDate, movie.status)
         MovieDownloads(movie.downloads)
@@ -494,10 +496,10 @@ fun MovieRating(_imdbRating: Double?, _kinopoiskRating: Double?) {
 }
 
 @Composable
-fun MovieGenres(genres: List<Genre>) {
+fun MovieGenres(genres: List<Genre>, onGenreClicked: (String, String) -> Unit) {
     LazyRow(Modifier.fillMaxWidth()) {
         itemsIndexed(genres) { _, genres ->
-            TextButton(onClick = {}) {
+            TextButton(onClick = { onGenreClicked(genres.name, genres.id.toString()) }) {
                 Text(
                     text = genres.name.uppercase(),
                     color = MaterialTheme.colorScheme.onPrimary,

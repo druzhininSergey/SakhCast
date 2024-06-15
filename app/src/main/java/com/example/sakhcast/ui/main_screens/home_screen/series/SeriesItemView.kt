@@ -89,11 +89,9 @@ fun SeriesItemView(seriesCard: SeriesCard, navHostController: NavHostController)
 
 @Composable
 fun SeriesCard(seriesCard: SeriesCard) {
-    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        seriesCard.coverAlt + ".avif"
-    } else {
-        seriesCard.coverAlt + ".webp"
-    }
+    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) seriesCard.coverAlt + ".avif"
+    else seriesCard.coverAlt + ".webp"
+
     val backdropColor1 =
         Color(android.graphics.Color.parseColor(seriesCard.coverColors.background1))
     val backdropColor2 =
@@ -113,9 +111,13 @@ fun SeriesCard(seriesCard: SeriesCard) {
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.FillBounds,
-                loading = { Box(modifier = Modifier
-                    .fillMaxSize()
-                    .background(brush = brush)) }
+                loading = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(brush = brush)
+                    )
+                }
             )
             Row(
                 modifier = Modifier
@@ -152,7 +154,6 @@ fun SeriesCard(seriesCard: SeriesCard) {
                         }
                     }
                 }
-
                 if (seriesCard.kp) {
                     Box(
                         modifier = Modifier

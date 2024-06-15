@@ -113,7 +113,7 @@ interface SakhCastApiService {
         @Query("amount") amount: Int = 40,
     ): Call<MovieList>
 
-    @GET("v2/catalog/movies/items?page=0&amount=48&genres=20")
+    @GET("v2/catalog/movies/items")
     fun getMoviesListByGenreId(
         @Query("genres") genresId: String,
         @Query("page") page: Int,
