@@ -4,6 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ResultLogout(
+data class Result(
     @SerialName("result") val result: Boolean
 )

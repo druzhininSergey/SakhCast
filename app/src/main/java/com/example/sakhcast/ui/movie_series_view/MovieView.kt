@@ -29,6 +29,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,6 +55,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -69,7 +72,6 @@ import com.example.sakhcast.model.MovieList
 import com.example.sakhcast.model.Person
 import com.example.sakhcast.model.ProductionCompany
 import com.example.sakhcast.model.ProductionCountry
-import com.example.sakhcast.model.UserFavourite
 import com.example.sakhcast.ui.DividerBase
 import com.example.sakhcast.ui.main_screens.home_screen.movie.MovieItemView
 import java.util.Locale
@@ -95,15 +97,23 @@ fun MovieView(
 ) {
     val movieState = movieViewModel.movieState.observeAsState(MovieViewModel.MovieState())
     val movie = movieState.value.movie
-    val recommendationList = movieState.value.movieRecomendationsList
+    val recommendationList = movieState.value.movieRecommendationsList
     val alphaId = navHostController.currentBackStackEntry?.arguments?.getString("movieId")
     LaunchedEffect(alphaId) {
-        if (alphaId != null) movieViewModel.getFullMovieWithRecomendations(alphaId)
+        if (alphaId != null) movieViewModel.getFullMovieWithRecommendations(alphaId)
     }
+    val isFavorite = remember {
+        mutableStateOf(movieState.value.isFavorite ?: false)
+    }
+    LaunchedEffect(movieState.value.isFavorite) {
+        isFavorite.value = movieState.value.isFavorite ?: false
+    }
+//    Log.e("!!!", "isFavorite MOVIE_VIEW from state = ${movieState.value.isFavorite}")
+//    Log.e("!!!", "isFavorite MOVIE_VIEW = $isFavorite")
 
     val scrollState = rememberScrollState()
-    var sizeImage by remember { mutableStateOf(IntSize.Zero) }
 
+    var sizeImage by remember { mutableStateOf(IntSize.Zero) }
     val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) movie?.posterAlt + ".avif"
     else movie?.posterAlt + ".webp"
 
@@ -223,8 +233,10 @@ fun MovieView(
                 ruTitle = it,
                 paddingValues = paddingValues,
                 navHostController = navHostController,
-                movie.userFavourite
-            )
+                isFavorite = isFavorite.value,
+            ) { kind: String ->
+                movieViewModel.onFavoriteButtonPushed(kind)
+            }
         }
 
     }
@@ -357,17 +369,21 @@ fun TopMovieBar(
     ruTitle: String,
     paddingValues: PaddingValues,
     navHostController: NavHostController,
-    userFavourite: UserFavourite
+    isFavorite: Boolean,
+    onFavoriteButtonPushed: (String) -> Unit
 ) {
+    var isExpandedFavorite by remember { mutableStateOf(false) }
     val alpha = if (scrollState.maxValue > 0) {
         min(1f, (scrollState.value.toFloat() / scrollState.maxValue) * 1.5f)
-    } else {
-        0f
-    }
+    } else 0f
+
     val primaryColor = MaterialTheme.colorScheme.primary
-    val isFavorite = userFavourite.isFav
-    val favIcon = if (isFavorite == true) painterResource(R.drawable.ic_star_full2)
+    val favIcon = if (isFavorite) painterResource(R.drawable.ic_star_full2)
     else painterResource(R.drawable.ic_star_empty2)
+    val listFavoriteType = mapOf(
+        "Буду смотреть" to "will",
+        "Просмотренно" to "watched"
+    )
 
     Column(
         modifier = Modifier
@@ -396,14 +412,36 @@ fun TopMovieBar(
                 text = ruTitle,
                 color = MaterialTheme.colorScheme.onPrimary.copy(alpha = alpha),
             )
-            Icon(
-                painter = favIcon,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .size(40.dp),
-                tint = if (isFavorite == true) Color(0xFFFFD700) else Color.White
-            )
+            Box {
+                Icon(
+                    painter = favIcon,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(40.dp)
+                        .clickable {
+                            if (isFavorite) onFavoriteButtonPushed("")
+                            else isExpandedFavorite = true
+                        },
+                    tint = if (isFavorite) Color(0xFFFFD700) else Color.White
+                )
+                DropdownMenu(
+                    modifier = Modifier.background(
+                        color = Color.Gray.copy(alpha = 0.5f)
+                    ),
+                    offset = DpOffset(0.dp, 8.dp),
+                    expanded = isExpandedFavorite,
+                    onDismissRequest = { isExpandedFavorite = false },
+                ) {
+                    listFavoriteType.keys.forEach { favType ->
+                        DropdownMenuItem(text = { Text(text = favType) }, onClick = {
+                            listFavoriteType[favType]?.let { onFavoriteButtonPushed(it) }
+                            isExpandedFavorite = false
+                        })
+                    }
+                }
+            }
+
         }
     }
 }

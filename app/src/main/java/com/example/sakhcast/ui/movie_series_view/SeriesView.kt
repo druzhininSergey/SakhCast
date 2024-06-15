@@ -337,9 +337,8 @@ fun TopSeriesBar(
     var isExpandedFavorite by remember { mutableStateOf(false) }
     val alpha = if (scrollState.maxValue > 0) {
         min(1f, (scrollState.value.toFloat() / scrollState.maxValue) * 1.5f)
-    } else {
-        0f
-    }
+    } else 0f
+
     val primaryColor = MaterialTheme.colorScheme.primary
     val favIcon = if (isFavorite) painterResource(R.drawable.ic_star_full2)
     else painterResource(R.drawable.ic_star_empty2)
