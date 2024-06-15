@@ -40,7 +40,7 @@ fun CatalogList(categories: List<String>, navHostController: NavHostController, 
                     .clickable {
                         val route =
                             if (tabIndex == 0) SERIES_CATEGORY_SCREEN + "/${item}"
-                            else MOVIE_CATEGORY_SCREEN + "/${item}"
+                            else MOVIE_CATEGORY_SCREEN + "/${item}/{}"
                         navHostController.navigate(route)
                     },
                 verticalAlignment = Alignment.CenterVertically,

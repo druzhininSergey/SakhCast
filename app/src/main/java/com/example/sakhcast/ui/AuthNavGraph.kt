@@ -72,13 +72,12 @@ fun AuthNavGraph(
         composable("$SERIES_VIEW/{seriesId}") {
             SeriesView(paddingValues, navHostController)
         }
-        composable("$MOVIE_CATEGORY_SCREEN/{category}") {
-
+        composable("$MOVIE_CATEGORY_SCREEN/{category}/{genresId}") {
             MovieCategoryScreen(paddingValues, navHostController)
         }
         composable("$SERIES_CATEGORY_SCREEN/{category}") {
-
             SeriesCategoryScreen(paddingValues, navHostController)
         }
+
     }
 }

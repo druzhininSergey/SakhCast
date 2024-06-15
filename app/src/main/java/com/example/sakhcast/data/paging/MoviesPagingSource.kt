@@ -56,8 +56,7 @@ class MoviesPagingSource(
     }
 
     private fun getCategoryNameUrl(categoryName: String): String {
-        return categoryList[categoryName] ?: genreList[categoryName]
-        ?: throw IllegalArgumentException("Unknown category or genre: $categoryName")
+        return categoryList[categoryName] ?: genreList[categoryName] ?: categoryName
     }
 
     private suspend fun getMoviesList(page: Int, categoryNameUrl: String): MovieList? {
