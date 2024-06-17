@@ -6,6 +6,7 @@ import com.example.sakhcast.model.LastWatched
 import com.example.sakhcast.model.LoginResponse
 import com.example.sakhcast.model.Movie
 import com.example.sakhcast.model.MovieList
+import com.example.sakhcast.model.NotificationList
 import com.example.sakhcast.model.Result
 import com.example.sakhcast.model.Series
 import com.example.sakhcast.model.SeriesList
@@ -81,6 +82,14 @@ interface SakhCastApiService {
         @Query("serial_id") seriesId: Int,
     ): Call<String>
 
+    @GET("v1/catalog/items")
+    fun searchSeries(
+        @Query("category") category: String = "search",
+        @Query("page") page: Int,
+        @Query("amount") amount: Int = 40,
+        @Query("t") textInput: String
+    ): Call<SeriesList>
+
     // Movies
     @GET("v2/catalog/movies/items")
     fun getMoviesByCategoryName(
@@ -133,5 +142,21 @@ interface SakhCastApiService {
         @Path("movie") movieAlphaId: String,
     ): Call<Result>
 
+    @GET("v2/catalog/movies/items")
+    fun searchMovie(
+        @Query("category") category: String = "search",
+        @Query("page") page: Int,
+        @Query("amount") amount: Int = 40,
+        @Query("phrase") textInput: String,
+    ): Call<MovieList>
 
+    @GET("v1/users/get_notifies?amount=20&from=0&subject_only=0")
+    fun getNotificationsList(
+        @Query("amount") amount: Int = 40,
+        @Query("from") from: Int = 0,
+        @Query("subject_only") subjectOnly: Int = 0,
+    ): Call<NotificationList>
+
+    @POST("v1/users/ack_all_notifies")
+    fun makeAllNotificationsRead(): Call<Boolean>
 }

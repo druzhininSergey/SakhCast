@@ -13,6 +13,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.sakhcast.MOVIE_CATEGORY_SCREEN
 import com.example.sakhcast.MOVIE_VIEW
+import com.example.sakhcast.SEARCH_SCREEN
 import com.example.sakhcast.SERIES_CATEGORY_SCREEN
 import com.example.sakhcast.SERIES_VIEW
 import com.example.sakhcast.model.CurrentUser
@@ -56,7 +57,8 @@ fun AuthenticatedMainScreen(
         currentDestination != "$SERIES_CATEGORY_SCREEN/{category}" &&
                 currentDestination != "$MOVIE_CATEGORY_SCREEN/{category}/{genresId}" &&
                 currentDestination != "$MOVIE_VIEW/{movieId}" &&
-                currentDestination != "$SERIES_VIEW/{seriesId}"
+                currentDestination != "$SERIES_VIEW/{seriesId}" &&
+                currentDestination != SEARCH_SCREEN
     }
     val isBottomBarVisible = remember(key1 = backStackState) {
         currentDestination != "$MOVIE_VIEW/{movieId}" &&

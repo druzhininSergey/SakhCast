@@ -10,4 +10,5 @@ object Dimens {
 object Colors{
     val errorColor = Color(0xFF4A252B)
     val blueColor = Color(0xFF007AFF)
+    val proDaysCountGreenColor = Color(0xFF30D158)
 }

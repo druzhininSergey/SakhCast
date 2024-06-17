@@ -162,7 +162,6 @@ fun LogInScreen(
         Button(
             onClick = {
                 logInScreenViewModel.checkUserData(login, password)
-//                Log.e("!!!", "ПОШЕЛ ЛОГИН БЛЯЯЯЯЯЯЯЯЯЯЯЯ")
                 if (logInScreenState.value.isLogged == true) navController.navigate(HOME_SCREEN)
             },
             shape = RoundedCornerShape(10.dp),

@@ -1,5 +1,6 @@
 package com.example.sakhcast.data.repository
 
+import android.util.Log
 import com.example.sakhcast.data.api_service.SakhCastApiService
 import com.example.sakhcast.model.CurrentUser
 import com.example.sakhcast.model.Episode
@@ -7,6 +8,7 @@ import com.example.sakhcast.model.LastWatched
 import com.example.sakhcast.model.LoginResponse
 import com.example.sakhcast.model.Movie
 import com.example.sakhcast.model.MovieList
+import com.example.sakhcast.model.NotificationList
 import com.example.sakhcast.model.Result
 import com.example.sakhcast.model.Series
 import com.example.sakhcast.model.SeriesList
@@ -322,6 +324,70 @@ class SakhCastRepository @Inject constructor(
             } catch (e: Exception) {
 //                Log.i("!!!", "movieFromFavorites repo = exception, movieId = $movieAlphaId")
 //                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
+    suspend fun getNotificationsList(): NotificationList? {
+        return withContext(ioDispatcher) {
+            try {
+                val notificationListCall =
+                    sakhCastApiService.getNotificationsList()
+                val responseBody = notificationListCall.execute()
+                Log.i("!!!", "notificationList repo = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+                Log.i("!!!", "notificationList repo = exception")
+                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
+    suspend fun makeAllNotificationsRead(): Boolean? {
+        return withContext(ioDispatcher) {
+            try {
+                val notificationListCall =
+                    sakhCastApiService.makeAllNotificationsRead()
+                val responseBody = notificationListCall.execute()
+                Log.i("!!!", "makeAllNotificationsRead repo = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+                Log.i("!!!", "makeAllNotificationsRead repo = exception")
+                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
+    suspend fun searchMovie(textInput: String, page: Int): MovieList? {
+        return withContext(ioDispatcher) {
+            try {
+                val notificationListCall =
+                    sakhCastApiService.searchMovie(textInput = textInput, page = page)
+                val responseBody = notificationListCall.execute()
+                Log.i("!!!", "movieList Search repo = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+                Log.i("!!!", "movieList Search repo = exception")
+                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
+    suspend fun searchSeries(textInput: String, page: Int): SeriesList? {
+        return withContext(ioDispatcher) {
+            try {
+                val notificationListCall =
+                    sakhCastApiService.searchSeries(textInput = textInput, page = page)
+                val responseBody = notificationListCall.execute()
+                Log.i("!!!", "seriesList Search repo = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+                Log.i("!!!", "seriesList Search repo = exception")
+                Log.i("!!!", "${e.message}")
                 null
             }
         }

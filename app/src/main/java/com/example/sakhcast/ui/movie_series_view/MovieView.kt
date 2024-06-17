@@ -259,7 +259,12 @@ fun MovieInfo(movie: Movie, recommendationList: MovieList, navHostController: Na
         MovieCountryYearStatus(movie.productionCountries, movie.releaseDate, movie.status)
         MovieDownloads(movie.downloads)
         movie.overview?.let { MovieOverview(it) }
-        movie.productionCompanies?.let { MovieProductionCompanies(it) }
+        movie.productionCompanies?.let { MovieProductionCompanies(it) { companyName: String, companyId: String ->
+            navHostController.navigate(
+                MOVIE_CATEGORY_SCREEN + "/${companyName}/${companyId}"
+            )
+        }
+        }
         movie.cast?.let { MovieExpandableCastTab(it) }
         MovieRecommendations(
             navHostController = navHostController,
@@ -337,7 +342,10 @@ fun MovieRecommendations(
 }
 
 @Composable
-fun MovieProductionCompanies(productionCompanies: List<ProductionCompany>) {
+fun MovieProductionCompanies(
+    productionCompanies: List<ProductionCompany>,
+    onCompanyPushed: (String, String) -> Unit
+) {
     Text(
         modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
         text = "Кинокомпании",
@@ -357,6 +365,7 @@ fun MovieProductionCompanies(productionCompanies: List<ProductionCompany>) {
                 modifier = Modifier
                     .border(1.dp, Color.Gray, MaterialTheme.shapes.small)
                     .padding(4.dp)
+                    .clickable { onCompanyPushed(company.name, company.id.toString()) }
             )
         }
     }
