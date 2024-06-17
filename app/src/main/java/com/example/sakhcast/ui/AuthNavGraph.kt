@@ -41,9 +41,7 @@ fun AuthNavGraph(
     ) {
 
         composable(HOME_SCREEN) {
-            HomeScreen(
-                paddingValues = paddingValues, navHostController = navHostController
-            )
+            HomeScreen(paddingValues = paddingValues, navHostController = navHostController)
         }
         composable(CATALOG_SCREEN) {
             val catalogScreenViewModel = hiltViewModel<CatalogScreenViewModel>()
@@ -64,7 +62,7 @@ fun AuthNavGraph(
             NotificationScreen(paddingValues, notificationScreenState)
         }
         composable(SEARCH_SCREEN) {
-            SearchScreen()
+            SearchScreen(paddingValues, navHostController)
         }
         composable("$MOVIE_VIEW/{movieId}") {
             MovieView(paddingValues, navHostController)

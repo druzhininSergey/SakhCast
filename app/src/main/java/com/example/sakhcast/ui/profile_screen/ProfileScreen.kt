@@ -56,6 +56,7 @@ fun ProfileScreen(
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = bottomSheetState,
+        scrimColor = Color(0x00000000)
     ) {
         Column {
             Box(
@@ -94,7 +95,7 @@ fun ProfileScreen(
                     Image(
                         modifier = Modifier
                             .padding(8.dp)
-                            .size(55.dp)
+                            .size(100.dp)
                             .clip(CircleShape),
                         painter = avatar,
                         contentDescription = null
@@ -111,7 +112,7 @@ fun ProfileScreen(
                                 color = Color.Black,
                                 modifier = Modifier
                                     .clip(MaterialTheme.shapes.small)
-                                    .background(Color.Green)
+                                    .background(Colors.proDaysCountGreenColor)
                                     .padding(4.dp)
                             )
                         }

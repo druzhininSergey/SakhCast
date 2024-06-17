@@ -28,15 +28,12 @@ import com.example.sakhcast.ui.profile_screen.ProfileScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(user: CurrentUser?) {
-//    Log.i("!!!","user isNull?? = $user")
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val avatarPainter: Painter =
         rememberAsyncImagePainter(
             ImageRequest.Builder(LocalContext.current).data(data = user?.avatar)
                 .apply(block = fun ImageRequest.Builder.() {
                     crossfade(true)
-                    //            placeholder(R.drawable.placeholder) // Укажите ресурс-заполнитель
-                    //            error(R.drawable.error) // Укажите ресурс ошибки
                 }).build()
         )
 

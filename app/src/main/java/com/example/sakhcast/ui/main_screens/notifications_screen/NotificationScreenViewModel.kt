@@ -3,13 +3,16 @@ package com.example.sakhcast.ui.main_screens.notifications_screen
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.sakhcast.data.samples.NotificationSample
+import androidx.lifecycle.viewModelScope
+import com.example.sakhcast.data.repository.SakhCastRepository
 import com.example.sakhcast.model.NotificationList
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class NotificationScreenViewModel @Inject constructor() : ViewModel() {
+class NotificationScreenViewModel @Inject constructor(private val sakhCastRepository: SakhCastRepository) :
+    ViewModel() {
 
     private var _notificationScreenState = MutableLiveData(NotificationScreenState())
     val notificationScreenState: LiveData<NotificationScreenState> = _notificationScreenState
@@ -19,12 +22,21 @@ class NotificationScreenViewModel @Inject constructor() : ViewModel() {
     }
 
     data class NotificationScreenState(
-        var notificationsList: NotificationList = NotificationList(0, emptyList())
+        var notificationsList: NotificationList? = null
     )
 
-    fun getNotifications(){
-        val notificationList = NotificationSample.getNotificationsList()
-        _notificationScreenState.value = notificationScreenState.value?.copy(notificationsList = notificationList)
+    private fun getNotifications() {
+        viewModelScope.launch {
+            val notificationList = sakhCastRepository.getNotificationsList()
+            _notificationScreenState.value =
+                notificationScreenState.value?.copy(notificationsList = notificationList)
+        }
+    }
+
+    fun makeAllNotificationsRead(){
+        viewModelScope.launch {
+            sakhCastRepository.makeAllNotificationsRead()
+        }
     }
 
 }

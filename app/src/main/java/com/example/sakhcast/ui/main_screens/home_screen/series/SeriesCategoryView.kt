@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.main_screens.home_screen.series
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,12 +19,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.sakhcast.Dimens
+import com.example.sakhcast.SERIES_CATEGORY_SCREEN
 import com.example.sakhcast.model.SeriesList
 
 @Composable
 fun SeriesCategoryView(seriesList: SeriesList, navHostController: NavHostController) {
     Row(
-        modifier = Modifier.padding(start = Dimens.mainPadding),
+        modifier = Modifier
+            .padding(start = Dimens.mainPadding)
+            .clickable { navHostController.navigate("$SERIES_CATEGORY_SCREEN/Все") },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
