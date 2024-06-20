@@ -71,11 +71,11 @@ class SakhCastRepository @Inject constructor(
             try {
                 val lastWatchedCall = sakhCastApiService.getContinueWatchMovieAndSeries()
                 val responseBody = lastWatchedCall.execute()
-//                Log.i("!!!", "LastWatched = ${responseBody.body()}")
+                Log.i("!!!", "LastWatched = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
-//                Log.i("!!!", "LastWatched = exception")
-//                Log.i("!!!", "${e.message}")
+                Log.i("!!!", "LastWatched = exception")
+                Log.i("!!!", "${e.message}")
                 null
             }
         }
@@ -189,6 +189,22 @@ class SakhCastRepository @Inject constructor(
             } catch (e: Exception) {
 //                Log.i("!!!", "removeSeriesFromFavorites repo = exception, seriesId = $seriesId")
 //                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
+    suspend fun searchSeries(textInput: String, page: Int): SeriesList? {
+        return withContext(ioDispatcher) {
+            try {
+                val notificationListCall =
+                    sakhCastApiService.searchSeries(textInput = textInput, page = page)
+                val responseBody = notificationListCall.execute()
+                Log.i("!!!", "seriesList Search repo = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+                Log.i("!!!", "seriesList Search repo = exception")
+                Log.i("!!!", "${e.message}")
                 null
             }
         }
@@ -335,11 +351,11 @@ class SakhCastRepository @Inject constructor(
                 val notificationListCall =
                     sakhCastApiService.getNotificationsList()
                 val responseBody = notificationListCall.execute()
-                Log.i("!!!", "notificationList repo = ${responseBody.body()}")
+//                Log.i("!!!", "notificationList repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
-                Log.i("!!!", "notificationList repo = exception")
-                Log.i("!!!", "${e.message}")
+//                Log.i("!!!", "notificationList repo = exception")
+//                Log.i("!!!", "${e.message}")
                 null
             }
         }
@@ -351,11 +367,11 @@ class SakhCastRepository @Inject constructor(
                 val notificationListCall =
                     sakhCastApiService.makeAllNotificationsRead()
                 val responseBody = notificationListCall.execute()
-                Log.i("!!!", "makeAllNotificationsRead repo = ${responseBody.body()}")
+//                Log.i("!!!", "makeAllNotificationsRead repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
-                Log.i("!!!", "makeAllNotificationsRead repo = exception")
-                Log.i("!!!", "${e.message}")
+//                Log.i("!!!", "makeAllNotificationsRead repo = exception")
+//                Log.i("!!!", "${e.message}")
                 null
             }
         }
@@ -367,26 +383,26 @@ class SakhCastRepository @Inject constructor(
                 val notificationListCall =
                     sakhCastApiService.searchMovie(textInput = textInput, page = page)
                 val responseBody = notificationListCall.execute()
-                Log.i("!!!", "movieList Search repo = ${responseBody.body()}")
+//                Log.i("!!!", "movieList Search repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
-                Log.i("!!!", "movieList Search repo = exception")
-                Log.i("!!!", "${e.message}")
+//                Log.i("!!!", "movieList Search repo = exception")
+//                Log.i("!!!", "${e.message}")
                 null
             }
         }
     }
 
-    suspend fun searchSeries(textInput: String, page: Int): SeriesList? {
+    suspend fun setMoviePosition(alphaId: String, positionSec: Int): Boolean? {
         return withContext(ioDispatcher) {
             try {
                 val notificationListCall =
-                    sakhCastApiService.searchSeries(textInput = textInput, page = page)
+                    sakhCastApiService.setMoviePosition(alphaId, positionSec)
                 val responseBody = notificationListCall.execute()
-                Log.i("!!!", "seriesList Search repo = ${responseBody.body()}")
+                Log.i("!!!", "setMoviePosition repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
-                Log.i("!!!", "seriesList Search repo = exception")
+                Log.i("!!!", "setMoviePosition repo = exception")
                 Log.i("!!!", "${e.message}")
                 null
             }

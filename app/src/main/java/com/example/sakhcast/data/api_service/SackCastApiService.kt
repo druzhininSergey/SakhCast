@@ -159,4 +159,10 @@ interface SakhCastApiService {
 
     @POST("v1/users/ack_all_notifies")
     fun makeAllNotificationsRead(): Call<Boolean>
+
+    @POST("v2/movie/{movie}")
+    fun setMoviePosition(
+        @Path("movie") movieAlphaId: String,
+        @Query("pos") positionSec: Int
+    ): Call<Boolean>
 }

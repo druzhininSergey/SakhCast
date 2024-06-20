@@ -63,6 +63,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcast.MOVIE_CATEGORY_SCREEN
+import com.example.sakhcast.PLAYER
 import com.example.sakhcast.R
 import com.example.sakhcast.model.Cast
 import com.example.sakhcast.model.Download
@@ -86,7 +87,7 @@ fun PreviewMovieView() {
 @Preview
 @Composable
 fun PreviewMovieInfo() {
-//    MovieInfo(MovieSample.getFullMovie(), recomendationList, navHostController)
+//    MovieInfo(MovieSample.getFullMovie(), recommendationList, navHostController)
 }
 
 @Composable
@@ -114,8 +115,7 @@ fun MovieView(
     val scrollState = rememberScrollState()
 
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
-    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) movie?.posterAlt + ".avif"
-    else movie?.posterAlt + ".webp"
+    val imageUrl = movie?.posterAlt + ".webp"
 
     val backdropColor1 =
         if (movie != null) Color(android.graphics.Color.parseColor(movie.backdropColors.background1))
@@ -163,7 +163,7 @@ fun MovieView(
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    IconButton(onClick = {}, modifier = Modifier
+                    IconButton(onClick = {navHostController.navigate("$PLAYER/${movie?.idAlpha}")}, modifier = Modifier
                         .size(100.dp)
                         .graphicsLayer {
                             alpha =

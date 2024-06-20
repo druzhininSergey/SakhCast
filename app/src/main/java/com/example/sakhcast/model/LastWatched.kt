@@ -58,7 +58,7 @@ data class MovieDataRecent(
     @SerialName("release_date") val releaseDate: String,
     @SerialName("ru_title") val ruTitle: String,
     @SerialName("runtime") val runtime: Int,
-    @SerialName("user") val userFavourite: UserFavourite
+    @SerialName("user") val userFavourite: UserFavourite?
 )
 
 @Serializable
@@ -84,7 +84,7 @@ data class SerialDataRecent(
     @SerialName("status") val status: String,
     @SerialName("tvshow") val tvshow: String,
     @SerialName("url") val url: String,
-    @SerialName("user_favorite") val userFavorite: UserFavorite,
+    @SerialName("user_favorite") val userFavorite: UserFavorite?,
     @SerialName("user_last_ep") val userLastEp: String,
     @SerialName("user_last_media") val userLastMedia: String,
     @SerialName("user_last_media_id") val userLastMediaId: Int,

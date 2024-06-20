@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.movie_series_view
 
-import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -114,11 +113,7 @@ fun SeriesView(
     val scrollState = rememberScrollState()
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
 
-    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        series?.posterAlt + ".avif"
-    } else {
-        series?.posterAlt + ".webp"
-    }
+    val imageUrl = series?.posterAlt + ".webp"
 
     val backdropColor1 =
         if (series != null) Color(android.graphics.Color.parseColor(series.posterColors.background1))
