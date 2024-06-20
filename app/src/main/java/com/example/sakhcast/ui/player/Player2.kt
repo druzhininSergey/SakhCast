@@ -40,7 +40,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import com.example.sakhcast.data.formatMinSec
@@ -61,7 +60,6 @@ fun Player2(
     }
     val movieState = playerViewModel.movieWatchState.observeAsState()
     val movie = movieState.value?.movie
-//    val exoPlayer = remember { ExoPlayer.Builder(context).build() }
     val exoPlayer = playerViewModel.player
 
     var continueTime by remember {
@@ -98,41 +96,15 @@ fun Player2(
     }
     val lifecycleOwner = LocalLifecycleOwner.current
 
-//
-//    var isPlaying by remember { mutableStateOf(exoPlayer.isPlaying) }
-//
-//    var totalDuration by remember { mutableLongStateOf(0L) }
-//
-//    var currentTime by remember { mutableLongStateOf(0L) }
-//
-//    var bufferedPercentage by remember { mutableIntStateOf(0) }
-//
-//    var playbackState by remember { mutableIntStateOf(exoPlayer.playbackState) }
 
     DisposableEffect(key1 = lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             lifecycle = event
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        val listener =
-            object : Player.Listener {
-                override fun onEvents(
-                    player: Player,
-                    events: Player.Events
-                ) {
-                    super.onEvents(player, events)
-//                    totalDuration = player.duration.coerceAtLeast(0L)
-//                    currentTime = player.currentPosition.coerceAtLeast(0L)
-//                    bufferedPercentage = player.bufferedPercentage
-//                    isPlaying = player.isPlaying
-//                    playbackState = player.playbackState
-                }
-            }
-        exoPlayer.addListener(listener)
         onDispose {
             exoPlayer.release()
             lifecycleOwner.lifecycle.removeObserver(observer)
-            exoPlayer.removeListener(listener)
             context.showSystemUi()
         }
     }
