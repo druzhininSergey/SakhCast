@@ -78,10 +78,13 @@ fun AuthNavGraph(
         composable("$SERIES_CATEGORY_SCREEN/{category}") {
             SeriesCategoryScreen(paddingValues, navHostController)
         }
-        composable("$PLAYER/{movieAlphaId}") {
-            val movieAlphaId =
-                navHostController.currentBackStackEntry?.arguments?.getString("movieAlphaId") ?: ""
-            Player2(paddingValues, movieAlphaId)
+        composable("$PLAYER/{hls}/{title}/{position}/{movieAlphaId}") { backStackEntry ->
+            val hls = backStackEntry.arguments?.getString("hls") ?: ""
+            val title = backStackEntry.arguments?.getString("title") ?: ""
+            val positionStr = backStackEntry.arguments?.getString("position") ?: "0"
+            val position = positionStr.toInt()
+            val movieAlphaId = backStackEntry.arguments?.getString("movieAlphaId") ?: ""
+            Player2(hls, title, position, movieAlphaId)
         }
 
     }

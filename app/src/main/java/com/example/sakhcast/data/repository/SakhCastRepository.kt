@@ -399,11 +399,8 @@ class SakhCastRepository @Inject constructor(
                 val notificationListCall =
                     sakhCastApiService.setMoviePosition(alphaId, positionSec)
                 val responseBody = notificationListCall.execute()
-                Log.i("!!!", "setMoviePosition repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
-                Log.i("!!!", "setMoviePosition repo = exception")
-                Log.i("!!!", "${e.message}")
                 null
             }
         }

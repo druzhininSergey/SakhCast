@@ -1,14 +1,13 @@
 package com.example.sakhcast.ui.player
 
+import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.OptIn
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -23,12 +22,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,75 +50,68 @@ import kotlinx.coroutines.launch
 @OptIn(UnstableApi::class)
 @Composable
 fun Player2(
-    paddingValues: PaddingValues,
+    hls: String,
+    title: String,
+    position: Int,
     movieAlphaId: String,
     playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(Unit) { playerViewModel.setMovieData(hls, title, position, movieAlphaId) }
+    val movieState = playerViewModel.movieWatchState.collectAsState()
 
-    LaunchedEffect(key1 = movieAlphaId) {
-        playerViewModel.getFullMovieData(movieAlphaId)
-    }
-    val movieState = playerViewModel.movieWatchState.observeAsState()
-    val movie = movieState.value?.movie
-    val exoPlayer = playerViewModel.player
-
-    var continueTime by remember {
-        mutableIntStateOf(0)
-    }
+    var continueTime by remember { mutableIntStateOf(0) }
 
     val context = LocalContext.current
     context.hideSystemUi()
 
+    var lifecycle by remember { mutableStateOf(Lifecycle.Event.ON_CREATE) }
+    val lifecycleOwner = LocalLifecycleOwner.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    var savedPlayerState by rememberSaveable { mutableStateOf<Bundle?>(null) }
+    var showSnackbar by rememberSaveable { mutableStateOf(true) }
 
-    LaunchedEffect(key1 = movie) {
-        if (movie != null) {
-            playerViewModel.startPlayer()
-            continueTime = movie.userFavourite.position ?: 0
-            Log.e("!!!", "continueTime = $continueTime")
-            val userTime = (continueTime * 1000L).formatMinSec()
+    LaunchedEffect(Unit) {
+        playerViewModel.startPlayer()
+        continueTime = movieState.value.position
 
-            if (continueTime != 0) scope.launch {
-                snackbarHostState.showSnackbar(
-                    message = "",
-                    actionLabel = "Продолжить с $userTime?",
-                    duration = SnackbarDuration.Long
-                )
-            }
-
+        val userTime = (continueTime * 1000L).formatMinSec()
+        if (continueTime != 0 && showSnackbar) scope.launch {
+            Log.i("!!!", "showSnackbar")
+            snackbarHostState.showSnackbar(
+                message = "Продолжить с $userTime?",
+                duration = SnackbarDuration.Long,
+            )
+            showSnackbar = false
         }
     }
-
-    var shouldShowControls by remember { mutableStateOf(false) }
-    var lifecycle by remember {
-        mutableStateOf(Lifecycle.Event.ON_CREATE)
-    }
-    val lifecycleOwner = LocalLifecycleOwner.current
-
 
     DisposableEffect(key1 = lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             lifecycle = event
         }
         lifecycleOwner.lifecycle.addObserver(observer)
+        playerViewModel.setMoviePosition()
+        playerViewModel.player.playWhenReady = true
         onDispose {
-            exoPlayer.release()
             lifecycleOwner.lifecycle.removeObserver(observer)
+            savedPlayerState = playerViewModel.savePlayerState()
             context.showSystemUi()
         }
+    }
+    LaunchedEffect(savedPlayerState) {
+        savedPlayerState?.let { playerViewModel.restorePlayerState(it) }
     }
     Box(modifier = Modifier.fillMaxSize()) {
 
         AndroidView(
             modifier =
             Modifier
-                .clickable { shouldShowControls = !shouldShowControls }
-                .padding(paddingValues)
+                .padding()
                 .fillMaxSize(),
             factory = {
                 PlayerView(context).apply {
-                    player = exoPlayer
+                    player = playerViewModel.player
                     useController = true
                     layoutParams =
                         FrameLayout.LayoutParams(
@@ -128,7 +121,6 @@ fun Player2(
                     setShowSubtitleButton(true)
                     setShowNextButton(false)
                     setShowPreviousButton(false)
-
                     setBackgroundColor(0xFF000000.toInt())
                 }
             },
@@ -138,10 +130,10 @@ fun Player2(
                         it.onPause()
                         it.player?.pause()
                     }
+
                     Lifecycle.Event.ON_PAUSE -> it.onResume()
                     else -> Unit
                 }
-
             }
         )
 
@@ -152,12 +144,15 @@ fun Player2(
                 .align(Alignment.BottomEnd),
             snackbar = { snackbarData ->
                 Button(
-                    onClick = { snackbarData.performAction() },
+                    onClick = {
+                        snackbarData.performAction()
+                        playerViewModel.player.seekTo(position * 1000L)
+                    },
                     shape = RoundedCornerShape(10.dp),
                     border = BorderStroke(width = 1.dp, color = Color.White)
                 ) {
                     Text(
-                        text = snackbarData.visuals.actionLabel ?: "",
+                        text = snackbarData.visuals.message,
                         modifier = Modifier
                             .padding(8.dp)
                             .wrapContentWidth()
@@ -167,9 +162,5 @@ fun Player2(
                 }
             }
         )
-
     }
-
 }
-
-

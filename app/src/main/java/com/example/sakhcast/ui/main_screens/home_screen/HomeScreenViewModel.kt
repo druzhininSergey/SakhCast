@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.main_screens.home_screen
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -40,9 +39,9 @@ class HomeScreenViewModel @Inject constructor(private val sakhCastRepository: Sa
                 sakhCastRepository.getMoviesListByCategoryName(categoryName = "all", page = 0)
             lastWatched?.movie?.data?.userFavourite?.position?.let { convertSeconds(it) }
 
-            Log.i("!!!", "lastWatched = $lastWatched")
-            Log.i("!!!", "seriesList = $seriesList")
-            Log.i("!!!", "moviesList = $moviesList")
+//            Log.i("!!!", "lastWatched = $lastWatched")
+//            Log.i("!!!", "seriesList = $seriesList")
+//            Log.i("!!!", "moviesList = $moviesList")
 
             _homeScreenState.value = homeScreenState.value?.copy(
                 lastWatched = lastWatched,

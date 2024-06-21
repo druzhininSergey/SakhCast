@@ -60,12 +60,12 @@ fun AuthenticatedMainScreen(
                 currentDestination != "$MOVIE_VIEW/{movieId}" &&
                 currentDestination != "$SERIES_VIEW/{seriesId}" &&
                 currentDestination != SEARCH_SCREEN &&
-                currentDestination != "$PLAYER/{movieAlphaId}"
+                currentDestination != "$PLAYER/{hls}/{title}/{position}/{movieAlphaId}"
     }
     val isBottomBarVisible = remember(key1 = backStackState) {
         currentDestination != "$MOVIE_VIEW/{movieId}" &&
                 currentDestination != "$SERIES_VIEW/{seriesId}" &&
-                currentDestination != "$PLAYER/{movieAlphaId}"
+                currentDestination != "$PLAYER/{hls}/{title}/{position}/{movieAlphaId}"
     }
 
     Scaffold(

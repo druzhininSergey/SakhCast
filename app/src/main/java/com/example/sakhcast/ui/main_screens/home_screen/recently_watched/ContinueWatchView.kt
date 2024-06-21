@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.sakhcast.Dimens
@@ -22,7 +21,6 @@ import com.example.sakhcast.model.MovieRecent
 import com.example.sakhcast.model.SeriesRecent
 
 @OptIn(ExperimentalFoundationApi::class)
-@Preview
 @Composable
 fun ContinueWatchView(
     movie: MovieRecent,
@@ -51,8 +49,8 @@ fun ContinueWatchView(
             state = pagerState
         ) { index ->
             when (index) {
-                0 -> ContinueWatchSeriesView(seriesCard = series, navHostController)
-                1 -> ContinueWatchMovieView(movieCard = movie, lastWatchedMovieTime, navHostController)
+                0 -> ContinueWatchMovieView(movieCard = movie, lastWatchedMovieTime, navHostController)
+                1 -> ContinueWatchSeriesView(seriesCard = series, navHostController)
             }
         }
     }
