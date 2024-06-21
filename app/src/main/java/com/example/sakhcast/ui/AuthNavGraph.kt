@@ -84,7 +84,7 @@ fun AuthNavGraph(
             val positionStr = backStackEntry.arguments?.getString("position") ?: "0"
             val position = positionStr.toInt()
             val movieAlphaId = backStackEntry.arguments?.getString("movieAlphaId") ?: ""
-            Player2(hls, title, position, movieAlphaId)
+            Player2(hls, title, position, movieAlphaId, navHostController)
         }
 
     }

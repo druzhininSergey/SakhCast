@@ -1,19 +1,29 @@
 package com.example.sakhcast.ui.player
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.OptIn
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -42,8 +52,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
+import androidx.navigation.NavHostController
 import com.example.sakhcast.data.formatMinSec
 import com.example.sakhcast.data.hideSystemUi
+import com.example.sakhcast.data.setScreenOrientation
 import com.example.sakhcast.data.showSystemUi
 import kotlinx.coroutines.launch
 
@@ -54,15 +66,18 @@ fun Player2(
     title: String,
     position: Int,
     movieAlphaId: String,
+    navHostController: NavHostController,
     playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    context.setScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+    context.hideSystemUi()
+
     LaunchedEffect(Unit) { playerViewModel.setMovieData(hls, title, position, movieAlphaId) }
     val movieState = playerViewModel.movieWatchState.collectAsState()
 
     var continueTime by remember { mutableIntStateOf(0) }
 
-    val context = LocalContext.current
-    context.hideSystemUi()
 
     var lifecycle by remember { mutableStateOf(Lifecycle.Event.ON_CREATE) }
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -70,6 +85,7 @@ fun Player2(
     val scope = rememberCoroutineScope()
     var savedPlayerState by rememberSaveable { mutableStateOf<Bundle?>(null) }
     var showSnackbar by rememberSaveable { mutableStateOf(true) }
+    var isControllerVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         playerViewModel.startPlayer()
@@ -96,6 +112,7 @@ fun Player2(
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
             savedPlayerState = playerViewModel.savePlayerState()
+            context.setScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
             context.showSystemUi()
         }
     }
@@ -122,6 +139,9 @@ fun Player2(
                     setShowNextButton(false)
                     setShowPreviousButton(false)
                     setBackgroundColor(0xFF000000.toInt())
+                    setControllerVisibilityListener(PlayerView.ControllerVisibilityListener { visibility ->
+                        isControllerVisible = visibility == View.VISIBLE
+                    })
                 }
             },
             update = {
@@ -135,7 +155,15 @@ fun Player2(
                     else -> Unit
                 }
             }
+
         )
+        AnimatedVisibility(
+            visible = isControllerVisible,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            ExitButton(navHostController)
+        }
 
         SnackbarHost(
             hostState = snackbarHostState,
@@ -161,6 +189,23 @@ fun Player2(
                     )
                 }
             }
+        )
+    }
+
+}
+
+@Composable
+fun ExitButton(navHostController: NavHostController) {
+    IconButton(
+        onClick = { navHostController.navigateUp() },
+        modifier = Modifier
+            .padding(16.dp)
+            .size(48.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Close,
+            contentDescription = "Exit",
+            tint = Color.Gray
         )
     }
 }
