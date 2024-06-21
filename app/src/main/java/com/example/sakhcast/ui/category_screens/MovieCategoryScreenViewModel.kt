@@ -17,8 +17,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MovieCategoryScreenViewModel @Inject constructor(private val sakhCastRepository: SakhCastRepository) :
-    ViewModel() {
+class MovieCategoryScreenViewModel
+@Inject constructor(private val sakhCastRepository: SakhCastRepository) : ViewModel() {
 
     private var _moviesCategoryScreenState = MutableLiveData(MoviesCategoryScreenState())
     val moviesCategoryScreenState: LiveData<MoviesCategoryScreenState> = _moviesCategoryScreenState

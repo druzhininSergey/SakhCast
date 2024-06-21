@@ -14,6 +14,7 @@ import com.example.sakhcast.HOME_SCREEN
 import com.example.sakhcast.MOVIE_CATEGORY_SCREEN
 import com.example.sakhcast.MOVIE_VIEW
 import com.example.sakhcast.NOTIFICATION_SCREEN
+import com.example.sakhcast.PLAYER
 import com.example.sakhcast.SEARCH_SCREEN
 import com.example.sakhcast.SERIES_CATEGORY_SCREEN
 import com.example.sakhcast.SERIES_VIEW
@@ -28,6 +29,7 @@ import com.example.sakhcast.ui.main_screens.notifications_screen.NotificationScr
 import com.example.sakhcast.ui.main_screens.search_screen.SearchScreen
 import com.example.sakhcast.ui.movie_series_view.MovieView
 import com.example.sakhcast.ui.movie_series_view.SeriesView
+import com.example.sakhcast.ui.player.Player2
 
 @Composable
 fun AuthNavGraph(
@@ -75,6 +77,14 @@ fun AuthNavGraph(
         }
         composable("$SERIES_CATEGORY_SCREEN/{category}") {
             SeriesCategoryScreen(paddingValues, navHostController)
+        }
+        composable("$PLAYER/{hls}/{title}/{position}/{movieAlphaId}") { backStackEntry ->
+            val hls = backStackEntry.arguments?.getString("hls") ?: ""
+            val title = backStackEntry.arguments?.getString("title") ?: ""
+            val positionStr = backStackEntry.arguments?.getString("position") ?: "0"
+            val position = positionStr.toInt()
+            val movieAlphaId = backStackEntry.arguments?.getString("movieAlphaId") ?: ""
+            Player2(hls, title, position, movieAlphaId, navHostController)
         }
 
     }

@@ -9,6 +9,8 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import com.example.sakhcast.BASE_URL
 import com.example.sakhcast.SHARED_PREFS_TOKEN_KEY
 import com.example.sakhcast.data.api_service.SakhCastApiService
@@ -69,6 +71,7 @@ class SakhCastModule {
             val requestBuilder = original.newBuilder()
                 .header("Authorization", value = token.toString())
                 .header("X-Force-Code", "1")
+                .header("X-App-Id", "4")
                 .method(original.method, original.body)
             val request = requestBuilder.build()
             chain.proceed(request)
@@ -91,5 +94,10 @@ class SakhCastModule {
     @Provides
     fun provideSakhCastApiService(retrofit: Retrofit): SakhCastApiService =
         retrofit.create(SakhCastApiService::class.java)
+
+    @Provides
+    fun provideExoPlayer(@ApplicationContext context: Context) : Player {
+        return ExoPlayer.Builder(context).build()
+    }
 
 }

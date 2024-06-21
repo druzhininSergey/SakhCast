@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.movie_series_view
 
+import android.net.Uri
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -40,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -63,6 +65,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcast.MOVIE_CATEGORY_SCREEN
+import com.example.sakhcast.PLAYER
 import com.example.sakhcast.R
 import com.example.sakhcast.model.Cast
 import com.example.sakhcast.model.Download
@@ -86,7 +89,7 @@ fun PreviewMovieView() {
 @Preview
 @Composable
 fun PreviewMovieInfo() {
-//    MovieInfo(MovieSample.getFullMovie(), recomendationList, navHostController)
+//    MovieInfo(MovieSample.getFullMovie(), recommendationList, navHostController)
 }
 
 @Composable
@@ -99,6 +102,12 @@ fun MovieView(
     val movie = movieState.value.movie
     val recommendationList = movieState.value.movieRecommendationsList
     val alphaId = navHostController.currentBackStackEntry?.arguments?.getString("movieId")
+
+    var alphaIdToSend by remember { mutableStateOf("") }
+    var hlsToSend by remember { mutableStateOf("") }
+    var titleToSend by remember { mutableStateOf("") }
+    var positionToSend by remember { mutableIntStateOf(0) }
+
     LaunchedEffect(alphaId) {
         if (alphaId != null) movieViewModel.getFullMovieWithRecommendations(alphaId)
     }
@@ -107,15 +116,16 @@ fun MovieView(
     }
     LaunchedEffect(movieState.value.isFavorite) {
         isFavorite.value = movieState.value.isFavorite ?: false
+        alphaIdToSend = movie?.idAlpha ?: ""
+        hlsToSend = Uri.encode(movie?.sources?.defaultSource ?: "")
+        titleToSend = movie?.ruTitle ?: ""
+        positionToSend = movie?.userFavourite?.position ?: 0
     }
-//    Log.e("!!!", "isFavorite MOVIE_VIEW from state = ${movieState.value.isFavorite}")
-//    Log.e("!!!", "isFavorite MOVIE_VIEW = $isFavorite")
 
     val scrollState = rememberScrollState()
 
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
-    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) movie?.posterAlt + ".avif"
-    else movie?.posterAlt + ".webp"
+    val imageUrl = movie?.posterAlt + ".webp"
 
     val backdropColor1 =
         if (movie != null) Color(android.graphics.Color.parseColor(movie.backdropColors.background1))
@@ -163,13 +173,19 @@ fun MovieView(
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    IconButton(onClick = {}, modifier = Modifier
-                        .size(100.dp)
-                        .graphicsLayer {
-                            alpha =
-                                1f - ((scrollState.value.toFloat() / scrollState.maxValue) * 2.5f)
-                            translationY = 0.5f * scrollState.value
-                        }) {
+                    IconButton(
+                        onClick = {
+                            navHostController.navigate(
+                                "$PLAYER/$hlsToSend/$titleToSend/$positionToSend/$alphaIdToSend"
+                            )
+                        },
+                        modifier = Modifier
+                            .size(100.dp)
+                            .graphicsLayer {
+                                alpha =
+                                    1f - ((scrollState.value.toFloat() / scrollState.maxValue) * 2.5f)
+                                translationY = 0.5f * scrollState.value
+                            }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_play),
                             contentDescription = null,
@@ -259,11 +275,12 @@ fun MovieInfo(movie: Movie, recommendationList: MovieList, navHostController: Na
         MovieCountryYearStatus(movie.productionCountries, movie.releaseDate, movie.status)
         MovieDownloads(movie.downloads)
         movie.overview?.let { MovieOverview(it) }
-        movie.productionCompanies?.let { MovieProductionCompanies(it) { companyName: String, companyId: String ->
-            navHostController.navigate(
-                MOVIE_CATEGORY_SCREEN + "/${companyName}/${companyId}"
-            )
-        }
+        movie.productionCompanies?.let {
+            MovieProductionCompanies(it) { companyName: String, companyId: String ->
+                navHostController.navigate(
+                    MOVIE_CATEGORY_SCREEN + "/${companyName}/${companyId}"
+                )
+            }
         }
         movie.cast?.let { MovieExpandableCastTab(it) }
         MovieRecommendations(
