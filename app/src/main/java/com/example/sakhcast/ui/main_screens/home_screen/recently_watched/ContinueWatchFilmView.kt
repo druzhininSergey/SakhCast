@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.main_screens.home_screen.recently_watched
 
-import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -23,10 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcast.Dimens
-import com.example.sakhcast.MOVIE_VIEW
 import com.example.sakhcast.model.MovieRecent
 
 @Preview(showBackground = true)
@@ -39,13 +36,10 @@ fun Preview2() {
 fun ContinueWatchMovieView(
     movieCard: MovieRecent,
     lastWatchedMovieTime: String,
-    navHostController: NavHostController
+    navigateToMovieByAlphaId: (String) -> Unit
 ) {
-    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        movieCard.data.backdropAlt + ".avif"
-    } else {
-        movieCard.data.backdropAlt + ".webp"
-    }
+    val imageUrl = movieCard.data.backdropAlt + ".webp"
+
     val backdropColor1 =
         Color(android.graphics.Color.parseColor(movieCard.data.coverColors.background1))
     val backdropColor2 =
@@ -57,7 +51,7 @@ fun ContinueWatchMovieView(
             .height(234.dp)
             .width(416.dp)
             .padding(Dimens.mainPadding)
-            .clickable { navHostController.navigate("${MOVIE_VIEW}/${movieCard.data.idAlpha}") },
+            .clickable { navigateToMovieByAlphaId(movieCard.data.idAlpha) },
     ) {
         Box {
             SubcomposeAsyncImage(
@@ -65,9 +59,13 @@ fun ContinueWatchMovieView(
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.FillBounds,
-                loading = { Box(modifier = Modifier
-                    .fillMaxSize()
-                    .background(brush = brush)) }
+                loading = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(brush = brush)
+                    )
+                }
             )
             Column(
                 Modifier

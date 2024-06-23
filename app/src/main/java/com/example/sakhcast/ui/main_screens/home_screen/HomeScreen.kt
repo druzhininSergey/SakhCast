@@ -16,7 +16,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.example.sakhcast.Colors
 import com.example.sakhcast.ui.main_screens.home_screen.movie.MovieCategoryView
 import com.example.sakhcast.ui.main_screens.home_screen.recently_watched.ContinueWatchView
@@ -27,7 +26,10 @@ import com.example.sakhcast.ui.theme.SakhCastTheme
 fun HomeScreen(
     paddingValues: PaddingValues,
     homeScreenViewModel: HomeScreenViewModel = hiltViewModel(),
-    navHostController: NavHostController,
+    navigateToMovieByAlphaId: (String) -> Unit,
+    navigateToSeriesById: (String) -> Unit,
+    navigateToCatalogAllSeries: () -> Unit,
+    navigateToCatalogAllMovies: () -> Unit
 ) {
     val homeScreenState by
     homeScreenViewModel.homeScreenState.observeAsState(HomeScreenViewModel.HomeScreenState())
@@ -47,9 +49,15 @@ fun HomeScreen(
                 .background(color = MaterialTheme.colorScheme.primary)
         ) {
             if (movie != null && series != null && seriesList != null && movieList != null) {
-                ContinueWatchView(movie, series, lastWatchedMovieTime, navHostController)
-                SeriesCategoryView(seriesList, navHostController)
-                MovieCategoryView(movieList, navHostController)
+                ContinueWatchView(
+                    movie,
+                    series,
+                    lastWatchedMovieTime,
+                    navigateToMovieByAlphaId,
+                    navigateToSeriesById
+                )
+                SeriesCategoryView(seriesList, navigateToSeriesById, navigateToCatalogAllSeries)
+                MovieCategoryView(movieList, navigateToMovieByAlphaId, navigateToCatalogAllMovies)
             } else {
                 Column(
                     modifier = Modifier

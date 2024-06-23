@@ -46,7 +46,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.sakhcast.Dimens
 import com.example.sakhcast.ui.category_screens.MovieCategoryCardItem
@@ -59,7 +58,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun SearchScreen(
     paddingValues: PaddingValues,
-    navHostController: NavHostController,
+    navigateToMovieByAlphaId: (String) -> Unit,
+    navigateToSeriesById: (String) -> Unit,
     searchScreenViewModel: SearchScreenViewModel = hiltViewModel()
 ) {
     val seriesPagingItems =
@@ -189,7 +189,7 @@ fun SearchScreen(
                     seriesPagingItems?.itemCount?.let {
                         items(it) { index2 ->
                             seriesPagingItems[index2]?.let { seriesCard ->
-                                SeriesCategoryCardItem(seriesCard, navHostController)
+                                SeriesCategoryCardItem(seriesCard, navigateToSeriesById)
                             }
                         }
                     }
@@ -197,7 +197,7 @@ fun SearchScreen(
                     moviePagingItems?.itemCount?.let {
                         items(it) { index3 ->
                             moviePagingItems[index3]?.let { movieCard ->
-                                MovieCategoryCardItem(movieCard, navHostController)
+                                MovieCategoryCardItem(movieCard, navigateToMovieByAlphaId)
                             }
                         }
                     }

@@ -28,16 +28,18 @@ class MovieCategoryScreenViewModel
         var runtimeString: String? = null,
     )
 
-    fun initCategory(categoryName: String) {
+    fun initCategory(categoryName: String?) {
         viewModelScope.launch {
-            val pagingSource = MoviesPagingSource(sakhCastRepository, categoryName)
-            val pager = Pager(
-                config = PagingConfig(pageSize = 40, enablePlaceholders = false),
-                pagingSourceFactory = { pagingSource }
-            )
-            val flow = pager.flow.cachedIn(viewModelScope)
-            _moviesCategoryScreenState.value =
-                moviesCategoryScreenState.value?.copy(moviesPagingData = flow)
+            if (categoryName != null) {
+                val pagingSource = MoviesPagingSource(sakhCastRepository, categoryName)
+                val pager = Pager(
+                    config = PagingConfig(pageSize = 40, enablePlaceholders = false),
+                    pagingSourceFactory = { pagingSource }
+                )
+                val flow = pager.flow.cachedIn(viewModelScope)
+                _moviesCategoryScreenState.value =
+                    moviesCategoryScreenState.value?.copy(moviesPagingData = flow)
+            }
         }
     }
 

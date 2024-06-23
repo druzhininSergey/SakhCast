@@ -52,7 +52,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
-import androidx.navigation.NavHostController
 import com.example.sakhcast.data.formatMinSec
 import com.example.sakhcast.data.hideSystemUi
 import com.example.sakhcast.data.setScreenOrientation
@@ -66,7 +65,7 @@ fun Player2(
     title: String,
     position: Int,
     movieAlphaId: String,
-    navHostController: NavHostController,
+    navigateUp: () -> Boolean,
     playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -162,7 +161,7 @@ fun Player2(
             enter = fadeIn(),
             exit = fadeOut()
         ) {
-            ExitButton(navHostController)
+            ExitButton(navigateUp)
         }
 
         SnackbarHost(
@@ -195,9 +194,9 @@ fun Player2(
 }
 
 @Composable
-fun ExitButton(navHostController: NavHostController) {
+fun ExitButton(navigateUp: () -> Boolean,) {
     IconButton(
-        onClick = { navHostController.navigateUp() },
+        onClick = { navigateUp() },
         modifier = Modifier
             .padding(16.dp)
             .size(48.dp)

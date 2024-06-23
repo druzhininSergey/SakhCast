@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.main_screens.home_screen.recently_watched
 
-import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -23,10 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcast.Dimens
-import com.example.sakhcast.SERIES_VIEW
 import com.example.sakhcast.model.SeriesRecent
 
 @Preview(showBackground = true)
@@ -36,12 +33,12 @@ fun Preview1() {
 }
 
 @Composable
-fun ContinueWatchSeriesView(seriesCard: SeriesRecent, navHostController: NavHostController) {
-    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        seriesCard.data.backdropAlt + ".avif"
-    } else {
-        seriesCard.data.backdropAlt + ".webp"
-    }
+fun ContinueWatchSeriesView(
+    seriesCard: SeriesRecent,
+    navigateToSeriesById: (String) -> Unit
+) {
+    val imageUrl = seriesCard.data.backdropAlt + ".webp"
+
     val backdropColor1 =
         Color(android.graphics.Color.parseColor(seriesCard.data.backdropColors.background1))
     val backdropColor2 =
@@ -52,7 +49,7 @@ fun ContinueWatchSeriesView(seriesCard: SeriesRecent, navHostController: NavHost
             .height(234.dp)
             .width(416.dp)
             .padding(Dimens.mainPadding)
-            .clickable { navHostController.navigate("${SERIES_VIEW}/${seriesCard.data.id}") }
+            .clickable { navigateToSeriesById(seriesCard.data.id.toString()) }
     ) {
         Box {
             SubcomposeAsyncImage(
@@ -60,9 +57,13 @@ fun ContinueWatchSeriesView(seriesCard: SeriesRecent, navHostController: NavHost
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.FillBounds,
-                loading = { Box(modifier = Modifier
-                    .fillMaxSize()
-                    .background(brush = brush)) }
+                loading = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(brush = brush)
+                    )
+                }
             )
             Column(
                 Modifier

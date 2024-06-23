@@ -17,13 +17,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.sakhcast.Dimens
 import com.example.sakhcast.model.MovieList
 import com.example.sakhcast.ui.main_screens.home_screen.movie.MovieItemView
 
 @Composable
-fun MoviesPage(movieCardsWillWatch: MovieList?, navHostController: NavHostController) {
+fun MoviesPage(
+    movieCardsWillWatch: MovieList?,
+    navigateToMovieByAlphaId: (String) -> Unit
+) {
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -50,7 +52,10 @@ fun MoviesPage(movieCardsWillWatch: MovieList?, navHostController: NavHostContro
         ) {
             if (movieCardsWillWatch != null) {
                 itemsIndexed(movieCardsWillWatch.items) { _, movie ->
-                    MovieItemView(movieCard = movie, navHostController = navHostController)
+                    MovieItemView(
+                        movieCard = movie,
+                        navigateToMovieByAlphaId = navigateToMovieByAlphaId
+                    )
                 }
             }
         }

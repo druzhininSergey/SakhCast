@@ -30,9 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
-import com.example.sakhcast.MOVIE_VIEW
 import com.example.sakhcast.R
 import com.example.sakhcast.model.MovieCard
 import java.util.Locale
@@ -55,9 +53,12 @@ fun PreviewMovieItemView() {
 }
 
 @Composable
-fun MovieItemView(movieCard: MovieCard, navHostController: NavHostController) {
+fun MovieItemView(
+    movieCard: MovieCard,
+    navigateToMovieByAlphaId: (String) -> Unit
+) {
     Box(
-        Modifier.clickable { navHostController.navigate("${MOVIE_VIEW}/${movieCard.idAlpha}") }
+        Modifier.clickable { navigateToMovieByAlphaId(movieCard.idAlpha) }
     ) {
         Column() {
 

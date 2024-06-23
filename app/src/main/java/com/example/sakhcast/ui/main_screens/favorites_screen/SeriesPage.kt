@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.sakhcast.Colors
 import com.example.sakhcast.Dimens
 import com.example.sakhcast.model.SeriesList
@@ -33,7 +32,7 @@ fun SeriesPage(
     seriesCardWatching: SeriesList?,
     seriesCardWillWatch: SeriesList?,
     seriesCardFinishedWatching: SeriesList?,
-    navHostController: NavHostController
+    navigateToSeriesById: (String) -> Unit
 ) {
     val categoryNames = listOf("Cмотрю", "Буду смотреть", "Перестал")
     val scrollState = rememberScrollState()
@@ -79,7 +78,10 @@ fun SeriesPage(
                             else -> emptyList()
                         }
                     ) { _, series ->
-                        SeriesItemView(seriesCard = series, navHostController = navHostController)
+                        SeriesItemView(
+                            seriesCard = series,
+                            navigateToSeriesById = navigateToSeriesById
+                        )
                     }
 
                 }

@@ -15,7 +15,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.sakhcast.Dimens
 import com.example.sakhcast.model.MovieRecent
 import com.example.sakhcast.model.SeriesRecent
@@ -26,7 +25,8 @@ fun ContinueWatchView(
     movie: MovieRecent,
     series: SeriesRecent,
     lastWatchedMovieTime: String,
-    navHostController: NavHostController
+    navigateToMovieByAlphaId: (String) -> Unit,
+    navigateToSeriesById: (String) -> Unit
 ) {
     val pagerState = rememberPagerState { 2 }
     var tabIndex by remember {
@@ -49,8 +49,8 @@ fun ContinueWatchView(
             state = pagerState
         ) { index ->
             when (index) {
-                0 -> ContinueWatchMovieView(movieCard = movie, lastWatchedMovieTime, navHostController)
-                1 -> ContinueWatchSeriesView(seriesCard = series, navHostController)
+                0 -> ContinueWatchMovieView(movie, lastWatchedMovieTime, navigateToMovieByAlphaId)
+                1 -> ContinueWatchSeriesView(series, navigateToSeriesById)
             }
         }
     }

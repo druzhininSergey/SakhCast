@@ -17,16 +17,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.sakhcast.Dimens
-import com.example.sakhcast.MOVIE_CATEGORY_SCREEN
 import com.example.sakhcast.model.MovieList
 
 @Composable
-fun MovieCategoryView(movieList: MovieList, navHostController: NavHostController) {
+fun MovieCategoryView(
+    movieList: MovieList,
+    navigateToMovieByAlphaId: (String) -> Unit,
+    navigateToCatalogAllMovies: () -> Unit
+) {
     Row(
-        modifier = Modifier.padding(top = Dimens.mainPadding, start = Dimens.mainPadding)
-            .clickable { navHostController.navigate("$MOVIE_CATEGORY_SCREEN/Все/{}") },
+        modifier = Modifier
+            .padding(top = Dimens.mainPadding, start = Dimens.mainPadding)
+            .clickable { navigateToCatalogAllMovies() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -47,7 +50,7 @@ fun MovieCategoryView(movieList: MovieList, navHostController: NavHostController
         horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding)
     ) {
         itemsIndexed(movieList.items) { _, item ->
-            MovieItemView(movieCard = item, navHostController)
+            MovieItemView(movieCard = item, navigateToMovieByAlphaId)
         }
     }
 }
