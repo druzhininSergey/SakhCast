@@ -14,6 +14,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.example.sakhcast.BASE_URL
 import com.example.sakhcast.SHARED_PREFS_TOKEN_KEY
 import com.example.sakhcast.data.api_service.SakhCastApiService
+import com.example.sakhcast.data.downloader.AndroidDownloader
+import com.example.sakhcast.data.downloader.Downloader
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -96,8 +98,14 @@ class SakhCastModule {
         retrofit.create(SakhCastApiService::class.java)
 
     @Provides
-    fun provideExoPlayer(@ApplicationContext context: Context) : Player {
+    fun provideExoPlayer(@ApplicationContext context: Context): Player {
         return ExoPlayer.Builder(context).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideDownloader(@ApplicationContext context: Context): Downloader {
+        return AndroidDownloader(context)
     }
 
 }
