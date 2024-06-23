@@ -239,7 +239,12 @@ fun MovieView(
             }
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.primary)) {
                 if (movie != null && recommendationList != null) {
-                    MovieInfo(movie, recommendationList, navHostController)
+                    MovieInfo(
+                        movie,
+                        recommendationList,
+                        navHostController,
+                        movieViewModel::downloadMovie
+                    )
                 }
             }
         }
@@ -260,7 +265,12 @@ fun MovieView(
 
 
 @Composable
-fun MovieInfo(movie: Movie, recommendationList: MovieList, navHostController: NavHostController) {
+fun MovieInfo(
+    movie: Movie,
+    recommendationList: MovieList,
+    navHostController: NavHostController,
+    download: (String, String) -> Unit
+) {
     val isRatingExists = movie.imdbRating != null || movie.kpRating != null
 
     Column(
@@ -273,7 +283,7 @@ fun MovieInfo(movie: Movie, recommendationList: MovieList, navHostController: Na
         }
         if (isRatingExists) MovieRating(movie.imdbRating, movie.kpRating)
         MovieCountryYearStatus(movie.productionCountries, movie.releaseDate, movie.status)
-        MovieDownloads(movie.downloads)
+        MovieDownloads(movie.downloads, download, movie.ruTitle)
         movie.overview?.let { MovieOverview(it) }
         movie.productionCompanies?.let {
             MovieProductionCompanies(it) { companyName: String, companyId: String ->
@@ -473,7 +483,7 @@ fun TopMovieBar(
 }
 
 @Composable
-fun MovieDownloads(downloads: List<Download>) {
+fun MovieDownloads(downloads: List<Download>, download: (String, String) -> Unit, ruTitle: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -481,7 +491,7 @@ fun MovieDownloads(downloads: List<Download>) {
     ) {
         Text(
             modifier = Modifier.padding(start = 16.dp),
-            text = "Качество",
+            text = "Скачать",
             fontSize = 25.sp,
             color = MaterialTheme.colorScheme.onPrimary
         )
@@ -497,6 +507,7 @@ fun MovieDownloads(downloads: List<Download>) {
                     modifier = Modifier
                         .border(1.dp, Color.Gray, MaterialTheme.shapes.small)
                         .padding(4.dp)
+                        .clickable { download(it.src, "$ruTitle.${it.h}p.") }
                 )
             }
         }

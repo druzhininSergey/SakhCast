@@ -104,4 +104,5 @@ class PlayerViewModel @Inject constructor(
         super.onCleared()
         player.release()
     }
+
 }

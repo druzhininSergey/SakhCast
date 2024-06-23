@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.sakhcast.data.downloader.Downloader
 import com.example.sakhcast.data.repository.SakhCastRepository
 import com.example.sakhcast.model.Movie
 import com.example.sakhcast.model.MovieList
@@ -13,8 +14,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MovieViewModel @Inject constructor(private val sakhCastRepository: SakhCastRepository) :
-    ViewModel() {
+class MovieViewModel @Inject constructor(
+    private val sakhCastRepository: SakhCastRepository,
+    private val downloader: Downloader,
+) : ViewModel() {
 
     private var _movieState = MutableLiveData(MovieState())
     val movieState: LiveData<MovieState> = _movieState
@@ -24,6 +27,10 @@ class MovieViewModel @Inject constructor(private val sakhCastRepository: SakhCas
         var movieRecommendationsList: MovieList? = null,
         var isFavorite: Boolean? = null,
     )
+
+    fun downloadMovie(url: String, fileName: String) {
+        downloader.downloadFile(url, fileName)
+    }
 
     fun getFullMovieWithRecommendations(alphaId: String) {
         viewModelScope.launch {
