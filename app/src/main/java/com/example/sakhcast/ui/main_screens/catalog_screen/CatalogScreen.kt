@@ -24,17 +24,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
-@Preview(showBackground = true)
 @Composable
 fun CatalogScreen(
     paddingValues: PaddingValues,
-    navHostController: NavHostController,
+    navigateToSeriesCategoryScreen: (String) -> Unit,
+    navigateToMoviesCategoryScreen: (String) -> Unit,
     catalogScreenState: CatalogScreenViewModel.CatalogScreenState
 ) {
     val tabList = listOf("Сериалы", "Фильмы")
@@ -87,7 +85,12 @@ fun CatalogScreen(
             val categories =
                 if (index == 0) catalogScreenState.seriesCategories
                 else catalogScreenState.moviesCategories
-            CatalogList(categories = categories, navHostController, tabIndex)
+            CatalogList(
+                categories,
+                tabIndex,
+                navigateToMoviesCategoryScreen,
+                navigateToSeriesCategoryScreen
+            )
         }
     }
 }

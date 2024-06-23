@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcast.R
 import com.example.sakhcast.model.Episode
@@ -81,13 +80,13 @@ fun PreviewSeriesInfo() {
 @Composable
 fun SeriesView(
     paddingValues: PaddingValues,
-    navHostController: NavHostController,
+    seriesId: Int?,
+    navigateUp: () -> Boolean,
     seriesViewModel: SeriesViewModel = hiltViewModel(),
 ) {
     val seriesState =
         seriesViewModel.seriesState.observeAsState(SeriesViewModel.SeriesState())
-    val seriesId =
-        navHostController.currentBackStackEntry?.arguments?.getString("seriesId")?.toIntOrNull()
+
     LaunchedEffect(seriesId) {
         if (seriesId != null) {
             seriesViewModel.getFullSeries(seriesId)
@@ -214,7 +213,7 @@ fun SeriesView(
                 ruTitle = it,
                 paddingValues = paddingValues,
                 isFavorite = isFavorite.value,
-                navHostController = navHostController,
+                navigateUp = navigateUp,
                 onFavoriteButtonPushed = { kind ->
                     seriesViewModel.onFavoriteButtonPushed(kind)
                 },
@@ -326,7 +325,7 @@ fun TopSeriesBar(
     ruTitle: String,
     paddingValues: PaddingValues,
     isFavorite: Boolean,
-    navHostController: NavHostController,
+    navigateUp: () -> Boolean,
     onFavoriteButtonPushed: (String) -> Unit,
 ) {
     var isExpandedFavorite by remember { mutableStateOf(false) }
@@ -357,7 +356,7 @@ fun TopSeriesBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { navHostController.navigateUp() }) {
+            IconButton(onClick = { navigateUp() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                     contentDescription = null,

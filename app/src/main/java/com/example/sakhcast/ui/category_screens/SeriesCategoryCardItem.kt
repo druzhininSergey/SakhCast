@@ -30,10 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcast.R
-import com.example.sakhcast.SERIES_VIEW
 import com.example.sakhcast.model.SeriesCard
 import java.util.Locale
 
@@ -56,8 +54,11 @@ fun PreviewSeriesCategoryCardItem() {
 }
 
 @Composable
-fun SeriesCategoryCardItem(seriesCard: SeriesCard, navHostController: NavHostController) {
-    Box(modifier = Modifier.clickable { navHostController.navigate("${SERIES_VIEW}/${seriesCard.id}") }) {
+fun SeriesCategoryCardItem(
+    seriesCard: SeriesCard,
+    navigateToSeriesById: (String) -> Unit
+) {
+    Box(modifier = Modifier.clickable { navigateToSeriesById(seriesCard.id.toString()) }) {
         Column() {
             SeriesCategoryCard(seriesCard)
             Text(

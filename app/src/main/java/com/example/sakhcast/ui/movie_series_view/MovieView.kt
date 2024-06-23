@@ -62,10 +62,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
-import com.example.sakhcast.MOVIE_CATEGORY_SCREEN
-import com.example.sakhcast.PLAYER
 import com.example.sakhcast.R
 import com.example.sakhcast.model.Cast
 import com.example.sakhcast.model.Download
@@ -95,13 +92,17 @@ fun PreviewMovieInfo() {
 @Composable
 fun MovieView(
     paddingValues: PaddingValues,
-    navHostController: NavHostController,
+    alphaId: String?,
+    navigateToMoviePlayer: (String, String, Int, String) -> Unit,
+    navigateToMovieByAlphaId: (String) -> Unit,
+    navigateToMovieCategoriesByGenresId: (String, String) -> Unit,
+    navigateUp: () -> Boolean,
     movieViewModel: MovieViewModel = hiltViewModel()
 ) {
     val movieState = movieViewModel.movieState.observeAsState(MovieViewModel.MovieState())
     val movie = movieState.value.movie
     val recommendationList = movieState.value.movieRecommendationsList
-    val alphaId = navHostController.currentBackStackEntry?.arguments?.getString("movieId")
+
 
     var alphaIdToSend by remember { mutableStateOf("") }
     var hlsToSend by remember { mutableStateOf("") }
@@ -175,8 +176,11 @@ fun MovieView(
                 ) {
                     IconButton(
                         onClick = {
-                            navHostController.navigate(
-                                "$PLAYER/$hlsToSend/$titleToSend/$positionToSend/$alphaIdToSend"
+                            navigateToMoviePlayer(
+                                hlsToSend,
+                                titleToSend,
+                                positionToSend,
+                                alphaIdToSend
                             )
                         },
                         modifier = Modifier
@@ -242,8 +246,9 @@ fun MovieView(
                     MovieInfo(
                         movie,
                         recommendationList,
-                        navHostController,
-                        movieViewModel::downloadMovie
+                        movieViewModel::downloadMovie,
+                        navigateToMovieByAlphaId,
+                        navigateToMovieCategoriesByGenresId
                     )
                 }
             }
@@ -253,7 +258,7 @@ fun MovieView(
                 scrollState = scrollState,
                 ruTitle = it,
                 paddingValues = paddingValues,
-                navHostController = navHostController,
+                navigateUp,
                 isFavorite = isFavorite.value,
             ) { kind: String ->
                 movieViewModel.onFavoriteButtonPushed(kind)
@@ -268,34 +273,27 @@ fun MovieView(
 fun MovieInfo(
     movie: Movie,
     recommendationList: MovieList,
-    navHostController: NavHostController,
-    download: (String, String) -> Unit
+    download: (String, String) -> Unit,
+    navigateToMovieByAlphaId: (String) -> Unit,
+    navigateToMovieCategoriesByGenresId: (String, String) -> Unit,
 ) {
     val isRatingExists = movie.imdbRating != null || movie.kpRating != null
 
     Column(
         modifier = Modifier.background(MaterialTheme.colorScheme.primary)
     ) {
-        MovieGenres(movie.genres) { genresName: String, genresId: String ->
-            navHostController.navigate(
-                MOVIE_CATEGORY_SCREEN + "/${genresName}/${genresId}"
-            )
-        }
+        MovieGenres(movie.genres, navigateToMovieCategoriesByGenresId)
         if (isRatingExists) MovieRating(movie.imdbRating, movie.kpRating)
         MovieCountryYearStatus(movie.productionCountries, movie.releaseDate, movie.status)
         MovieDownloads(movie.downloads, download, movie.ruTitle)
         movie.overview?.let { MovieOverview(it) }
         movie.productionCompanies?.let {
-            MovieProductionCompanies(it) { companyName: String, companyId: String ->
-                navHostController.navigate(
-                    MOVIE_CATEGORY_SCREEN + "/${companyName}/${companyId}"
-                )
-            }
+            MovieProductionCompanies(it, navigateToMovieCategoriesByGenresId)  // меняем навигацию
         }
         movie.cast?.let { MovieExpandableCastTab(it) }
         MovieRecommendations(
-            navHostController = navHostController,
-            movieRecommendations = recommendationList
+            movieRecommendations = recommendationList,
+            navigateToMovieByAlphaId = navigateToMovieByAlphaId,
         )
         MovieViewsCountInfo(movie.views, movie.favorites)
     }
@@ -347,7 +345,7 @@ fun MovieViewsCountInfo(views: Int, favorites: Int) {
 @Composable
 fun MovieRecommendations(
     movieRecommendations: MovieList,
-    navHostController: NavHostController
+    navigateToMovieByAlphaId: (String) -> Unit,
 ) {
     Text(
         modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
@@ -362,7 +360,10 @@ fun MovieRecommendations(
         contentPadding = PaddingValues(16.dp)
     ) {
         itemsIndexed(movieRecommendations.items) { _, movie ->
-            MovieItemView(movieCard = movie, navHostController = navHostController)
+            MovieItemView(
+                movieCard = movie,
+                navigateToMovieByAlphaId = navigateToMovieByAlphaId
+            )
         }
     }
     DividerBase()
@@ -404,7 +405,7 @@ fun TopMovieBar(
     scrollState: ScrollState,
     ruTitle: String,
     paddingValues: PaddingValues,
-    navHostController: NavHostController,
+    navigateUp: () -> Boolean,
     isFavorite: Boolean,
     onFavoriteButtonPushed: (String) -> Unit
 ) {
@@ -434,7 +435,7 @@ fun TopMovieBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { navHostController.navigateUp() }) {
+            IconButton(onClick = { navigateUp() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                     contentDescription = null,

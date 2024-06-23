@@ -20,13 +20,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.example.sakhcast.Dimens
-import com.example.sakhcast.MOVIE_CATEGORY_SCREEN
-import com.example.sakhcast.SERIES_CATEGORY_SCREEN
 
 @Composable
-fun CatalogList(categories: List<String>, navHostController: NavHostController, tabIndex: Int) {
+fun CatalogList(
+    categories: List<String>,
+    tabIndex: Int,
+    navigateToMoviesCategoryScreen: (String) -> Unit,
+    navigateToSeriesCategoryScreen: (String) -> Unit
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth(),
@@ -38,10 +40,8 @@ fun CatalogList(categories: List<String>, navHostController: NavHostController, 
                     .height(50.dp)
                     .background(MaterialTheme.colorScheme.primary)
                     .clickable {
-                        val route =
-                            if (tabIndex == 0) SERIES_CATEGORY_SCREEN + "/${item}"
-                            else MOVIE_CATEGORY_SCREEN + "/${item}/{}"
-                        navHostController.navigate(route)
+                        if (tabIndex == 0) navigateToSeriesCategoryScreen(item)
+                        else navigateToMoviesCategoryScreen(item)
                     },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween

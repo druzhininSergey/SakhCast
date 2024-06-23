@@ -17,17 +17,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.sakhcast.Dimens
-import com.example.sakhcast.SERIES_CATEGORY_SCREEN
 import com.example.sakhcast.model.SeriesList
 
 @Composable
-fun SeriesCategoryView(seriesList: SeriesList, navHostController: NavHostController) {
+fun SeriesCategoryView(
+    seriesList: SeriesList,
+    navigateToSeriesById: (String) -> Unit,
+    navigateToCatalogAllSeries: () -> Unit
+) {
     Row(
         modifier = Modifier
             .padding(start = Dimens.mainPadding)
-            .clickable { navHostController.navigate("$SERIES_CATEGORY_SCREEN/Все") },
+            .clickable { navigateToCatalogAllSeries() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -48,7 +50,7 @@ fun SeriesCategoryView(seriesList: SeriesList, navHostController: NavHostControl
         horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding)
     ) {
         itemsIndexed(seriesList.items) { _, item ->
-            SeriesItemView(seriesCard = item, navHostController)
+            SeriesItemView(seriesCard = item, navigateToSeriesById)
         }
     }
 }

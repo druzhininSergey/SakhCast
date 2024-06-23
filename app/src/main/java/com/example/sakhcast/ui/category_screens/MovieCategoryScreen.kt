@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.category_screens
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,7 +23,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.sakhcast.Dimens
@@ -35,18 +33,18 @@ import com.example.sakhcast.model.MovieCard
 @Composable
 fun MovieCategoryScreen(
     paddingValues: PaddingValues,
-    navHostController: NavHostController,
+    searchCategoryName: String?,
+    searchGenreId: String?,
+    navigateUp: () -> Boolean,
+    navigateToMovieByAlphaId: (String) -> Unit,
     movieCategoryScreenViewModel: MovieCategoryScreenViewModel = hiltViewModel()
 ) {
-    val searchCategoryName =
-        navHostController.currentBackStackEntry?.arguments?.getString("category") ?: "Все"
-    val searchGenreId =
-        navHostController.currentBackStackEntry?.arguments?.getString("genresId")
-    Log.e("!!!","searchGenreId = $searchGenreId")
     val moviePagingData: LazyPagingItems<MovieCard>? =
         movieCategoryScreenViewModel.moviesCategoryScreenState.value?.moviesPagingData?.collectAsLazyPagingItems()
     LaunchedEffect(searchCategoryName, searchGenreId) {
-        if (searchGenreId == null || searchGenreId == "{}") movieCategoryScreenViewModel.initCategory(searchCategoryName)
+        if (searchGenreId == null || searchGenreId == "{}") movieCategoryScreenViewModel.initCategory(
+            searchCategoryName
+        )
         else movieCategoryScreenViewModel.initCategory(searchGenreId)
     }
     val lazyGridState = rememberLazyGridState()
@@ -54,13 +52,14 @@ fun MovieCategoryScreen(
     Column {
         CenterAlignedTopAppBar(
             title = {
-                Text(
-                    textAlign = TextAlign.Center,
-                    text = searchCategoryName.replaceFirstChar { it.uppercaseChar() }
-                )
+                if (searchCategoryName != null)
+                    Text(
+                        textAlign = TextAlign.Center,
+                        text = searchCategoryName.replaceFirstChar { it.uppercaseChar() }
+                    )
             },
             navigationIcon = {
-                IconButton(onClick = { navHostController.navigateUp() }) {
+                IconButton(onClick = { navigateUp() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                         contentDescription = null,
@@ -84,7 +83,12 @@ fun MovieCategoryScreen(
                 state = lazyGridState
             ) {
                 items(pagingItems.itemCount) { index ->
-                    pagingItems[index]?.let { MovieCategoryCardItem(it, navHostController) }
+                    pagingItems[index]?.let {
+                        MovieCategoryCardItem(
+                            it,
+                            navigateToMovieByAlphaId
+                        )
+                    }
                 }
             }
         }

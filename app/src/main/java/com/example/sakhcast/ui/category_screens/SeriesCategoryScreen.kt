@@ -23,7 +23,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.sakhcast.Dimens
@@ -33,12 +32,12 @@ import com.example.sakhcast.model.SeriesCard
 @Composable
 fun SeriesCategoryScreen(
     paddingValues: PaddingValues,
-    navHostController: NavHostController,
+    categoryName: String,
+    navigateUp: ()-> Boolean,
+    navigateToSeriesById: (String) -> Unit,
     seriesCategoryScreenViewModel: SeriesCategoryScreenViewModel = hiltViewModel()
 ) {
-    val categoryName = navHostController.currentBackStackEntry?.arguments?.getString(
-        "category"
-    ) ?: "Все"
+
     val seriesPagingData: LazyPagingItems<SeriesCard>? =
         seriesCategoryScreenViewModel.seriesCategoryScreenState.value?.seriesPagingData?.collectAsLazyPagingItems()
 
@@ -56,7 +55,7 @@ fun SeriesCategoryScreen(
                 )
             },
             navigationIcon = {
-                IconButton(onClick = { navHostController.navigateUp() }) {
+                IconButton(onClick = { navigateUp() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                         contentDescription = null,
@@ -79,7 +78,10 @@ fun SeriesCategoryScreen(
                 state = lazyGridState
             ) {
                 items(pagingItems.itemCount) { index ->
-                    pagingItems[index]?.let { SeriesCategoryCardItem(it, navHostController) }
+                    pagingItems[index]?.let { SeriesCategoryCardItem(
+                        it,
+                        navigateToSeriesById
+                    ) }
                 }
             }
         }

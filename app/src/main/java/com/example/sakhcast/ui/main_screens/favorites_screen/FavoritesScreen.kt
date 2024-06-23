@@ -26,14 +26,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FavoritesScreen(
     paddingValues: PaddingValues,
-    navHostController: NavHostController,
+    navigateToMovieByAlphaId: (String) -> Unit,
+    navigateToSeriesById: (String) -> Unit,
     favoritesScreenViewModel: FavoritesScreenViewModel = hiltViewModel()
 ) {
     val favoritesScreenState = favoritesScreenViewModel.favoritesScreenState.observeAsState(
@@ -67,7 +67,7 @@ fun FavoritesScreen(
             indicator = { tabPositions ->
                 SecondaryIndicator(
                     Modifier.tabIndicatorOffset(tabPositions[tabIndex]),
-                    color = MaterialTheme.colorScheme.onPrimary // Устанавливаем цвет индикатора
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         ) {
@@ -98,9 +98,9 @@ fun FavoritesScreen(
                     seriesCardWatching,
                     seriesCardWillWatch,
                     seriesCardFinishedWatching,
-                    navHostController
+                    navigateToSeriesById
                 )
-            else MoviesPage(movieCardsWillWatch, navHostController)
+            else MoviesPage(movieCardsWillWatch, navigateToMovieByAlphaId)
         }
     }
 }

@@ -36,24 +36,53 @@ fun AuthNavGraph(
     navHostController: NavHostController,
     paddingValues: PaddingValues,
 ) {
+    val navigateUp = { navHostController.navigateUp() }
+    val navigate = { route: String -> navHostController.navigate(route) }
+
+    val navigateToMovieByAlphaId = { movieAlphaId: String -> navigate("$MOVIE_VIEW/$movieAlphaId") }
+    val navigateToSeriesById = { seriesId: String -> navigate("$SERIES_VIEW/$seriesId") }
+    val navigateToCatalogAllSeries = { navigate("$SERIES_CATEGORY_SCREEN/Все") }
+    val navigateToCatalogAllMovies = { navigate("$MOVIE_CATEGORY_SCREEN/Все/{}") }
+    val navigateToSeriesCategoryScreen = { categoryName: String -> navigate("$SERIES_CATEGORY_SCREEN/$categoryName") }
+    val navigateToMoviesCategoryScreen = { categoryName: String -> navigate("$MOVIE_CATEGORY_SCREEN/$categoryName/{}") }
+    val navigateToMoviePlayer = { hlsToSend: String, titleToSend: String, positionToSend: Int, alphaIdToSend: String ->
+        navigate("$PLAYER/$hlsToSend/$titleToSend/$positionToSend/$alphaIdToSend")
+    }
+    val navigateToMovieCategoriesByGenresId = { genresName: String, genresId: String ->
+        navigate("$MOVIE_CATEGORY_SCREEN/$genresName/$genresId")
+    }
 
     NavHost(
         navController = navHostController,
         startDestination = HOME_SCREEN
     ) {
-
         composable(HOME_SCREEN) {
-            HomeScreen(paddingValues = paddingValues, navHostController = navHostController)
+            HomeScreen(
+                paddingValues = paddingValues,
+                navigateToMovieByAlphaId = navigateToMovieByAlphaId,
+                navigateToSeriesById = navigateToSeriesById,
+                navigateToCatalogAllSeries = navigateToCatalogAllSeries,
+                navigateToCatalogAllMovies = navigateToCatalogAllMovies
+            )
         }
         composable(CATALOG_SCREEN) {
             val catalogScreenViewModel = hiltViewModel<CatalogScreenViewModel>()
             val catalogScreenState by
             catalogScreenViewModel.catalogScreenState.observeAsState(CatalogScreenViewModel.CatalogScreenState())
 
-            CatalogScreen(paddingValues = paddingValues, navHostController, catalogScreenState)
+            CatalogScreen(
+                paddingValues = paddingValues,
+                navigateToSeriesCategoryScreen = navigateToSeriesCategoryScreen,
+                navigateToMoviesCategoryScreen = navigateToMoviesCategoryScreen,
+                catalogScreenState = catalogScreenState
+            )
         }
         composable(FAVORITES_SCREEN) {
-            FavoritesScreen(paddingValues, navHostController)
+            FavoritesScreen(
+                paddingValues = paddingValues,
+                navigateToMovieByAlphaId = navigateToMovieByAlphaId,
+                navigateToSeriesById = navigateToSeriesById,
+            )
         }
         composable(NOTIFICATION_SCREEN) {
             val notificationScreenViewModel: NotificationScreenViewModel = hiltViewModel()
@@ -64,19 +93,50 @@ fun AuthNavGraph(
             NotificationScreen(paddingValues, notificationScreenState)
         }
         composable(SEARCH_SCREEN) {
-            SearchScreen(paddingValues, navHostController)
+            SearchScreen(
+                paddingValues = paddingValues,
+                navigateToMovieByAlphaId = navigateToMovieByAlphaId,
+                navigateToSeriesById = navigateToSeriesById
+            )
         }
-        composable("$MOVIE_VIEW/{movieId}") {
-            MovieView(paddingValues, navHostController)
+        composable("$MOVIE_VIEW/{movieId}") { backStackEntry ->
+            val alphaId = backStackEntry.arguments?.getString("movieId")
+            MovieView(
+                paddingValues = paddingValues,
+                alphaId = alphaId,
+                navigateToMoviePlayer = navigateToMoviePlayer,
+                navigateToMovieByAlphaId = navigateToMovieByAlphaId,
+                navigateToMovieCategoriesByGenresId = navigateToMovieCategoriesByGenresId,
+                navigateUp = navigateUp
+            )
         }
-        composable("$SERIES_VIEW/{seriesId}") {
-            SeriesView(paddingValues, navHostController)
+        composable("$SERIES_VIEW/{seriesId}") { backStackEntry ->
+            val seriesId = backStackEntry.arguments?.getString("seriesId")?.toIntOrNull()
+            SeriesView(
+                paddingValues = paddingValues,
+                navigateUp = navigateUp,
+                seriesId = seriesId,
+            )
         }
-        composable("$MOVIE_CATEGORY_SCREEN/{category}/{genresId}") {
-            MovieCategoryScreen(paddingValues, navHostController)
+        composable("$MOVIE_CATEGORY_SCREEN/{category}/{genresId}") { backStackEntry ->
+            val searchCategoryName = backStackEntry.arguments?.getString("category") ?: "Все"
+            val searchGenreId = backStackEntry.arguments?.getString("genresId")
+            MovieCategoryScreen(
+                paddingValues = paddingValues,
+                searchCategoryName = searchCategoryName,
+                searchGenreId = searchGenreId,
+                navigateUp = navigateUp,
+                navigateToMovieByAlphaId = navigateToMovieByAlphaId
+            )
         }
-        composable("$SERIES_CATEGORY_SCREEN/{category}") {
-            SeriesCategoryScreen(paddingValues, navHostController)
+        composable("$SERIES_CATEGORY_SCREEN/{category}") { backStackEntry ->
+            val categoryName = backStackEntry.arguments?.getString("category") ?: "Все"
+            SeriesCategoryScreen(
+                paddingValues = paddingValues,
+                categoryName = categoryName,
+                navigateUp = navigateUp,
+                navigateToSeriesById = navigateToSeriesById,
+            )
         }
         composable("$PLAYER/{hls}/{title}/{position}/{movieAlphaId}") { backStackEntry ->
             val hls = backStackEntry.arguments?.getString("hls") ?: ""
@@ -84,8 +144,13 @@ fun AuthNavGraph(
             val positionStr = backStackEntry.arguments?.getString("position") ?: "0"
             val position = positionStr.toInt()
             val movieAlphaId = backStackEntry.arguments?.getString("movieAlphaId") ?: ""
-            Player2(hls, title, position, movieAlphaId, navHostController)
+            Player2(
+                hls = hls,
+                title = title,
+                position = position,
+                movieAlphaId = movieAlphaId,
+                navigateUp = navigateUp
+            )
         }
-
     }
 }
