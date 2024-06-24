@@ -42,9 +42,8 @@ fun MovieCategoryScreen(
     val moviePagingData: LazyPagingItems<MovieCard>? =
         movieCategoryScreenViewModel.moviesCategoryScreenState.value?.moviesPagingData?.collectAsLazyPagingItems()
     LaunchedEffect(searchCategoryName, searchGenreId) {
-        if (searchGenreId == null || searchGenreId == "{}") movieCategoryScreenViewModel.initCategory(
-            searchCategoryName
-        )
+        if (searchGenreId == null || searchGenreId == "{}")
+            movieCategoryScreenViewModel.initCategory(searchCategoryName)
         else movieCategoryScreenViewModel.initCategory(searchGenreId)
     }
     val lazyGridState = rememberLazyGridState()
@@ -93,5 +92,4 @@ fun MovieCategoryScreen(
             }
         }
     }
-
 }

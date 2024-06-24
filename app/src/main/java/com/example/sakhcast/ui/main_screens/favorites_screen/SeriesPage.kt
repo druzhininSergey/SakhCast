@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.main_screens.favorites_screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,25 +33,26 @@ fun SeriesPage(
     seriesCardWatching: SeriesList?,
     seriesCardWillWatch: SeriesList?,
     seriesCardFinishedWatching: SeriesList?,
-    navigateToSeriesById: (String) -> Unit
+    navigateToSeriesById: (String) -> Unit,
+    navigateToSeriesCategoryByType: (String, String) -> Unit,
 ) {
-    val categoryNames = listOf("Cмотрю", "Буду смотреть", "Перестал")
+    val categoryNames = mapOf("Cмотрю" to "watching", "Буду смотреть" to "will", "Перестал" to "stopped")
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .verticalScroll(scrollState)
     ) {
-        categoryNames.forEachIndexed { index, category ->
+        categoryNames.entries.forEachIndexed { index, category ->
             Row(
                 modifier = Modifier.padding(
                     horizontal = Dimens.mainPadding,
                     vertical = Dimens.mainPadding
-                ),
+                ).clickable { navigateToSeriesCategoryByType("${category.value}.favorite", category.key) },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = category,
+                    text = category.key,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
                 )

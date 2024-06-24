@@ -94,9 +94,9 @@ fun SeriesCard(seriesCard: SeriesCard) {
     else seriesCard.coverAlt + ".webp"
 
     val backdropColor1 =
-        Color(android.graphics.Color.parseColor(seriesCard.coverColors.background1))
+        Color(android.graphics.Color.parseColor(seriesCard.coverColors?.background1 ?: "#000000"))
     val backdropColor2 =
-        Color(android.graphics.Color.parseColor(seriesCard.coverColors.background2))
+        Color(android.graphics.Color.parseColor(seriesCard.coverColors?.background2 ?: "#000000"))
     val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
 
     Card(

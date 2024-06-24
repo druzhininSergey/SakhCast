@@ -30,6 +30,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -174,29 +176,30 @@ fun MovieView(
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    IconButton(
-                        onClick = {
-                            navigateToMoviePlayer(
-                                hlsToSend,
-                                titleToSend,
-                                positionToSend,
-                                alphaIdToSend
+                    if (movie != null)
+                        IconButton(
+                            onClick = {
+                                navigateToMoviePlayer(
+                                    hlsToSend,
+                                    titleToSend,
+                                    positionToSend,
+                                    alphaIdToSend
+                                )
+                            },
+                            modifier = Modifier
+                                .size(100.dp)
+                                .graphicsLayer {
+                                    alpha =
+                                        1f - ((scrollState.value.toFloat() / scrollState.maxValue) * 2.5f)
+                                    translationY = 0.5f * scrollState.value
+                                }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_play),
+                                contentDescription = null,
+                                modifier = Modifier.size(100.dp),
+                                tint = Color.White
                             )
-                        },
-                        modifier = Modifier
-                            .size(100.dp)
-                            .graphicsLayer {
-                                alpha =
-                                    1f - ((scrollState.value.toFloat() / scrollState.maxValue) * 2.5f)
-                                translationY = 0.5f * scrollState.value
-                            }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_play),
-                            contentDescription = null,
-                            modifier = Modifier.size(100.dp),
-                            tint = Color.White
-                        )
-                    }
+                        }
                 }
                 Box(
                     modifier = Modifier
@@ -258,7 +261,7 @@ fun MovieView(
                 scrollState = scrollState,
                 ruTitle = it,
                 paddingValues = paddingValues,
-                navigateUp,
+                navigateUp = navigateUp,
                 isFavorite = isFavorite.value,
             ) { kind: String ->
                 movieViewModel.onFavoriteButtonPushed(kind)
@@ -290,7 +293,7 @@ fun MovieInfo(
         movie.productionCompanies?.let {
             MovieProductionCompanies(it, navigateToMovieCategoriesByGenresId)  // меняем навигацию
         }
-        movie.cast?.let { MovieExpandableCastTab(it) }
+        movie.cast?.let { MovieExpandableCastTab(it, navigateToMovieCategoriesByGenresId) }
         MovieRecommendations(
             movieRecommendations = recommendationList,
             navigateToMovieByAlphaId = navigateToMovieByAlphaId,
@@ -372,7 +375,7 @@ fun MovieRecommendations(
 @Composable
 fun MovieProductionCompanies(
     productionCompanies: List<ProductionCompany>,
-    onCompanyPushed: (String, String) -> Unit
+    navigateToMovieCategoriesByGenresId: (String, String) -> Unit
 ) {
     Text(
         modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
@@ -386,6 +389,8 @@ fun MovieProductionCompanies(
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
     ) {
         itemsIndexed(productionCompanies) { _, company ->
+            val productionCompanyUri = Uri.encode(company.name)
+
             Text(
                 text = company.name,
                 color = Color.Gray,
@@ -393,7 +398,12 @@ fun MovieProductionCompanies(
                 modifier = Modifier
                     .border(1.dp, Color.Gray, MaterialTheme.shapes.small)
                     .padding(4.dp)
-                    .clickable { onCompanyPushed(company.name, company.id.toString()) }
+                    .clickable {
+                        navigateToMovieCategoriesByGenresId(
+                            productionCompanyUri,
+                            "${company.id}.company"
+                        )
+                    }
             )
         }
     }
@@ -485,6 +495,12 @@ fun TopMovieBar(
 
 @Composable
 fun MovieDownloads(downloads: List<Download>, download: (String, String) -> Unit, ruTitle: String) {
+    val openDialog = remember {
+        mutableStateOf(false)
+    }
+    val selectedItemIndex = remember {
+     mutableIntStateOf(0)
+    }
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -500,7 +516,7 @@ fun MovieDownloads(downloads: List<Download>, download: (String, String) -> Unit
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.padding(end = 16.dp)
         ) {
-            downloads.forEach {
+            downloads.forEachIndexed { index, it ->
                 Text(
                     text = it.ql,
                     color = Color.Gray,
@@ -508,13 +524,45 @@ fun MovieDownloads(downloads: List<Download>, download: (String, String) -> Unit
                     modifier = Modifier
                         .border(1.dp, Color.Gray, MaterialTheme.shapes.small)
                         .padding(4.dp)
-                        .clickable { download(it.src, "$ruTitle.${it.h}p.") }
+                        .clickable {
+                            selectedItemIndex.intValue = index
+                            openDialog.value = true
+//                            download(it.src, "$ruTitle.${it.h}p.")
+                        }
+                )
+            }
+            if (openDialog.value) {
+                val selectedDownloadFile = downloads[selectedItemIndex.intValue]
+                AlertDialog(
+                    onDismissRequest = { openDialog.value = false },
+                    title = {
+                        Text(text = "Подтвердите скачивание фильма:")
+                    },
+                    text = {
+                        Text(text = "\"$ruTitle\". Качество: ${selectedDownloadFile.ql}")
+                    },
+                    confirmButton = {
+                        Button(onClick = {
+                            openDialog.value = false
+                            download(selectedDownloadFile.src, "$ruTitle.${selectedDownloadFile.h}p.")
+                        }) {
+                            Text(text = "Скачать")
+                        }
+                    },
+                    dismissButton = {
+                        Button(onClick = {
+                            openDialog.value = false
+                        }) {
+                            Text(text = "Отменить")
+                        }
+                    }
                 )
             }
         }
     }
     DividerBase()
 }
+
 
 @Composable
 fun MovieCountryYearStatus(
@@ -572,10 +620,18 @@ fun MovieRating(_imdbRating: Double?, _kinopoiskRating: Double?) {
 }
 
 @Composable
-fun MovieGenres(genres: List<Genre>, onGenreClicked: (String, String) -> Unit) {
+fun MovieGenres(
+    genres: List<Genre>,
+    navigateToMovieCategoriesByGenresId: (String, String) -> Unit
+) {
     LazyRow(Modifier.fillMaxWidth()) {
         itemsIndexed(genres) { _, genres ->
-            TextButton(onClick = { onGenreClicked(genres.name, genres.id.toString()) }) {
+            TextButton(onClick = {
+                navigateToMovieCategoriesByGenresId(
+                    genres.name,
+                    genres.id.toString()
+                )
+            }) {
                 Text(
                     text = genres.name.uppercase(),
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -612,7 +668,10 @@ fun MovieOverview(overview: String) {
 }
 
 @Composable
-fun MovieExpandableCastTab(cast: Cast) {
+fun MovieExpandableCastTab(
+    cast: Cast,
+    navigateToMovieCategoriesByGenresId: (String, String) -> Unit
+) {
     var isExpanded by remember { mutableStateOf(false) }
     val rotationAngle by animateFloatAsState(
         targetValue = if (isExpanded) 90f else 0f,
@@ -671,7 +730,7 @@ fun MovieExpandableCastTab(cast: Cast) {
                     contentPadding = PaddingValues(16.dp)
                 ) {
                     items(members) { person ->
-                        PersonItem(person)
+                        PersonItem(person, navigateToMovieCategoriesByGenresId)
                     }
                 }
                 DividerBase()
@@ -681,7 +740,7 @@ fun MovieExpandableCastTab(cast: Cast) {
 }
 
 @Composable
-fun PersonItem(person: Person) {
+fun PersonItem(person: Person, navigateToMovieCategoriesByGenresId: (String, String) -> Unit) {
     val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         person.photoAlt + ".avif"
     } else {
@@ -693,7 +752,13 @@ fun PersonItem(person: Person) {
     Column(
         modifier = Modifier
             .width(70.dp)
-            .padding(vertical = 4.dp),
+            .padding(vertical = 4.dp)
+            .clickable {
+                navigateToMovieCategoriesByGenresId(
+                    person.ruName,
+                    "${person.id}.person"
+                )
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

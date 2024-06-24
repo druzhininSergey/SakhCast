@@ -33,7 +33,8 @@ import com.example.sakhcast.model.SeriesCard
 fun SeriesCategoryScreen(
     paddingValues: PaddingValues,
     categoryName: String,
-    navigateUp: ()-> Boolean,
+    name: String,
+    navigateUp: () -> Boolean,
     navigateToSeriesById: (String) -> Unit,
     seriesCategoryScreenViewModel: SeriesCategoryScreenViewModel = hiltViewModel()
 ) {
@@ -45,13 +46,16 @@ fun SeriesCategoryScreen(
         seriesCategoryScreenViewModel.initCategory(categoryName)
     }
     val lazyGridState = rememberLazyGridState()
+    val categoryNameTitle = if (categoryName.endsWith(".company")) name
+    else if (categoryName.endsWith(".favorite")) name
+    else categoryName.replaceFirstChar { it.uppercase() }
 
     Column {
         CenterAlignedTopAppBar(
             title = {
                 Text(
                     textAlign = TextAlign.Center,
-                    text = categoryName
+                    text = categoryNameTitle
                 )
             },
             navigationIcon = {
@@ -78,10 +82,12 @@ fun SeriesCategoryScreen(
                 state = lazyGridState
             ) {
                 items(pagingItems.itemCount) { index ->
-                    pagingItems[index]?.let { SeriesCategoryCardItem(
-                        it,
-                        navigateToSeriesById
-                    ) }
+                    pagingItems[index]?.let {
+                        SeriesCategoryCardItem(
+                            it,
+                            navigateToSeriesById
+                        )
+                    }
                 }
             }
         }

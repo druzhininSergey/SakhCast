@@ -42,7 +42,7 @@ data class MovieDataRecent(
     @SerialName("backdrop_colors") val backdropColors: BackdropColors,
     @SerialName("cover") val cover: String,
     @SerialName("cover_alt") val coverAlt: String,
-    @SerialName("cover_colors") val coverColors: PosterColors,
+    @SerialName("cover_colors") val coverColors: PosterColors?,
     @SerialName("cover_h") val coverH: Int,
     @SerialName("cover_lq") val coverLq: String,
     @SerialName("cover_w") val coverW: Int,

@@ -41,9 +41,9 @@ fun ContinueWatchMovieView(
     val imageUrl = movieCard.data.backdropAlt + ".webp"
 
     val backdropColor1 =
-        Color(android.graphics.Color.parseColor(movieCard.data.coverColors.background1))
+        Color(android.graphics.Color.parseColor(movieCard.data.coverColors?.background1 ?: "#000000"))
     val backdropColor2 =
-        Color(android.graphics.Color.parseColor(movieCard.data.coverColors.background2))
+        Color(android.graphics.Color.parseColor(movieCard.data.coverColors?.background2 ?: "#000000"))
     val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
 
     Card(

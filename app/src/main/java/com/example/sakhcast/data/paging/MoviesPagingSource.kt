@@ -62,6 +62,14 @@ class MoviesPagingSource(
     private suspend fun getMoviesList(page: Int, categoryNameUrl: String): MovieList? {
         return if (categoryName in categoryList) {
             sakhCastRepository.getMoviesListBySortField(categoryNameUrl, page)
+        } else if (categoryName.endsWith(".company")) {
+            val companyId = categoryName.substringBeforeLast(".company")
+            sakhCastRepository.getMoviesListByCompanyId(companyId, page)
+        } else if (categoryName.endsWith(".person")) {
+            val personId = categoryName.substringBeforeLast(".person")
+            sakhCastRepository.getMoviesListByPersonId(personId, page)
+        } else if (categoryName.endsWith(".favorite")) {
+            sakhCastRepository.getMovieFavorites(page)
         } else {
             sakhCastRepository.getMoviesListByGenreId(categoryNameUrl, page)
         }

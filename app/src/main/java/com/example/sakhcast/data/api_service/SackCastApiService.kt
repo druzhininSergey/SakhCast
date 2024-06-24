@@ -45,10 +45,19 @@ interface SakhCastApiService {
     ): Call<SeriesList>
 
     @GET("v1/catalog/items")
+    fun getSeriesListByCompany(
+        @Query("category") category: String = "network",
+        @Query("page") page: Int,
+        @Query("amount") amount: Int = 40,
+        @Query("networks") networks: String,
+    ): Call<SeriesList>
+
+    @GET("v1/catalog/items")
     fun getSeriesListByGenre(
         @Query("category") category: String = "genre",
         @Query("page") page: Int,
         @Query("amount") amount: Int = 40,
+        @Query("kind") kind: String = "watching",
         @Query("genres") genres: String,
     ): Call<SeriesList>
 
@@ -125,6 +134,21 @@ interface SakhCastApiService {
     ): Call<MovieList>
 
     @GET("v2/catalog/movies/items")
+    fun getMoviesListByCompanyId(
+        @Query("sf") sortField: String = "Movie.sort",
+        @Query("companies") companyId: String,
+        @Query("page") page: Int,
+        @Query("amount") amount: Int = 40,
+    ): Call<MovieList>
+
+    @GET("v2/catalog/movies/items")
+    fun getMoviesListByPersonId(
+        @Query("page") page: Int,
+        @Query("amount") amount: Int = 40,
+        @Query("person") personId: String,
+    ): Call<MovieList>
+
+    @GET("v2/catalog/movies/items")
     fun getMoviesListByGenreId(
         @Query("genres") genresId: String,
         @Query("page") page: Int,
@@ -150,6 +174,12 @@ interface SakhCastApiService {
         @Query("phrase") textInput: String,
     ): Call<MovieList>
 
+    @POST("v2/movie/{movie}/pos")
+    fun setMoviePosition(
+        @Path("movie") movieAlphaId: String,
+        @Query("t") positionSec: Int
+    ): Call<Boolean>
+
     @GET("v1/users/get_notifies?amount=20&from=0&subject_only=0")
     fun getNotificationsList(
         @Query("amount") amount: Int = 40,
@@ -159,10 +189,4 @@ interface SakhCastApiService {
 
     @POST("v1/users/ack_all_notifies")
     fun makeAllNotificationsRead(): Call<Boolean>
-
-    @POST("v2/movie/{movie}/pos")
-    fun setMoviePosition(
-        @Path("movie") movieAlphaId: String,
-        @Query("t") positionSec: Int
-    ): Call<Boolean>
 }
