@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui
 
+import android.net.Uri
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,14 +44,19 @@ fun AuthNavGraph(
     val navigateToSeriesById = { seriesId: String -> navigate("$SERIES_VIEW/$seriesId") }
     val navigateToCatalogAllSeries = { navigate("$SERIES_CATEGORY_SCREEN/Все") }
     val navigateToCatalogAllMovies = { navigate("$MOVIE_CATEGORY_SCREEN/Все/{}") }
-    val navigateToSeriesCategoryScreen = { categoryName: String -> navigate("$SERIES_CATEGORY_SCREEN/$categoryName") }
-    val navigateToMoviesCategoryScreen = { categoryName: String -> navigate("$MOVIE_CATEGORY_SCREEN/$categoryName/{}") }
-    val navigateToMoviePlayer = { hlsToSend: String, titleToSend: String, positionToSend: Int, alphaIdToSend: String ->
-        navigate("$PLAYER/$hlsToSend/$titleToSend/$positionToSend/$alphaIdToSend")
-    }
+    val navigateToSeriesCategoryScreen =
+        { categoryName: String -> navigate("$SERIES_CATEGORY_SCREEN/$categoryName/{}") }
+    val navigateToMoviesCategoryScreen =
+        { categoryName: String -> navigate("$MOVIE_CATEGORY_SCREEN/$categoryName/{}") }
+    val navigateToMoviePlayer =
+        { hlsToSend: String, titleToSend: String, positionToSend: Int, alphaIdToSend: String ->
+            navigate("$PLAYER/$hlsToSend/$titleToSend/$positionToSend/$alphaIdToSend")
+        }
     val navigateToMovieCategoriesByGenresId = { genresName: String, genresId: String ->
         navigate("$MOVIE_CATEGORY_SCREEN/$genresName/$genresId")
     }
+    val navigateToSeriesCategoryByType =
+        { type: String, name: String -> navigate("$SERIES_CATEGORY_SCREEN/$type/$name") }
 
     NavHost(
         navController = navHostController,
@@ -82,6 +88,8 @@ fun AuthNavGraph(
                 paddingValues = paddingValues,
                 navigateToMovieByAlphaId = navigateToMovieByAlphaId,
                 navigateToSeriesById = navigateToSeriesById,
+                navigateToSeriesCategoryByType = navigateToSeriesCategoryByType,
+                navigateToMovieCategoriesByGenresId = navigateToMovieCategoriesByGenresId,
             )
         }
         composable(NOTIFICATION_SCREEN) {
@@ -116,10 +124,13 @@ fun AuthNavGraph(
                 paddingValues = paddingValues,
                 navigateUp = navigateUp,
                 seriesId = seriesId,
+                navigateToSeriesCategoryByCompany = navigateToSeriesCategoryByType,
+                navigateToSeriesCategoryScreen = navigateToSeriesCategoryScreen,
             )
         }
         composable("$MOVIE_CATEGORY_SCREEN/{category}/{genresId}") { backStackEntry ->
-            val searchCategoryName = backStackEntry.arguments?.getString("category") ?: "Все"
+            val searchCategoryNameUri = backStackEntry.arguments?.getString("category") ?: "Все"
+            val searchCategoryName = Uri.decode(searchCategoryNameUri)
             val searchGenreId = backStackEntry.arguments?.getString("genresId")
             MovieCategoryScreen(
                 paddingValues = paddingValues,
@@ -129,11 +140,13 @@ fun AuthNavGraph(
                 navigateToMovieByAlphaId = navigateToMovieByAlphaId
             )
         }
-        composable("$SERIES_CATEGORY_SCREEN/{category}") { backStackEntry ->
+        composable("$SERIES_CATEGORY_SCREEN/{category}/{name}") { backStackEntry ->
             val categoryName = backStackEntry.arguments?.getString("category") ?: "Все"
+            val name = backStackEntry.arguments?.getString("name") ?: ""
             SeriesCategoryScreen(
                 paddingValues = paddingValues,
                 categoryName = categoryName,
+                name = name,
                 navigateUp = navigateUp,
                 navigateToSeriesById = navigateToSeriesById,
             )

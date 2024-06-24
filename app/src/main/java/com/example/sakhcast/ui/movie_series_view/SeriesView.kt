@@ -82,6 +82,8 @@ fun SeriesView(
     paddingValues: PaddingValues,
     seriesId: Int?,
     navigateUp: () -> Boolean,
+    navigateToSeriesCategoryScreen: (String) -> Unit,
+    navigateToSeriesCategoryByCompany: (String, String) -> Unit,
     seriesViewModel: SeriesViewModel = hiltViewModel(),
 ) {
     val seriesState =
@@ -201,7 +203,7 @@ fun SeriesView(
             }
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.primary)) {
                 series?.let {
-                    SeriesInfo(it, seriesEpisodes) { newSeasonId ->
+                    SeriesInfo(it, seriesEpisodes, navigateToSeriesCategoryScreen, navigateToSeriesCategoryByCompany) { newSeasonId ->
                         seasonId = newSeasonId
                     }
                 }
@@ -227,6 +229,8 @@ fun SeriesView(
 fun SeriesInfo(
     series: Series,
     seriesEpisodes: List<Episode>,
+    navigateToSeriesCategoryScreen: (String) -> Unit,
+    navigateToSeriesCategoryByCompany: (String, String) -> Unit,
     onSeasonChanged: (Int) -> Unit
 ) {
     val isRatingExists = series.imdbRating != null || series.kpRating != null
@@ -237,12 +241,12 @@ fun SeriesInfo(
         modifier = Modifier.background(MaterialTheme.colorScheme.primary)
     ) {
 
-        SeriesGenres(series.genres)
+        SeriesGenres(series.genres, navigateToSeriesCategoryScreen)
         if (isRatingExists) SeriesRating(series.imdbRating, series.kpRating)
         SeriesCountryYearStatus(series.country, year, series.status)
         SeriesDownloads(series.seasons, seriesEpisodes, onSeasonChanged)
         SeriesOverview(series.about)
-        SeriesProductionCompanies(series.networks)
+        SeriesProductionCompanies(series.networks, navigateToSeriesCategoryByCompany)
         SeriesViewsCountInfo(series.views, series.favAmount)
     }
 }
@@ -293,7 +297,7 @@ fun SeriesViewsCountInfo(views: Int, favorites: Int) {
 }
 
 @Composable
-fun SeriesProductionCompanies(productionCompanies: List<Network>) {
+fun SeriesProductionCompanies(productionCompanies: List<Network>, navigateToSeriesCategoryByCompany: (String, String) -> Unit,) {
     Text(
         modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
         text = "Кинокомпании",
@@ -312,6 +316,7 @@ fun SeriesProductionCompanies(productionCompanies: List<Network>) {
                 fontSize = 14.sp,
                 modifier = Modifier
                     .border(1.dp, Color.Gray, MaterialTheme.shapes.small)
+                    .clickable { navigateToSeriesCategoryByCompany("${company.id}.company", company.name) }
                     .padding(4.dp)
             )
         }
@@ -549,7 +554,7 @@ fun SeriesRating(_imdbRating: Double?, _kinopoiskRating: Double?) {
 }
 
 @Composable
-fun SeriesGenres(genres: List<Genre>) {
+fun SeriesGenres(genres: List<Genre>, navigateToSeriesCategoryScreen: (String) -> Unit) {
     LazyRow(Modifier.fillMaxWidth()) {
         itemsIndexed(genres) { _, genres ->
             TextButton(onClick = {}) {
@@ -563,6 +568,7 @@ fun SeriesGenres(genres: List<Genre>) {
                             MaterialTheme.colorScheme.onPrimary,
                             MaterialTheme.shapes.small
                         )
+                        .clickable { navigateToSeriesCategoryScreen(genres.name) }
                         .padding(4.dp)
                 )
             }

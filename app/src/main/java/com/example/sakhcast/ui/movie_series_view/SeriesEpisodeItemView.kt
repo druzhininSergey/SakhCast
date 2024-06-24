@@ -107,7 +107,7 @@ fun SeriesEpisodeItemView(seriesEpisode: Episode) {
             Box(
                 modifier = Modifier
                     .padding(4.dp)
-                    .size(20.dp)
+                    .size(30.dp)
                     .background(
                         color = Color.Gray.copy(alpha = 0.3f),
                         shape = CircleShape
@@ -116,7 +116,7 @@ fun SeriesEpisodeItemView(seriesEpisode: Episode) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    fontSize = 9.sp,
+                    fontSize = 12.sp,
                     text = seriesEpisode.index,
                     color = Color.White,
                 )

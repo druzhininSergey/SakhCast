@@ -100,17 +100,37 @@ class SakhCastRepository @Inject constructor(
         }
     }
 
+    suspend fun getSeriesListByCompany(companyId: String, page: Int): SeriesList? {
+        return withContext(ioDispatcher) {
+            try {
+                val seriesListCall =
+                    sakhCastApiService.getSeriesListByCompany(page = page, networks = companyId)
+                val responseBody = seriesListCall.execute()
+//                Log.i("!!!", "SeriesList from repo = ${responseBody.body()}")
+//                Log.i("!!!", "Call repo = $seriesListCall")
+//                Log.i("!!!", "SeriesList from repo = $responseBody")
+                responseBody.body()
+            } catch (e: Exception) {
+//                Log.i("!!!", "series homeScreen list = exception")
+//                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
     suspend fun getSeriesListByGenre(page: Int, genre: String): SeriesList? {
         return withContext(ioDispatcher) {
             try {
                 val seriesListCall =
                     sakhCastApiService.getSeriesListByGenre(page = page, genres = genre)
                 val responseBody = seriesListCall.execute()
-//                Log.i("!!!", "SeriesList BY GENRE from repo = ${responseBody.body()}")
+                Log.i("!!!", "SeriesList BY GENRE from repo = ${responseBody.body()}")
+                Log.i("!!!", "SeriesList BY GENRE from repo = ${responseBody.code()}")
+                Log.i("!!!", "SeriesList BY GENRE from repo = ${responseBody}")
                 responseBody.body()
             } catch (e: Exception) {
-//                Log.i("!!!", "series list BY GENRE = exception")
-//                Log.i("!!!", "${e.message}")
+                Log.i("!!!", "series list BY GENRE = exception")
+                Log.i("!!!", "${e.message}")
                 null
             }
         }
@@ -131,11 +151,11 @@ class SakhCastRepository @Inject constructor(
         }
     }
 
-    suspend fun getSeriesFavorites(kind: String): SeriesList? {
+    suspend fun getSeriesFavorites(kind: String, page: Int = 0): SeriesList? {
         return withContext(ioDispatcher) {
             try {
                 val seriesFavoritesListCall =
-                    sakhCastApiService.getSeriesFavorites(page = 0, kind = kind)
+                    sakhCastApiService.getSeriesFavorites(page = page, kind = kind)
                 val responseBody = seriesFavoritesListCall.execute()
 //                Log.i("!!!", "SeriesFavorites from repo = ${responseBody.body()}")
                 responseBody.body()
@@ -262,11 +282,11 @@ class SakhCastRepository @Inject constructor(
         }
     }
 
-    suspend fun getMovieFavorites(): MovieList? {
+    suspend fun getMovieFavorites(page: Int = 0): MovieList? {
         return withContext(ioDispatcher) {
             try {
                 val movieFavoritesListCall =
-                    sakhCastApiService.getMovieFavorites(page = 0)
+                    sakhCastApiService.getMovieFavorites(page = page)
                 val responseBody = movieFavoritesListCall.execute()
 //                Log.i("!!!", "MoviesFavorites from repo = ${responseBody.body()}")
                 responseBody.body()
@@ -283,6 +303,38 @@ class SakhCastRepository @Inject constructor(
             try {
                 val movieListCall =
                     sakhCastApiService.getMoviesListBySortField(sortField = sortField, page = page)
+                val responseBody = movieListCall.execute()
+//                Log.i("!!!", "SeriesFavorites from repo = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+//                Log.i("!!!", "SeriesFavoritesFrom repo = exception, sortField = $sortField")
+//                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
+    suspend fun getMoviesListByCompanyId(companyId: String, page: Int): MovieList? {
+        return withContext(ioDispatcher) {
+            try {
+                val movieListCall =
+                    sakhCastApiService.getMoviesListByCompanyId(companyId = companyId, page = page)
+                val responseBody = movieListCall.execute()
+//                Log.i("!!!", "SeriesFavorites from repo = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+//                Log.i("!!!", "SeriesFavoritesFrom repo = exception, sortField = $sortField")
+//                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
+    suspend fun getMoviesListByPersonId(personId: String, page: Int): MovieList? {
+        return withContext(ioDispatcher) {
+            try {
+                val movieListCall =
+                    sakhCastApiService.getMoviesListByPersonId(personId = personId, page = page)
                 val responseBody = movieListCall.execute()
 //                Log.i("!!!", "SeriesFavorites from repo = ${responseBody.body()}")
                 responseBody.body()

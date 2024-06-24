@@ -34,6 +34,8 @@ fun FavoritesScreen(
     paddingValues: PaddingValues,
     navigateToMovieByAlphaId: (String) -> Unit,
     navigateToSeriesById: (String) -> Unit,
+    navigateToSeriesCategoryByType: (String, String) -> Unit,
+    navigateToMovieCategoriesByGenresId: (String, String) -> Unit,
     favoritesScreenViewModel: FavoritesScreenViewModel = hiltViewModel()
 ) {
     val favoritesScreenState = favoritesScreenViewModel.favoritesScreenState.observeAsState(
@@ -98,9 +100,10 @@ fun FavoritesScreen(
                     seriesCardWatching,
                     seriesCardWillWatch,
                     seriesCardFinishedWatching,
-                    navigateToSeriesById
+                    navigateToSeriesById,
+                    navigateToSeriesCategoryByType
                 )
-            else MoviesPage(movieCardsWillWatch, navigateToMovieByAlphaId)
+            else MoviesPage(movieCardsWillWatch, navigateToMovieByAlphaId, navigateToMovieCategoriesByGenresId)
         }
     }
 }

@@ -21,7 +21,7 @@ class SeriesPagingSource(
         "По алфавиту" to "abc",
     )
     private val genreList = mapOf(
-        "Мини–сериалы" to "мини–сериал",
+        "Мини–сериал" to "мини–сериал",
         "Документальные" to "документальный",
         "Подкасты" to "подкаст",
         "Аниме" to "аниме",
@@ -30,6 +30,8 @@ class SeriesPagingSource(
     )
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, SeriesCard> {
+        Log.i("!!!", "categoryName load() = $categoryName")
+
         try {
             val page = params.key ?: 0
             val categoryNameUrl = getCategoryNameUrl(categoryName)
@@ -52,15 +54,22 @@ class SeriesPagingSource(
     }
 
     private fun getCategoryNameUrl(categoryName: String): String {
+        Log.i("!!!", "categoryName = $categoryName")
         return categoryList[categoryName] ?: genreList[categoryName]
-        ?: throw IllegalArgumentException("Unknown category or genre: $categoryName")
+        ?: categoryName
     }
 
     private suspend fun getSeriesList(page: Int, categoryNameUrl: String): SeriesList? {
         return if (categoryName in categoryList) {
             sakhCastRepository.getSeriesListByCategoryName(categoryNameUrl, page)
+        } else if (categoryName.endsWith(".company")) {
+            val companyId = categoryName.substringBeforeLast(".company")
+            sakhCastRepository.getSeriesListByCompany(companyId, page)
+        } else if (categoryName.endsWith(".favorite")) {
+            val companyId = categoryName.substringBeforeLast(".favorite")
+            sakhCastRepository.getSeriesFavorites(companyId, page)
         } else {
-            sakhCastRepository.getSeriesListByGenre(genre = categoryNameUrl, page =  page)
+            sakhCastRepository.getSeriesListByGenre(genre = categoryNameUrl, page = page)
         }
     }
 

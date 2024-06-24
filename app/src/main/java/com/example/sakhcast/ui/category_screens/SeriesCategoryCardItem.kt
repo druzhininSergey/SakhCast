@@ -93,9 +93,9 @@ fun SeriesCategoryCard(seriesCard: SeriesCard) {
         seriesCard.coverAlt + ".webp"
     }
     val backdropColor1 =
-        Color(android.graphics.Color.parseColor(seriesCard.coverColors.background1))
+        Color(android.graphics.Color.parseColor(seriesCard.coverColors?.background1 ?: "#000000"))
     val backdropColor2 =
-        Color(android.graphics.Color.parseColor(seriesCard.coverColors.background2))
+        Color(android.graphics.Color.parseColor(seriesCard.coverColors?.background2 ?: "#000000"))
     val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
 
     Card(
@@ -110,9 +110,13 @@ fun SeriesCategoryCard(seriesCard: SeriesCard) {
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.FillBounds,
-                loading = { Box(modifier = Modifier
-                    .fillMaxSize()
-                    .background(brush = brush)) }
+                loading = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(brush = brush)
+                    )
+                }
             )
             Row(
                 modifier = Modifier

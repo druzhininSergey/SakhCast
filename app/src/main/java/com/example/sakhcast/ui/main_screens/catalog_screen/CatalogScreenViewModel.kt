@@ -3,7 +3,6 @@ package com.example.sakhcast.ui.main_screens.catalog_screen
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.sakhcast.data.repository.SakhCastRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -39,7 +38,7 @@ class CatalogScreenViewModel @Inject constructor() : ViewModel() {
             "Мировой топ",
             "Сейчас смотрят",
             "По алфавиту",
-            "Мини-сериалы",
+            "Мини–сериал",
             "Документальные",
             "Подкасты",
             "Аниме",

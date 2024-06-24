@@ -20,7 +20,7 @@ data class SeriesCard(
     @SerialName("cover_alt")
     val coverAlt: String,
     @SerialName("cover_colors")
-    val coverColors: CoverColors,
+    val coverColors: CoverColors?,
     @SerialName("cover_h")
     val coverH: Int,
     @SerialName("cover_lq")

@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.main_screens.favorites_screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,7 +25,8 @@ import com.example.sakhcast.ui.main_screens.home_screen.movie.MovieItemView
 @Composable
 fun MoviesPage(
     movieCardsWillWatch: MovieList?,
-    navigateToMovieByAlphaId: (String) -> Unit
+    navigateToMovieByAlphaId: (String) -> Unit,
+    navigateToMovieCategoriesByGenresId: (String, String) -> Unit,
 ) {
     Column {
         Row(
@@ -35,7 +37,7 @@ fun MoviesPage(
                 modifier = Modifier.padding(
                     horizontal = Dimens.mainPadding,
                     vertical = Dimens.mainPadding
-                ),
+                ).clickable { navigateToMovieCategoriesByGenresId("Буду смотреть", "movie.favorite") },
                 text = "Буду смотреть",
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
