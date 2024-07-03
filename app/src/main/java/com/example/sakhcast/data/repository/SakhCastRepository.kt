@@ -12,6 +12,7 @@ import com.example.sakhcast.model.NotificationList
 import com.example.sakhcast.model.Result
 import com.example.sakhcast.model.Series
 import com.example.sakhcast.model.SeriesList
+import com.example.sakhcast.model.SeriesPlaylist
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -71,11 +72,11 @@ class SakhCastRepository @Inject constructor(
             try {
                 val lastWatchedCall = sakhCastApiService.getContinueWatchMovieAndSeries()
                 val responseBody = lastWatchedCall.execute()
-                Log.i("!!!", "LastWatched = ${responseBody.body()}")
+//                Log.i("!!!", "LastWatched = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
-                Log.i("!!!", "LastWatched = exception")
-                Log.i("!!!", "${e.message}")
+//                Log.i("!!!", "LastWatched = exception")
+//                Log.i("!!!", "${e.message}")
                 null
             }
         }
@@ -124,13 +125,13 @@ class SakhCastRepository @Inject constructor(
                 val seriesListCall =
                     sakhCastApiService.getSeriesListByGenre(page = page, genres = genre)
                 val responseBody = seriesListCall.execute()
-                Log.i("!!!", "SeriesList BY GENRE from repo = ${responseBody.body()}")
-                Log.i("!!!", "SeriesList BY GENRE from repo = ${responseBody.code()}")
-                Log.i("!!!", "SeriesList BY GENRE from repo = ${responseBody}")
+//                Log.i("!!!", "SeriesList BY GENRE from repo = ${responseBody.body()}")
+//                Log.i("!!!", "SeriesList BY GENRE from repo = ${responseBody.code()}")
+//                Log.i("!!!", "SeriesList BY GENRE from repo = ${responseBody}")
                 responseBody.body()
             } catch (e: Exception) {
-                Log.i("!!!", "series list BY GENRE = exception")
-                Log.i("!!!", "${e.message}")
+//                Log.i("!!!", "series list BY GENRE = exception")
+//                Log.i("!!!", "${e.message}")
                 null
             }
         }
@@ -220,17 +221,49 @@ class SakhCastRepository @Inject constructor(
                 val notificationListCall =
                     sakhCastApiService.searchSeries(textInput = textInput, page = page)
                 val responseBody = notificationListCall.execute()
-                Log.i("!!!", "seriesList Search repo = ${responseBody.body()}")
+//                Log.i("!!!", "seriesList Search repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
-                Log.i("!!!", "seriesList Search repo = exception")
-                Log.i("!!!", "${e.message}")
+//                Log.i("!!!", "seriesList Search repo = exception")
+//                Log.i("!!!", "${e.message}")
                 null
             }
         }
     }
 
-    //MOVIES
+    suspend fun getSeriesPlaylistBySeasonIdAndRgName(seasonId: String, rgName: String)
+            : List<SeriesPlaylist>? {
+        return withContext(ioDispatcher) {
+            try {
+                val notificationListCall =
+                    sakhCastApiService.getSeriesPlaylistBySeasonIdAndRgName(seasonId, rgName)
+                val responseBody = notificationListCall.execute()
+//                Log.i("!!!", "playlist repo = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+//                Log.i("!!!", "playlist repo = exception")
+//                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
+    suspend fun setSeriesEpisodePosition(episodeId: Int, positionSec: Int): Boolean? {
+        return withContext(ioDispatcher) {
+            try {
+                val notificationListCall =
+                    sakhCastApiService.setSeriesEpisodePosition(episodeId, positionSec)
+                val responseBody = notificationListCall.execute()
+                Log.i("!!!", "send position to backend = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+
+//TODO MOVIES
+
     suspend fun getMoviesListByCategoryName(categoryName: String, page: Int): MovieList? {
         return withContext(ioDispatcher) {
             try {
@@ -450,6 +483,20 @@ class SakhCastRepository @Inject constructor(
             try {
                 val notificationListCall =
                     sakhCastApiService.setMoviePosition(alphaId, positionSec)
+                val responseBody = notificationListCall.execute()
+                Log.i("!!!", "send position to backend = ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+
+    suspend fun getMoviePosition(alphaId: String): Int? {
+        return withContext(ioDispatcher) {
+            try {
+                val notificationListCall =
+                    sakhCastApiService.getMoviePosition(alphaId)
                 val responseBody = notificationListCall.execute()
                 responseBody.body()
             } catch (e: Exception) {

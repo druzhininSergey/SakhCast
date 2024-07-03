@@ -2,10 +2,12 @@ package com.example.sakhcast.ui.movie_series_view
 
 import android.os.Build
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,19 +18,30 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
+import com.example.sakhcast.Colors
+import com.example.sakhcast.R
 import com.example.sakhcast.data.samples.SeriesEpisodesSample
 import com.example.sakhcast.model.Episode
 
@@ -36,37 +49,65 @@ import com.example.sakhcast.model.Episode
 @Composable
 fun PreviewSeriesEpisodeView() {
     val episodes = SeriesEpisodesSample.getSeriesEpisodesList()
-    SeriesEpisodeView(episodes)
+    val x = "1"
+    val w = "2"
+    val q = "3"
+    val z = "4"
+    SeriesEpisodeView(episodes, navigateToSeriesPlayer = { x, w, q, z ->
+    }, 0, "")
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewSeriesEpisodeItemView() {
     val episodes = SeriesEpisodesSample.getSeriesEpisodesList()[0]
-    SeriesEpisodeItemView(seriesEpisode = episodes)
+    val x = "1"
+    val w = "2"
+    val q = "3"
+    val z = "4"
+    SeriesEpisodeItemView(seriesEpisode = episodes, navigateToSeriesPlayer = { x, w, q, z ->
+    }, seasonId = 0, seriesName = "", "")
 }
 
 @Composable
-fun SeriesEpisodeView(episodes: List<Episode>) {
+fun SeriesEpisodeView(
+    episodes: List<Episode>,
+    navigateToSeriesPlayer: (String, String, String, String) -> Unit,
+    seasonId: Int,
+    seriesName: String,
+) {
     LazyRow(
         modifier = Modifier,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         itemsIndexed(episodes) { _, episode ->
-            SeriesEpisodeItemView(seriesEpisode = episode)
+            SeriesEpisodeItemView(
+                seriesEpisode = episode,
+                navigateToSeriesPlayer = navigateToSeriesPlayer,
+                seasonId, seriesName, episode.index
+            )
         }
     }
 
 }
 
 @Composable
-fun SeriesEpisodeItemView(seriesEpisode: Episode) {
+fun SeriesEpisodeItemView(
+    seriesEpisode: Episode,
+    navigateToSeriesPlayer: (String, String, String, String) -> Unit,
+    seasonId: Int,
+    seriesName: String,
+    episodeChosenIndex: String,
+) {
 
     val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         seriesEpisode.previewAlt + ".avif"
     } else {
         seriesEpisode.previewAlt + ".webp"
+    }
+    var isExpanded by remember {
+        mutableStateOf(false)
     }
 
     val backdropColor1 = listOf(
@@ -89,7 +130,9 @@ fun SeriesEpisodeItemView(seriesEpisode: Episode) {
     ).random()
     val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
 
-    Card(modifier = Modifier.width(190.dp)) {
+    Card(modifier = Modifier
+        .width(190.dp)
+        .clickable { isExpanded = true }) {
         Box() {
             SubcomposeAsyncImage(
                 model = imageUrl,
@@ -128,7 +171,37 @@ fun SeriesEpisodeItemView(seriesEpisode: Episode) {
                 .padding(horizontal = 8.dp)
         ) {
             Text(text = seriesEpisode.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(text = seriesEpisode.date)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = seriesEpisode.date)
+                if (seriesEpisode.isViewed == 0)
+                    Icon(
+                        painterResource(id = R.drawable.ic_circle),
+                        contentDescription = null,
+                        tint = Colors.blueColor
+                    )
+            }
+        }
+        DropdownMenu(
+            modifier = Modifier.background(
+                color = Color.Gray.copy(alpha = 0.5f)
+            ),
+            offset = DpOffset(0.dp, 8.dp),
+            expanded = isExpanded,
+            onDismissRequest = { isExpanded = false },
+        ) {
+            seriesEpisode.rgs.forEach { rgs ->
+                DropdownMenuItem(
+                    text = { Text(text = rgs.runame) },
+                    onClick = {
+                        navigateToSeriesPlayer(seasonId.toString(), seriesName, episodeChosenIndex, rgs.rg)
+                        isExpanded = false
+                    },
+                )
+            }
         }
     }
 }

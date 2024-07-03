@@ -49,7 +49,7 @@ class PlayerViewModel @Inject constructor(
             player.prepare()
             delay(1000)
             player.playWhenReady = true
-//            setMoviePosition()
+            setMoviePosition()
         }
 
     }

@@ -1,4 +1,4 @@
-package com.example.sakhcast.ui.player
+package com.example.sakhcast.ui.series_player
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
@@ -32,7 +32,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -47,9 +46,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import com.example.sakhcast.data.formatMinSec
@@ -60,23 +60,21 @@ import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
 @Composable
-fun Player2(
-    hls: String,
-    title: String,
-    position: Int,
-    movieAlphaId: String,
+fun SeriesPlayer(
     navigateUp: () -> Boolean,
-    playerViewModel: PlayerViewModel = hiltViewModel()
+    isPlayListLoaded: Boolean,
+    isDataLoaded: Boolean,
+    seriesState: SeriesPlayerViewModel.SeriesWatchState,
+    player: Player,
+    savePlayerState: () -> Bundle,
+    restorePlayerState: (Bundle) -> Unit,
+    changeEpisodeId: () -> Unit,
 ) {
     val context = LocalContext.current
     context.setScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
     context.hideSystemUi()
 
-    LaunchedEffect(Unit) { playerViewModel.setMovieData(hls, title, position, movieAlphaId) }
-    val movieState = playerViewModel.movieWatchState.collectAsState()
-
     var continueTime by remember { mutableIntStateOf(0) }
-
 
     var lifecycle by remember { mutableStateOf(Lifecycle.Event.ON_CREATE) }
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -86,18 +84,30 @@ fun Player2(
     var showSnackbar by rememberSaveable { mutableStateOf(true) }
     var isControllerVisible by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        playerViewModel.startPlayer()
-        continueTime = movieState.value.position
 
-        val userTime = (continueTime * 1000L).formatMinSec()
-        if (continueTime != 0 && showSnackbar) scope.launch {
-            Log.i("!!!", "showSnackbar")
-            snackbarHostState.showSnackbar(
-                message = "Продолжить с $userTime?",
-                duration = SnackbarDuration.Long,
-            )
-            showSnackbar = false
+    LaunchedEffect(seriesState) {
+        if (isPlayListLoaded || isDataLoaded) {
+            continueTime = seriesState.lastWatchedTime
+
+            val userTime = (continueTime * 1000L).formatMinSec()
+            if (continueTime != 0 && showSnackbar) scope.launch {
+                Log.i("!!!", "showSnackbar")
+                snackbarHostState.showSnackbar(
+                    message = "Продолжить с $userTime?",
+                    duration = SnackbarDuration.Long,
+                )
+                showSnackbar = false
+            }
+        }
+    }
+    val playerListener = object : Player.Listener {
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            when (reason) {
+                Player.MEDIA_ITEM_TRANSITION_REASON_SEEK -> changeEpisodeId()
+                Player.MEDIA_ITEM_TRANSITION_REASON_AUTO -> changeEpisodeId()
+                Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED -> Unit
+                Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT -> Unit
+            }
         }
     }
 
@@ -106,28 +116,29 @@ fun Player2(
             lifecycle = event
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-//        playerViewModel.setMoviePosition()
-        playerViewModel.player.playWhenReady = true
+        player.playWhenReady = true
+        player.addListener(playerListener)
+
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
-            savedPlayerState = playerViewModel.savePlayerState()
+            player.removeListener(playerListener)
+            savedPlayerState = savePlayerState()
             context.setScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
             context.showSystemUi()
         }
     }
     LaunchedEffect(savedPlayerState) {
-        savedPlayerState?.let { playerViewModel.restorePlayerState(it) }
+        savedPlayerState?.let { restorePlayerState(it) }
     }
     Box(modifier = Modifier.fillMaxSize()) {
 
         AndroidView(
-            modifier =
-            Modifier
+            modifier = Modifier
                 .padding()
                 .fillMaxSize(),
             factory = {
                 PlayerView(context).apply {
-                    player = playerViewModel.player
+                    this.player = player
                     useController = true
                     layoutParams =
                         FrameLayout.LayoutParams(
@@ -135,8 +146,6 @@ fun Player2(
                             ViewGroup.LayoutParams.MATCH_PARENT
                         )
                     setShowSubtitleButton(true)
-                    setShowNextButton(false)
-                    setShowPreviousButton(false)
                     setBackgroundColor(0xFF000000.toInt())
                     setControllerVisibilityListener(PlayerView.ControllerVisibilityListener { visibility ->
                         isControllerVisible = visibility == View.VISIBLE
@@ -173,7 +182,7 @@ fun Player2(
                 Button(
                     onClick = {
                         snackbarData.performAction()
-                        playerViewModel.player.seekTo(position * 1000L)
+                        player.seekTo(continueTime * 1000L)
                     },
                     shape = RoundedCornerShape(10.dp),
                     border = BorderStroke(width = 1.dp, color = Color.White)
@@ -190,11 +199,10 @@ fun Player2(
             }
         )
     }
-
 }
 
 @Composable
-fun ExitButton(navigateUp: () -> Boolean,) {
+fun ExitButton(navigateUp: () -> Boolean) {
     IconButton(
         onClick = { navigateUp() },
         modifier = Modifier

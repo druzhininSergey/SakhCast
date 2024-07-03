@@ -105,14 +105,19 @@ fun MovieView(
     val movie = movieState.value.movie
     val recommendationList = movieState.value.movieRecommendationsList
 
-
     var alphaIdToSend by remember { mutableStateOf("") }
     var hlsToSend by remember { mutableStateOf("") }
     var titleToSend by remember { mutableStateOf("") }
     var positionToSend by remember { mutableIntStateOf(0) }
+    val positionUpdated by remember {
+        mutableIntStateOf(movieViewModel.position.value)
+    }
+
 
     LaunchedEffect(alphaId) {
-        if (alphaId != null) movieViewModel.getFullMovieWithRecommendations(alphaId)
+        if (alphaId != null && movie == null) movieViewModel.getFullMovieWithRecommendations(alphaId)
+        if (alphaId != null && movie != null) movieViewModel.getMoviePosition(alphaId)
+//        positionToSend = positionUpdated.value
     }
     val isFavorite = remember {
         mutableStateOf(movieState.value.isFavorite ?: false)
@@ -126,7 +131,6 @@ fun MovieView(
     }
 
     val scrollState = rememberScrollState()
-
     var sizeImage by remember { mutableStateOf(IntSize.Zero) }
     val imageUrl = movie?.posterAlt + ".webp"
 
@@ -179,12 +183,20 @@ fun MovieView(
                     if (movie != null)
                         IconButton(
                             onClick = {
-                                navigateToMoviePlayer(
-                                    hlsToSend,
-                                    titleToSend,
-                                    positionToSend,
-                                    alphaIdToSend
-                                )
+                                if (positionUpdated == 0)
+                                    navigateToMoviePlayer(
+                                        hlsToSend,
+                                        titleToSend,
+                                        positionToSend,
+                                        alphaIdToSend
+                                    )
+                                else
+                                    navigateToMoviePlayer(
+                                        hlsToSend,
+                                        titleToSend,
+                                        positionUpdated,
+                                        alphaIdToSend
+                                    )
                             },
                             modifier = Modifier
                                 .size(100.dp)
@@ -421,7 +433,7 @@ fun TopMovieBar(
 ) {
     var isExpandedFavorite by remember { mutableStateOf(false) }
     val alpha = if (scrollState.maxValue > 0) {
-        min(1f, (scrollState.value.toFloat() / scrollState.maxValue) * 1.5f)
+        min(1f, (scrollState.value.toFloat() / scrollState.maxValue) * 2.0f)
     } else 0f
 
     val primaryColor = MaterialTheme.colorScheme.primary
@@ -499,7 +511,7 @@ fun MovieDownloads(downloads: List<Download>, download: (String, String) -> Unit
         mutableStateOf(false)
     }
     val selectedItemIndex = remember {
-     mutableIntStateOf(0)
+        mutableIntStateOf(0)
     }
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -544,7 +556,10 @@ fun MovieDownloads(downloads: List<Download>, download: (String, String) -> Unit
                     confirmButton = {
                         Button(onClick = {
                             openDialog.value = false
-                            download(selectedDownloadFile.src, "$ruTitle.${selectedDownloadFile.h}p.")
+                            download(
+                                selectedDownloadFile.src,
+                                "$ruTitle.${selectedDownloadFile.h}p."
+                            )
                         }) {
                             Text(text = "Скачать")
                         }

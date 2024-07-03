@@ -3,8 +3,12 @@ package com.example.sakhcast.ui
 import android.net.Uri
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -18,6 +22,7 @@ import com.example.sakhcast.NOTIFICATION_SCREEN
 import com.example.sakhcast.PLAYER
 import com.example.sakhcast.SEARCH_SCREEN
 import com.example.sakhcast.SERIES_CATEGORY_SCREEN
+import com.example.sakhcast.SERIES_PLAYER
 import com.example.sakhcast.SERIES_VIEW
 import com.example.sakhcast.ui.category_screens.MovieCategoryScreen
 import com.example.sakhcast.ui.category_screens.SeriesCategoryScreen
@@ -31,6 +36,8 @@ import com.example.sakhcast.ui.main_screens.search_screen.SearchScreen
 import com.example.sakhcast.ui.movie_series_view.MovieView
 import com.example.sakhcast.ui.movie_series_view.SeriesView
 import com.example.sakhcast.ui.player.Player2
+import com.example.sakhcast.ui.series_player.SeriesPlayer
+import com.example.sakhcast.ui.series_player.SeriesPlayerViewModel
 
 @Composable
 fun AuthNavGraph(
@@ -42,7 +49,7 @@ fun AuthNavGraph(
 
     val navigateToMovieByAlphaId = { movieAlphaId: String -> navigate("$MOVIE_VIEW/$movieAlphaId") }
     val navigateToSeriesById = { seriesId: String -> navigate("$SERIES_VIEW/$seriesId") }
-    val navigateToCatalogAllSeries = { navigate("$SERIES_CATEGORY_SCREEN/Все") }
+    val navigateToCatalogAllSeries = { navigate("$SERIES_CATEGORY_SCREEN/Все/{}") }
     val navigateToCatalogAllMovies = { navigate("$MOVIE_CATEGORY_SCREEN/Все/{}") }
     val navigateToSeriesCategoryScreen =
         { categoryName: String -> navigate("$SERIES_CATEGORY_SCREEN/$categoryName/{}") }
@@ -57,6 +64,14 @@ fun AuthNavGraph(
     }
     val navigateToSeriesCategoryByType =
         { type: String, name: String -> navigate("$SERIES_CATEGORY_SCREEN/$type/$name") }
+    val navigateToSeriesPlayer = {
+            seasonId: String,
+            seriesTitle: String,
+            episodeChosenIndex: String,
+            rgChosen: String,
+        ->
+        navigate("$SERIES_PLAYER/$seasonId/$seriesTitle/$episodeChosenIndex/$rgChosen")
+    }
 
     NavHost(
         navController = navHostController,
@@ -126,6 +141,7 @@ fun AuthNavGraph(
                 seriesId = seriesId,
                 navigateToSeriesCategoryByCompany = navigateToSeriesCategoryByType,
                 navigateToSeriesCategoryScreen = navigateToSeriesCategoryScreen,
+                navigateToSeriesPlayer = navigateToSeriesPlayer
             )
         }
         composable("$MOVIE_CATEGORY_SCREEN/{category}/{genresId}") { backStackEntry ->
@@ -163,6 +179,47 @@ fun AuthNavGraph(
                 position = position,
                 movieAlphaId = movieAlphaId,
                 navigateUp = navigateUp
+            )
+        }
+        composable("$SERIES_PLAYER/{seasonId}/{seriesTitle}/{episodeChosenIndex}/{rgChosen}") { backStackEntry ->
+            val seasonId = backStackEntry.arguments?.getString("seasonId") ?: ""
+            val seriesTitle = backStackEntry.arguments?.getString("seriesTitle") ?: ""
+            val episodeChosenIndex =
+                backStackEntry.arguments?.getString("episodeChosenIndex") ?: "1"
+            val episodeChosenIndexInt = episodeChosenIndex.toInt()
+            val rgChosen = backStackEntry.arguments?.getString("rgChosen") ?: ""
+
+            val initialized = rememberSaveable { mutableStateOf(false) }
+            val seriesPlayerViewModel: SeriesPlayerViewModel = hiltViewModel()
+            LaunchedEffect(seasonId) {
+                if (!initialized.value) {
+                    seriesPlayerViewModel.setSeriesData(
+                        seasonId,
+                        seriesTitle,
+                        episodeChosenIndexInt,
+                        rgChosen
+                    )
+                    seriesPlayerViewModel.getPlaylist(seasonId, rgChosen)
+                    initialized.value = true
+                }
+            }
+            val isPlayListLoaded by seriesPlayerViewModel.isPlaylistLoaded.collectAsState()
+            val isDataLoaded by seriesPlayerViewModel.isDataLoaded.collectAsState()
+            val seriesState by seriesPlayerViewModel.seriesWatchState.collectAsState()
+
+            LaunchedEffect(isDataLoaded) {
+                if (isDataLoaded) seriesPlayerViewModel.startPlayer()
+            }
+
+            SeriesPlayer(
+                navigateUp = navigateUp,
+                isPlayListLoaded,
+                isDataLoaded,
+                seriesState,
+                seriesPlayerViewModel.player,
+                seriesPlayerViewModel::savePlayerState,
+                seriesPlayerViewModel::restorePlayerState,
+                seriesPlayerViewModel::changeCurrentEpisodeId,
             )
         }
     }

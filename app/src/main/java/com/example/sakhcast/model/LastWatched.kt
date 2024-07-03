@@ -29,7 +29,7 @@ data class UserFavorite(
     @SerialName("serial_id") val serialId: Int,
     @SerialName("user_id") val userId: Int,
     @SerialName("viewed") val viewed: Int,
-    @SerialName("voices") val voices: String
+    @SerialName("voices") val voices: String?
 )
 
 @Serializable
