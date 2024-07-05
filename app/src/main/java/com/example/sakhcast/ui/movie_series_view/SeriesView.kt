@@ -20,9 +20,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.twotone.PlayArrow
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -52,6 +56,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcast.R
@@ -62,6 +67,7 @@ import com.example.sakhcast.model.Season
 import com.example.sakhcast.model.Series
 import com.example.sakhcast.model.UserContinueWatchSeries
 import com.example.sakhcast.ui.DividerBase
+import kotlinx.coroutines.delay
 import java.util.Locale
 import kotlin.math.min
 
@@ -77,6 +83,7 @@ fun PreviewSeriesInfo() {
 //    SeriesInfo(SeriesSample.getFullSeries(), SeriesEpisodesSample.getSeriesEpisodesList())
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SeriesView(
     paddingValues: PaddingValues,
@@ -124,12 +131,22 @@ fun SeriesView(
         else Color.Blue
     val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
 
+    var refreshing by remember { mutableStateOf(false) }
+    val pullRefreshState = rememberPullRefreshState(refreshing, { refreshing = true })
+    LaunchedEffect(refreshing) {
+        if (refreshing) {
+            seriesId?.let { seriesViewModel.getFullSeries(it) }
+            delay(2000)
+            refreshing = false
+        }
+    }
 
-    Box {
+    Box{
         Column(
             modifier = Modifier
                 .padding(bottom = paddingValues.calculateBottomPadding())
                 .fillMaxSize()
+                .pullRefresh(pullRefreshState)
                 .verticalScroll(scrollState)
         ) {
             Box(
@@ -230,6 +247,14 @@ fun SeriesView(
                 },
             )
         }
+        PullRefreshIndicator(
+            refreshing = refreshing,
+            state = pullRefreshState,
+            modifier = Modifier
+                .padding(paddingValues)
+                .align(Alignment.TopCenter)
+                .zIndex(1f)
+        )
     }
 }
 
@@ -518,12 +543,17 @@ fun SeriesDownloads(
                 .border(width = 1.dp, color = Color.Gray, shape = MaterialTheme.shapes.small)
                 .clickable {
                     val lastMediaData = getLastMediaData()
-                    if (lastMediaData != null){
+                    if (lastMediaData != null) {
                         val lastIndex = lastMediaData.lastMediaIndex.toString()
                         val lastRg = lastMediaData.lastRgWatched
 //                        val userLastTime = lastMediaData.userLastTime
                         val lastSeasonId = lastMediaData.lastSeasonId
-                        navigateToSeriesPlayer(lastSeasonId.toString(), seriesName, lastIndex, lastRg)
+                        navigateToSeriesPlayer(
+                            lastSeasonId.toString(),
+                            seriesName,
+                            lastIndex,
+                            lastRg
+                        )
                     }
                 }
                 .padding(5.dp)
