@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.player
 
-import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -65,8 +64,7 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun setMoviePosition() {
-//        Log.i("!!!", "вызов setMoviePosition")
+    private fun setMoviePosition() {
         viewModelScope.launch {
             while (true) {
                 if (player.isPlaying){
@@ -75,29 +73,12 @@ class PlayerViewModel @Inject constructor(
                     val currentPosition = (player.currentPosition / 1000).toInt()
                     sakhCastRepository.setMoviePosition(movieAlphaId, currentPosition)
                     _movieWatchState.value = _movieWatchState.value.copy(position = currentPosition)
-//                    Log.i("!!!", "отправка position")
                 } else {
                     delay(5000)
                     continue
                 }
             }
         }
-//        Log.i("!!!", "выход из функции setMoviePosition()")
-
-    }
-
-    fun savePlayerState(): Bundle {
-        return Bundle().apply {
-            putInt("position", player.currentPosition.toInt())
-            putBoolean("playWhenReady", player.playWhenReady)
-        }
-    }
-
-    fun restorePlayerState(bundle: Bundle) {
-        val position = bundle.getInt("position")
-        val playWhenReady = bundle.getBoolean("playWhenReady")
-        player.seekTo(position.toLong())
-        player.playWhenReady = playWhenReady
     }
 
     override fun onCleared() {

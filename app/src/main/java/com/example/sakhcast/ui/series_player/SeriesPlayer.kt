@@ -1,7 +1,6 @@
 package com.example.sakhcast.ui.series_player
 
 import android.content.pm.ActivityInfo
-import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -66,8 +65,6 @@ fun SeriesPlayer(
     isDataLoaded: Boolean,
     seriesState: SeriesPlayerViewModel.SeriesWatchState,
     player: Player,
-    savePlayerState: () -> Bundle,
-    restorePlayerState: (Bundle) -> Unit,
     changeEpisodeId: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -80,10 +77,8 @@ fun SeriesPlayer(
     val lifecycleOwner = LocalLifecycleOwner.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    var savedPlayerState by rememberSaveable { mutableStateOf<Bundle?>(null) }
     var showSnackbar by rememberSaveable { mutableStateOf(true) }
     var isControllerVisible by remember { mutableStateOf(false) }
-
 
     LaunchedEffect(seriesState) {
         if (isPlayListLoaded || isDataLoaded) {
@@ -122,14 +117,11 @@ fun SeriesPlayer(
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
             player.removeListener(playerListener)
-            savedPlayerState = savePlayerState()
             context.setScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
             context.showSystemUi()
         }
     }
-    LaunchedEffect(savedPlayerState) {
-        savedPlayerState?.let { restorePlayerState(it) }
-    }
+
     Box(modifier = Modifier.fillMaxSize()) {
 
         AndroidView(

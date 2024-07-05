@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.series_player
 
-import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -42,11 +41,6 @@ class SeriesPlayerViewModel @Inject constructor(
         var lastWatchedTime: Int = 0,
         var currentEpisodeId: Int = 0,
     )
-
-//    data class CurrentEpisodeDate(
-//        var lastWatchedTime: Int = 0,
-//        var currentEpisodeId: Int = 0,
-//    )
 
     fun startPlayer() {
         Log.i("!!!", "вызов startPlayer")
@@ -147,14 +141,12 @@ class SeriesPlayerViewModel @Inject constructor(
     }
 
     private fun setEpisodePosition() {
-//        Log.i("!!!", "вызов setSeriesPosition")
         viewModelScope.launch {
             while (true) {
                 if (player.isPlaying) {
                     delay(5000)
                     val currentEpisodeId = _seriesWatchState.value.currentEpisodeId
                     val currentPosition = (player.currentPosition / 1000).toInt()
-
                     Log.i(
                         "!!!",
                         "currentEpisodeId = $currentEpisodeId\ncurrentPosition = $currentPosition"
@@ -166,21 +158,6 @@ class SeriesPlayerViewModel @Inject constructor(
                 }
             }
         }
-//        Log.i("!!!", "выход из функции setMoviePosition()")
-    }
-
-    fun savePlayerState(): Bundle {
-        return Bundle().apply {
-            putInt("position", player.currentPosition.toInt())
-            putBoolean("playWhenReady", player.playWhenReady)
-        }
-    }
-
-    fun restorePlayerState(bundle: Bundle) {
-        val position = bundle.getInt("position")
-        val playWhenReady = bundle.getBoolean("playWhenReady")
-        player.seekTo(position.toLong())
-        player.playWhenReady = playWhenReady
     }
 
     override fun onCleared() {

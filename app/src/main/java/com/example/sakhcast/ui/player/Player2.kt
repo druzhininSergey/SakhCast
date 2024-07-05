@@ -1,7 +1,6 @@
 package com.example.sakhcast.ui.player
 
 import android.content.pm.ActivityInfo
-import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -82,7 +81,6 @@ fun Player2(
     val lifecycleOwner = LocalLifecycleOwner.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    var savedPlayerState by rememberSaveable { mutableStateOf<Bundle?>(null) }
     var showSnackbar by rememberSaveable { mutableStateOf(true) }
     var isControllerVisible by remember { mutableStateOf(false) }
 
@@ -106,20 +104,15 @@ fun Player2(
             lifecycle = event
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-//        playerViewModel.setMoviePosition()
         playerViewModel.player.playWhenReady = true
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
-            savedPlayerState = playerViewModel.savePlayerState()
             context.setScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
             context.showSystemUi()
         }
     }
-    LaunchedEffect(savedPlayerState) {
-        savedPlayerState?.let { playerViewModel.restorePlayerState(it) }
-    }
-    Box(modifier = Modifier.fillMaxSize()) {
 
+    Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
             modifier =
             Modifier
@@ -194,7 +187,7 @@ fun Player2(
 }
 
 @Composable
-fun ExitButton(navigateUp: () -> Boolean,) {
+fun ExitButton(navigateUp: () -> Boolean) {
     IconButton(
         onClick = { navigateUp() },
         modifier = Modifier
