@@ -86,11 +86,14 @@ class SeriesPlayerViewModel @Inject constructor(
         )
     }
 
-    fun changeCurrentEpisodeId() {
+    fun onEpisodeChanged() {
         val trackIndex = player.currentMediaItemIndex
+        val episode = seriesWatchState.value.episodeList
+            ?.find { it.index == (trackIndex + 1).toString() }
+        val currentEpisodeLastTime = episode?.isViewed ?: 0
         Log.d(
             "ExoPlayer",
-            "Track changed due to seek\nCurrentTrackIndex = $trackIndex"
+            "Track changed due to seek\nCurrentTrackIndex = $trackIndex\n currentEpisodeLastTime = $currentEpisodeLastTime"
         )
         val playList = seriesWatchState.value.playlist
         val currentEpisodeId =
@@ -100,6 +103,7 @@ class SeriesPlayerViewModel @Inject constructor(
             "currentEpisodeId = $currentEpisodeId"
         )
         _seriesWatchState.value = seriesWatchState.value.copy(
+            lastWatchedTime = currentEpisodeLastTime,
             currentEpisodeId = currentEpisodeId
         )
     }

@@ -61,7 +61,7 @@ class SeriesViewModel @Inject constructor(private val sakhCastRepository: SakhCa
         }
     }
 
-    fun getLastMediaData() : UserContinueWatchSeries? {
+    fun getLastMediaData(): UserContinueWatchSeries? {
         val episodeList = _seriesState.value?.episodeList
         val lastEpisodeId = _seriesState.value?.series?.userLastMediaId
         val lastSeasonId = _seriesState.value?.series?.userLastSeasonId ?: 0

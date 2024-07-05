@@ -11,8 +11,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -43,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
@@ -65,7 +69,7 @@ fun SeriesPlayer(
     isDataLoaded: Boolean,
     seriesState: SeriesPlayerViewModel.SeriesWatchState,
     player: Player,
-    changeEpisodeId: () -> Unit,
+    onEpisodeChanged: () -> Unit,
 ) {
     val context = LocalContext.current
     context.setScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
@@ -87,6 +91,7 @@ fun SeriesPlayer(
             val userTime = (continueTime * 1000L).formatMinSec()
             if (continueTime != 0 && showSnackbar) scope.launch {
                 Log.i("!!!", "showSnackbar")
+                snackbarHostState.currentSnackbarData?.dismiss()
                 snackbarHostState.showSnackbar(
                     message = "Продолжить с $userTime?",
                     duration = SnackbarDuration.Long,
@@ -98,8 +103,16 @@ fun SeriesPlayer(
     val playerListener = object : Player.Listener {
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             when (reason) {
-                Player.MEDIA_ITEM_TRANSITION_REASON_SEEK -> changeEpisodeId()
-                Player.MEDIA_ITEM_TRANSITION_REASON_AUTO -> changeEpisodeId()
+                Player.MEDIA_ITEM_TRANSITION_REASON_SEEK -> {
+                    showSnackbar = true
+                    onEpisodeChanged()
+                }
+
+                Player.MEDIA_ITEM_TRANSITION_REASON_AUTO -> {
+                    showSnackbar = true
+                    onEpisodeChanged()
+                }
+
                 Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED -> Unit
                 Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT -> Unit
             }
@@ -155,14 +168,13 @@ fun SeriesPlayer(
                     else -> Unit
                 }
             }
-
         )
         AnimatedVisibility(
             visible = isControllerVisible,
             enter = fadeIn(),
             exit = fadeOut()
         ) {
-            ExitButton(navigateUp)
+            SeriesTopControls(navigateUp, seriesState.seriesTitle, player.currentMediaItemIndex)
         }
 
         SnackbarHost(
@@ -194,17 +206,29 @@ fun SeriesPlayer(
 }
 
 @Composable
-fun ExitButton(navigateUp: () -> Boolean) {
-    IconButton(
-        onClick = { navigateUp() },
+fun SeriesTopControls(navigateUp: () -> Boolean, seriesTitle: String, currentMediaItemIndex: Int) {
+    Row(
         modifier = Modifier
-            .padding(16.dp)
-            .size(48.dp)
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = Icons.Default.Close,
-            contentDescription = "Exit",
-            tint = Color.Gray
-        )
+        IconButton(
+            onClick = { navigateUp() },
+            modifier = Modifier
+                .size(48.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Exit",
+                tint = Color.Gray
+            )
+        }
+        Row {
+            Text(text = seriesTitle, fontWeight = FontWeight.Bold)
+            Text(text = " | ", fontWeight = FontWeight.Bold)
+            Text(text = "Эпизод ${currentMediaItemIndex + 1}")
+        }
     }
 }

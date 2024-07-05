@@ -142,7 +142,7 @@ class SakhCastRepository @Inject constructor(
             try {
                 val seriesCall = sakhCastApiService.getSeriesById(seriesId)
                 val responseBody = seriesCall.execute()
-//                Log.i("!!!", "SeriesById = ${responseBody.body()}")
+//                Log.i("!!!", "seriesCall}")
                 responseBody.body()
             } catch (e: Exception) {
 //                Log.i("!!!", "seriesById = exception")
@@ -174,7 +174,7 @@ class SakhCastRepository @Inject constructor(
                 val episodesListCall = sakhCastApiService.getSeriesEpisodesBySeasonId(seasonId)
                 val responseBody = episodesListCall.execute()
 //                Log.i("!!!", "Episodes from repo = ${responseBody.body()}")
-//                Log.i("!!!", "SEASON_ID REPO = ${seasonId}")
+//                Log.i("!!!", "episodesListCall")
                 responseBody.body()
             } catch (e: Exception) {
 //                Log.i("!!!", "Episodes = exception")
@@ -254,7 +254,8 @@ class SakhCastRepository @Inject constructor(
                 val notificationListCall =
                     sakhCastApiService.setSeriesEpisodePosition(episodeId, positionSec)
                 val responseBody = notificationListCall.execute()
-                Log.i("!!!", "send position to backend = ${responseBody.body()}")
+                val getPositionCall = sakhCastApiService.getSeriesEpisodePosition(episodeId)
+                getPositionCall.execute()
                 responseBody.body()
             } catch (e: Exception) {
                 null
@@ -262,7 +263,7 @@ class SakhCastRepository @Inject constructor(
         }
     }
 
-//TODO MOVIES
+// MOVIES
 
     suspend fun getMoviesListByCategoryName(categoryName: String, page: Int): MovieList? {
         return withContext(ioDispatcher) {

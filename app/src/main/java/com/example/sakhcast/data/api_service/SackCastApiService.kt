@@ -20,7 +20,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SakhCastApiService {
-    // LOGIN
+// LOGIN
     @POST("v1/users/login")
     fun userLogin(
         @Query("login") login: String,
@@ -110,6 +110,11 @@ interface SakhCastApiService {
     fun setSeriesEpisodePosition (
         @Query("media_id") mediaId: Int,
         @Query("t") time: Int,
+    ): Call<Boolean>
+
+    @GET("v1/serial/watch/get_pos")
+    fun getSeriesEpisodePosition (
+        @Query("media_id") mediaId: Int,
     ): Call<Boolean>
 
 // Movies

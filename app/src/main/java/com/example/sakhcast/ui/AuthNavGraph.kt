@@ -217,7 +217,7 @@ fun AuthNavGraph(
                 isDataLoaded,
                 seriesState,
                 seriesPlayerViewModel.player,
-                seriesPlayerViewModel::changeCurrentEpisodeId,
+                seriesPlayerViewModel::onEpisodeChanged,
             )
         }
     }

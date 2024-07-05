@@ -117,7 +117,6 @@ fun MovieView(
     LaunchedEffect(alphaId) {
         if (alphaId != null && movie == null) movieViewModel.getFullMovieWithRecommendations(alphaId)
         if (alphaId != null && movie != null) movieViewModel.getMoviePosition(alphaId)
-//        positionToSend = positionUpdated.value
     }
     val isFavorite = remember {
         mutableStateOf(movieState.value.isFavorite ?: false)
