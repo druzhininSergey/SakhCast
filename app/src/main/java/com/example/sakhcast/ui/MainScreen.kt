@@ -16,6 +16,7 @@ import com.example.sakhcast.MOVIE_VIEW
 import com.example.sakhcast.PLAYER
 import com.example.sakhcast.SEARCH_SCREEN
 import com.example.sakhcast.SERIES_CATEGORY_SCREEN
+import com.example.sakhcast.SERIES_PLAYER
 import com.example.sakhcast.SERIES_VIEW
 import com.example.sakhcast.model.CurrentUser
 import com.example.sakhcast.ui.log_in_screen.LogInScreen
@@ -60,12 +61,14 @@ fun AuthenticatedMainScreen(
                 currentDestination != "$MOVIE_VIEW/{movieId}" &&
                 currentDestination != "$SERIES_VIEW/{seriesId}" &&
                 currentDestination != SEARCH_SCREEN &&
-                currentDestination != "$PLAYER/{hls}/{title}/{position}/{movieAlphaId}"
+                currentDestination != "$PLAYER/{hls}/{title}/{position}/{movieAlphaId}" &&
+                currentDestination != "$SERIES_PLAYER/{seasonId}/{seriesTitle}/{episodeChosenIndex}/{rgChosen}"
     }
     val isBottomBarVisible = remember(key1 = backStackState) {
         currentDestination != "$MOVIE_VIEW/{movieId}" &&
                 currentDestination != "$SERIES_VIEW/{seriesId}" &&
-                currentDestination != "$PLAYER/{hls}/{title}/{position}/{movieAlphaId}"
+                currentDestination != "$PLAYER/{hls}/{title}/{position}/{movieAlphaId}" &&
+                currentDestination != "$SERIES_PLAYER/{seasonId}/{seriesTitle}/{episodeChosenIndex}/{rgChosen}"
     }
 
     Scaffold(

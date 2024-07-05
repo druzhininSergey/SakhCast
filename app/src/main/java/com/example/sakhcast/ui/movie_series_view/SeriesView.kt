@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.movie_series_view
 
-import android.util.Log
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,9 +20,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.twotone.PlayArrow
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -53,6 +56,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcast.R
@@ -61,7 +65,9 @@ import com.example.sakhcast.model.Genre
 import com.example.sakhcast.model.Network
 import com.example.sakhcast.model.Season
 import com.example.sakhcast.model.Series
+import com.example.sakhcast.model.UserContinueWatchSeries
 import com.example.sakhcast.ui.DividerBase
+import kotlinx.coroutines.delay
 import java.util.Locale
 import kotlin.math.min
 
@@ -77,6 +83,7 @@ fun PreviewSeriesInfo() {
 //    SeriesInfo(SeriesSample.getFullSeries(), SeriesEpisodesSample.getSeriesEpisodesList())
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SeriesView(
     paddingValues: PaddingValues,
@@ -84,13 +91,14 @@ fun SeriesView(
     navigateUp: () -> Boolean,
     navigateToSeriesCategoryScreen: (String) -> Unit,
     navigateToSeriesCategoryByCompany: (String, String) -> Unit,
+    navigateToSeriesPlayer: (String, String, String, String) -> Unit,
     seriesViewModel: SeriesViewModel = hiltViewModel(),
 ) {
     val seriesState =
         seriesViewModel.seriesState.observeAsState(SeriesViewModel.SeriesState())
 
     LaunchedEffect(seriesId) {
-        if (seriesId != null) {
+        if (seriesId != null && seriesState.value.series == null) {
             seriesViewModel.getFullSeries(seriesId)
         }
     }
@@ -99,14 +107,13 @@ fun SeriesView(
     LaunchedEffect(seriesState.value.isFavorite) {
         isFavorite.value = seriesState.value.isFavorite ?: false
     }
-    var seasonId by remember { mutableIntStateOf(series?.seasons?.get(0)?.id ?: 0) }
-    Log.e("!!!!", "seasonID = $seasonId")
+    var seasonId by remember { mutableIntStateOf(series?.userLastSeasonId ?: 0) }
     LaunchedEffect(series) {
-        seasonId = series?.seasons?.getOrNull(0)?.id ?: 0
+        seasonId = series?.userLastSeasonId ?: 0
     }
 
     SideEffect {
-        if (seasonId != 0) {
+        if (seasonId != 0 && seriesState.value.episodeList.isEmpty()) {
             seriesViewModel.getSeriesEpisodesBySeasonId(seasonId)
         }
     }
@@ -124,12 +131,22 @@ fun SeriesView(
         else Color.Blue
     val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
 
+    var refreshing by remember { mutableStateOf(false) }
+    val pullRefreshState = rememberPullRefreshState(refreshing, { refreshing = true })
+    LaunchedEffect(refreshing) {
+        if (refreshing) {
+            seriesId?.let { seriesViewModel.getFullSeries(it) }
+            delay(2000)
+            refreshing = false
+        }
+    }
 
-    Box {
+    Box{
         Column(
             modifier = Modifier
                 .padding(bottom = paddingValues.calculateBottomPadding())
                 .fillMaxSize()
+                .pullRefresh(pullRefreshState)
                 .verticalScroll(scrollState)
         ) {
             Box(
@@ -203,7 +220,16 @@ fun SeriesView(
             }
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.primary)) {
                 series?.let {
-                    SeriesInfo(it, seriesEpisodes, navigateToSeriesCategoryScreen, navigateToSeriesCategoryByCompany) { newSeasonId ->
+                    SeriesInfo(
+                        it,
+                        seriesEpisodes,
+                        navigateToSeriesCategoryScreen,
+                        navigateToSeriesCategoryByCompany,
+                        navigateToSeriesPlayer,
+                        seasonId,
+                        series.name,
+                        seriesViewModel::getLastMediaData
+                    ) { newSeasonId ->
                         seasonId = newSeasonId
                     }
                 }
@@ -221,6 +247,14 @@ fun SeriesView(
                 },
             )
         }
+        PullRefreshIndicator(
+            refreshing = refreshing,
+            state = pullRefreshState,
+            modifier = Modifier
+                .padding(paddingValues)
+                .align(Alignment.TopCenter)
+                .zIndex(1f)
+        )
     }
 }
 
@@ -231,6 +265,10 @@ fun SeriesInfo(
     seriesEpisodes: List<Episode>,
     navigateToSeriesCategoryScreen: (String) -> Unit,
     navigateToSeriesCategoryByCompany: (String, String) -> Unit,
+    navigateToSeriesPlayer: (String, String, String, String) -> Unit,
+    seasonId: Int,
+    seriesName: String,
+    getLastMediaData: () -> UserContinueWatchSeries?,
     onSeasonChanged: (Int) -> Unit
 ) {
     val isRatingExists = series.imdbRating != null || series.kpRating != null
@@ -244,7 +282,16 @@ fun SeriesInfo(
         SeriesGenres(series.genres, navigateToSeriesCategoryScreen)
         if (isRatingExists) SeriesRating(series.imdbRating, series.kpRating)
         SeriesCountryYearStatus(series.country, year, series.status)
-        SeriesDownloads(series.seasons, seriesEpisodes, onSeasonChanged)
+        SeriesDownloads(
+            series.seasons,
+            seriesEpisodes,
+            onSeasonChanged,
+            series.userLastSeason,
+            navigateToSeriesPlayer,
+            seasonId,
+            seriesName,
+            getLastMediaData
+        )
         SeriesOverview(series.about)
         SeriesProductionCompanies(series.networks, navigateToSeriesCategoryByCompany)
         SeriesViewsCountInfo(series.views, series.favAmount)
@@ -297,7 +344,10 @@ fun SeriesViewsCountInfo(views: Int, favorites: Int) {
 }
 
 @Composable
-fun SeriesProductionCompanies(productionCompanies: List<Network>, navigateToSeriesCategoryByCompany: (String, String) -> Unit,) {
+fun SeriesProductionCompanies(
+    productionCompanies: List<Network>,
+    navigateToSeriesCategoryByCompany: (String, String) -> Unit,
+) {
     Text(
         modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
         text = "Кинокомпании",
@@ -316,7 +366,12 @@ fun SeriesProductionCompanies(productionCompanies: List<Network>, navigateToSeri
                 fontSize = 14.sp,
                 modifier = Modifier
                     .border(1.dp, Color.Gray, MaterialTheme.shapes.small)
-                    .clickable { navigateToSeriesCategoryByCompany("${company.id}.company", company.name) }
+                    .clickable {
+                        navigateToSeriesCategoryByCompany(
+                            "${company.id}.company",
+                            company.name
+                        )
+                    }
                     .padding(4.dp)
             )
         }
@@ -419,9 +474,14 @@ fun SeriesDownloads(
     seasons: List<Season>,
     seriesEpisodes: List<Episode>,
     onSeasonChanged: (Int) -> Unit,
+    userLastSeason: String,
+    navigateToSeriesPlayer: (String, String, String, String) -> Unit,
+    seasonId: Int,
+    seriesName: String,
+    getLastMediaData: () -> UserContinueWatchSeries?,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
-    var seasonSelected by remember { mutableStateOf("Сезон ${seasons[0].index}") }
+    var seasonSelected by remember { mutableStateOf("Сезон 0$userLastSeason") }
     val scrollState = rememberScrollState()
     Row(
         modifier = Modifier
@@ -481,13 +541,28 @@ fun SeriesDownloads(
                     color = MaterialTheme.colorScheme.primary
                 )
                 .border(width = 1.dp, color = Color.Gray, shape = MaterialTheme.shapes.small)
+                .clickable {
+                    val lastMediaData = getLastMediaData()
+                    if (lastMediaData != null) {
+                        val lastIndex = lastMediaData.lastMediaIndex.toString()
+                        val lastRg = lastMediaData.lastRgWatched
+//                        val userLastTime = lastMediaData.userLastTime
+                        val lastSeasonId = lastMediaData.lastSeasonId
+                        navigateToSeriesPlayer(
+                            lastSeasonId.toString(),
+                            seriesName,
+                            lastIndex,
+                            lastRg
+                        )
+                    }
+                }
                 .padding(5.dp)
         ) {
             Icon(imageVector = Icons.TwoTone.PlayArrow, contentDescription = null)
             Text(text = "Продолжить просмотр", color = MaterialTheme.colorScheme.onPrimary)
         }
     }
-    SeriesEpisodeView(seriesEpisodes)
+    SeriesEpisodeView(seriesEpisodes, navigateToSeriesPlayer, seasonId, seriesName)
     DividerBase()
 }
 

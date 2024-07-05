@@ -10,6 +10,7 @@ import com.example.sakhcast.model.NotificationList
 import com.example.sakhcast.model.Result
 import com.example.sakhcast.model.Series
 import com.example.sakhcast.model.SeriesList
+import com.example.sakhcast.model.SeriesPlaylist
 import retrofit2.Call
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -19,7 +20,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SakhCastApiService {
-    // LOGIN
+// LOGIN
     @POST("v1/users/login")
     fun userLogin(
         @Query("login") login: String,
@@ -32,11 +33,11 @@ interface SakhCastApiService {
     @GET("v2/users/current")
     fun checkLoginStatus(): Call<CurrentUser>
 
-    // HOME
+// HOME
     @GET("v2/users/continue")
     fun getContinueWatchMovieAndSeries(): Call<LastWatched>
 
-    // SERIES
+// SERIES
     @GET("catalog.items")
     fun getSeriesListByCategoryName(
         @Query("category") category: String,
@@ -99,7 +100,24 @@ interface SakhCastApiService {
         @Query("t") textInput: String
     ): Call<SeriesList>
 
-    // Movies
+    @GET("v1/serial/watch/get_playlist/?season_id=6850&rg=NewStudio")
+    fun getSeriesPlaylistBySeasonIdAndRgName(
+        @Query("season_id") seasonId: String,
+        @Query("rg") rgName: String,
+    ): Call<List<SeriesPlaylist>>
+
+    @POST("v1/serial/watch/set_pos")
+    fun setSeriesEpisodePosition (
+        @Query("media_id") mediaId: Int,
+        @Query("t") time: Int,
+    ): Call<Boolean>
+
+    @GET("v1/serial/watch/get_pos")
+    fun getSeriesEpisodePosition (
+        @Query("media_id") mediaId: Int,
+    ): Call<Boolean>
+
+// Movies
     @GET("v2/catalog/movies/items")
     fun getMoviesByCategoryName(
         @Query("category") category: String,
@@ -179,6 +197,11 @@ interface SakhCastApiService {
         @Path("movie") movieAlphaId: String,
         @Query("t") positionSec: Int
     ): Call<Boolean>
+
+    @GET("v2/movie/{movie}/pos")
+    fun getMoviePosition(
+        @Path("movie") movieAlphaId: String,
+    ): Call<Int>
 
     @GET("v1/users/get_notifies?amount=20&from=0&subject_only=0")
     fun getNotificationsList(

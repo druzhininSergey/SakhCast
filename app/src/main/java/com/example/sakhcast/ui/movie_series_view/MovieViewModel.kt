@@ -10,6 +10,8 @@ import com.example.sakhcast.data.repository.SakhCastRepository
 import com.example.sakhcast.model.Movie
 import com.example.sakhcast.model.MovieList
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,6 +24,9 @@ class MovieViewModel @Inject constructor(
     private var _movieState = MutableLiveData(MovieState())
     val movieState: LiveData<MovieState> = _movieState
 
+    private val _position = MutableStateFlow(0)
+    val position: StateFlow<Int> = _position
+
     data class MovieState(
         var movie: Movie? = null,
         var movieRecommendationsList: MovieList? = null,
@@ -32,12 +37,20 @@ class MovieViewModel @Inject constructor(
         downloader.downloadFile(url, fileName)
     }
 
+    fun getMoviePosition(alphaId: String) {
+        if (_position.value == 0) {
+            viewModelScope.launch {
+                val position = sakhCastRepository.getMoviePosition(alphaId) ?: 0
+                Log.i("!!!", "вызов getMoviePosition()///// position = ${_position.value}")
+                _position.value = position
+            }
+        }
+    }
+
     fun getFullMovieWithRecommendations(alphaId: String) {
         viewModelScope.launch {
             val movie = sakhCastRepository.getMovieByAlphaId(alphaId)
-            Log.e("!!!", "INIT movie VM = $movie")
             val isFavorite = movie?.userFavourite?.isFav
-            Log.e("!!!", "INIT isFavoriteState VM = $isFavorite")
             val movieRecommendationsList =
                 movie?.id?.let { sakhCastRepository.getMovieRecommendationsByRefId(it) }
             _movieState.value = movieState.value?.copy(
@@ -51,23 +64,15 @@ class MovieViewModel @Inject constructor(
     fun onFavoriteButtonPushed(kind: String) {
         viewModelScope.launch {
             val movieAlphaId = movieState.value?.movie?.idAlpha ?: "0"
-            Log.e("!!!", "movieAlphaId onFavPushed = $movieAlphaId")
-
-            Log.e(
-                "!!!",
-                "onFavoriteButtonPushed  movieState.value?.isFavorite${movieState.value?.isFavorite}, kind = $kind"
-            )
             if (movieState.value?.isFavorite == false) {
                 val response =
                     sakhCastRepository.putMovieInFavorites(movieAlphaId = movieAlphaId, kind = kind)
                 if (response?.result == true) _movieState.value =
                     movieState.value?.copy(isFavorite = true)
-                Log.e("!!!", "isFavoriteState VM = ${movieState.value?.isFavorite}")
             } else {
                 val response = sakhCastRepository.deleteMovieFromFavorites(movieAlphaId)
                 if (response?.result == true) _movieState.value =
                     movieState.value?.copy(isFavorite = false)
-                Log.e("!!!", "isFavoriteState VM = ${movieState.value?.isFavorite}")
             }
         }
     }

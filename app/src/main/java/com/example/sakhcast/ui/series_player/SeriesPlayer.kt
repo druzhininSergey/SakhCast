@@ -1,4 +1,4 @@
-package com.example.sakhcast.ui.player
+package com.example.sakhcast.ui.series_player
 
 import android.content.pm.ActivityInfo
 import android.util.Log
@@ -11,8 +11,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -31,7 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,11 +46,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import com.example.sakhcast.data.formatMinSec
@@ -59,23 +63,19 @@ import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
 @Composable
-fun Player2(
-    hls: String,
-    title: String,
-    position: Int,
-    movieAlphaId: String,
+fun SeriesPlayer(
     navigateUp: () -> Boolean,
-    playerViewModel: PlayerViewModel = hiltViewModel()
+    isPlayListLoaded: Boolean,
+    isDataLoaded: Boolean,
+    seriesState: SeriesPlayerViewModel.SeriesWatchState,
+    player: Player,
+    onEpisodeChanged: () -> Unit,
 ) {
     val context = LocalContext.current
     context.setScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
     context.hideSystemUi()
 
-    LaunchedEffect(Unit) { playerViewModel.setMovieData(hls, title, position, movieAlphaId) }
-    val movieState = playerViewModel.movieWatchState.collectAsState()
-
     var continueTime by remember { mutableIntStateOf(0) }
-
 
     var lifecycle by remember { mutableStateOf(Lifecycle.Event.ON_CREATE) }
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -84,18 +84,38 @@ fun Player2(
     var showSnackbar by rememberSaveable { mutableStateOf(true) }
     var isControllerVisible by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        playerViewModel.startPlayer()
-        continueTime = movieState.value.position
+    LaunchedEffect(seriesState) {
+        if (isPlayListLoaded || isDataLoaded) {
+            continueTime = seriesState.lastWatchedTime
 
-        val userTime = (continueTime * 1000L).formatMinSec()
-        if (continueTime != 0 && showSnackbar) scope.launch {
-            Log.i("!!!", "showSnackbar")
-            snackbarHostState.showSnackbar(
-                message = "Продолжить с $userTime?",
-                duration = SnackbarDuration.Long,
-            )
-            showSnackbar = false
+            val userTime = (continueTime * 1000L).formatMinSec()
+            if (continueTime != 0 && showSnackbar) scope.launch {
+                Log.i("!!!", "showSnackbar")
+                snackbarHostState.currentSnackbarData?.dismiss()
+                snackbarHostState.showSnackbar(
+                    message = "Продолжить с $userTime?",
+                    duration = SnackbarDuration.Long,
+                )
+                showSnackbar = false
+            }
+        }
+    }
+    val playerListener = object : Player.Listener {
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            when (reason) {
+                Player.MEDIA_ITEM_TRANSITION_REASON_SEEK -> {
+                    showSnackbar = true
+                    onEpisodeChanged()
+                }
+
+                Player.MEDIA_ITEM_TRANSITION_REASON_AUTO -> {
+                    showSnackbar = true
+                    onEpisodeChanged()
+                }
+
+                Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED -> Unit
+                Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT -> Unit
+            }
         }
     }
 
@@ -104,23 +124,26 @@ fun Player2(
             lifecycle = event
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        playerViewModel.player.playWhenReady = true
+        player.playWhenReady = true
+        player.addListener(playerListener)
+
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
+            player.removeListener(playerListener)
             context.setScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
             context.showSystemUi()
         }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+
         AndroidView(
-            modifier =
-            Modifier
+            modifier = Modifier
                 .padding()
                 .fillMaxSize(),
             factory = {
                 PlayerView(context).apply {
-                    player = playerViewModel.player
+                    this.player = player
                     useController = true
                     layoutParams =
                         FrameLayout.LayoutParams(
@@ -128,8 +151,6 @@ fun Player2(
                             ViewGroup.LayoutParams.MATCH_PARENT
                         )
                     setShowSubtitleButton(true)
-                    setShowNextButton(false)
-                    setShowPreviousButton(false)
                     setBackgroundColor(0xFF000000.toInt())
                     setControllerVisibilityListener(PlayerView.ControllerVisibilityListener { visibility ->
                         isControllerVisible = visibility == View.VISIBLE
@@ -147,14 +168,13 @@ fun Player2(
                     else -> Unit
                 }
             }
-
         )
         AnimatedVisibility(
             visible = isControllerVisible,
             enter = fadeIn(),
             exit = fadeOut()
         ) {
-            ExitButton(navigateUp)
+            SeriesTopControls(navigateUp, seriesState.seriesTitle, player.currentMediaItemIndex)
         }
 
         SnackbarHost(
@@ -166,7 +186,7 @@ fun Player2(
                 Button(
                     onClick = {
                         snackbarData.performAction()
-                        playerViewModel.player.seekTo(position * 1000L)
+                        player.seekTo(continueTime * 1000L)
                     },
                     shape = RoundedCornerShape(10.dp),
                     border = BorderStroke(width = 1.dp, color = Color.White)
@@ -183,21 +203,32 @@ fun Player2(
             }
         )
     }
-
 }
 
 @Composable
-fun ExitButton(navigateUp: () -> Boolean) {
-    IconButton(
-        onClick = { navigateUp() },
+fun SeriesTopControls(navigateUp: () -> Boolean, seriesTitle: String, currentMediaItemIndex: Int) {
+    Row(
         modifier = Modifier
-            .padding(16.dp)
-            .size(48.dp)
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = Icons.Default.Close,
-            contentDescription = "Exit",
-            tint = Color.Gray
-        )
+        IconButton(
+            onClick = { navigateUp() },
+            modifier = Modifier
+                .size(48.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Exit",
+                tint = Color.Gray
+            )
+        }
+        Row {
+            Text(text = seriesTitle, fontWeight = FontWeight.Bold)
+            Text(text = " | ", fontWeight = FontWeight.Bold)
+            Text(text = "Эпизод ${currentMediaItemIndex + 1}")
+        }
     }
 }

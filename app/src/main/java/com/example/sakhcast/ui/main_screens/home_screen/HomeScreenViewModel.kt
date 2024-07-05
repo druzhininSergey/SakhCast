@@ -30,6 +30,15 @@ class HomeScreenViewModel @Inject constructor(private val sakhCastRepository: Sa
         var lastWatchedMovieTime: String = "",
     )
 
+    fun refreshLastWatched(){
+        viewModelScope.launch {
+            val lastWatched = sakhCastRepository.getContinueWatchMovieAndSeries()
+            _homeScreenState.value = homeScreenState.value?.copy(
+                lastWatched = lastWatched,
+            )
+        }
+    }
+
     private fun getAllScreenData() {
         viewModelScope.launch {
             val lastWatched = sakhCastRepository.getContinueWatchMovieAndSeries()
