@@ -36,7 +36,15 @@ class NotificationScreenViewModel @Inject constructor(private val sakhCastReposi
     fun makeAllNotificationsRead(){
         viewModelScope.launch {
             sakhCastRepository.makeAllNotificationsRead()
+            val currentNotifications = _notificationScreenState.value?.notificationsList?.items ?: return@launch
+            val updatedNotifications = currentNotifications.map { it.copy(acknowledge = true) }
+
+            _notificationScreenState.value = notificationScreenState.value?.copy(
+                notificationsList = NotificationList(
+                    amount = updatedNotifications.size,
+                    items = updatedNotifications
+                )
+            )
         }
     }
-
 }

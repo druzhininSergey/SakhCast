@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -30,9 +32,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sakhcast.Colors
+import com.example.sakhcast.R
+import com.example.sakhcast.TELEGRAM_URL
+import com.example.sakhcast.data.browserIntent
 import com.example.sakhcast.ui.log_in_screen.LogInScreenViewModel
 import kotlinx.coroutines.launch
 
@@ -52,6 +59,7 @@ fun ProfileScreen(
         skipPartiallyExpanded = skipPartiallyExpanded
     )
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -63,6 +71,20 @@ fun ProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.CenterEnd
             ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp),
+                    contentAlignment = Alignment.TopStart
+                ) {
+                    IconButton(onClick = { context.browserIntent(TELEGRAM_URL) }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_telegram),
+                            contentDescription = null,
+                            tint = Color.Unspecified
+                        )
+                    }
+                }
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Text(text = "Учетная запись")
                 }
