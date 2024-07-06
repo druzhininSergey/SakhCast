@@ -1,7 +1,7 @@
 package com.example.sakhcast.model
 
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class NotificationList(
@@ -11,7 +11,7 @@ data class NotificationList(
 
 @Serializable
 data class Notification(
-    @SerialName("ack") val acknowledge: Boolean,
+    @SerialName("ack") var acknowledge: Boolean,
     @SerialName("context") val summary: Summary,
     @SerialName("date") val date: String,
     @SerialName("id") val id: Int,

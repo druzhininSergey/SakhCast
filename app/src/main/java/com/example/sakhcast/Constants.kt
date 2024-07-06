@@ -15,6 +15,7 @@ const val PLAYER = "player"
 const val SERIES_PLAYER = "series_player"
 
 const val BASE_URL = "https://api.sakh.tv"
+const val TELEGRAM_URL = "https://t.me/+G5wrkNj7RD04ODZi"
 
 const val SHARED_PREFS_TOKEN_KEY = "shared_preferences_token"
 

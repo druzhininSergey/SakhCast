@@ -44,7 +44,8 @@ fun PreviewNotificationScreen() {
 @Composable
 fun NotificationScreen(
     paddingValues: PaddingValues,
-    notificationScreenState: State<NotificationScreenViewModel.NotificationScreenState>
+    notificationScreenState: State<NotificationScreenViewModel.NotificationScreenState>,
+    makeAllNotificationsRead: () -> Unit
 ) {
     val notificationList = notificationScreenState.value.notificationsList?.items
 
@@ -54,10 +55,8 @@ fun NotificationScreen(
             .padding(paddingValues)
             .background(MaterialTheme.colorScheme.primary),
     ) {
-
         LazyColumn(
             modifier = Modifier
-//                .padding(paddingValues)
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.primary),
         ) {
@@ -94,7 +93,7 @@ fun NotificationScreen(
         }
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
             FloatingActionButton(
-                onClick = {  },
+                onClick = makeAllNotificationsRead,
                 containerColor = Color.DarkGray,
                 modifier = Modifier.padding(20.dp),
                 elevation = FloatingActionButtonDefaults.elevation(10.dp)
@@ -106,6 +105,5 @@ fun NotificationScreen(
             }
         }
     }
-
 
 }
