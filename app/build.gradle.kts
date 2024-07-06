@@ -4,6 +4,8 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     kotlin("plugin.serialization")
+    alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)
 }
 
 android {
@@ -53,6 +55,11 @@ android {
 }
 
 dependencies {
+    //Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
+
     //kotlinx.serialization
     implementation(libs.kotlinx.serialization.json)
 
@@ -68,7 +75,7 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
 
     //lifecycle ViewModel
-    implementation(libs.androidx.lifecycle.viewmodel.compose) // возможно не нужна
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     //okhttp3
     implementation(libs.okhttp)
