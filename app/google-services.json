@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "850850492941",
+    "project_id": "sakh-cast",
+    "storage_bucket": "sakh-cast.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:850850492941:android:f9a5f4fb348928eec71b44",
+        "android_client_info": {
+          "package_name": "com.example.sakhcast"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBt0l1KU9eAASnfCOnEPpfYR2kSPnPfUgE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
