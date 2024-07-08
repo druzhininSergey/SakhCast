@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.player
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
@@ -10,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,6 +24,9 @@ class PlayerViewModel @Inject constructor(
     private val _movieWatchState = MutableStateFlow(MovieWatchState())
     val movieWatchState: StateFlow<MovieWatchState> = _movieWatchState
 
+    private var _isPositionSending = MutableStateFlow(false)
+    private val isPositionSending = _isPositionSending.asStateFlow()
+
     data class MovieWatchState(
         var hlsUri: String = "",
         var title: String = "",
@@ -30,23 +35,27 @@ class PlayerViewModel @Inject constructor(
     )
 
     fun startPlayer() {
-        viewModelScope.launch {
-            val uri = movieWatchState.value.hlsUri
-            val title = movieWatchState.value.title
-            player.setMediaItem(
-                MediaItem.Builder()
-                    .setUri(uri)
-                    .setMediaMetadata(
-                        MediaMetadata.Builder()
-                            .setDisplayTitle(title)
-                            .build()
-                    )
-                    .build()
-            )
-            player.prepare()
-            delay(1000)
-            player.playWhenReady = true
-            setMoviePosition()
+        if (!isPositionSending.value) {
+            Log.i("!!!", "startPlayer")
+            _isPositionSending.value = true
+            viewModelScope.launch {
+                val uri = movieWatchState.value.hlsUri
+                val title = movieWatchState.value.title
+                player.setMediaItem(
+                    MediaItem.Builder()
+                        .setUri(uri)
+                        .setMediaMetadata(
+                            MediaMetadata.Builder()
+                                .setDisplayTitle(title)
+                                .build()
+                        )
+                        .build()
+                )
+                player.prepare()
+                delay(1000)
+                player.playWhenReady = true
+                setMoviePosition()
+            }
         }
 
     }
@@ -65,7 +74,7 @@ class PlayerViewModel @Inject constructor(
     private fun setMoviePosition() {
         viewModelScope.launch {
             while (true) {
-                if (player.isPlaying){
+                if (player.isPlaying) {
                     delay(5000)
                     val movieAlphaId = _movieWatchState.value.movieAlphaId
                     val currentPosition = (player.currentPosition / 1000).toInt()
@@ -81,6 +90,8 @@ class PlayerViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+        Log.i("!!!", "player released")
+        _isPositionSending.value = false
         player.release()
     }
 

@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.player
 
-import android.content.pm.ActivityInfo
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -10,8 +9,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -20,9 +22,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -43,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -52,7 +55,6 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import com.example.sakhcast.data.formatMinSec
 import com.example.sakhcast.data.hideSystemUi
-import com.example.sakhcast.data.setScreenOrientation
 import com.example.sakhcast.data.showSystemUi
 import kotlinx.coroutines.launch
 
@@ -67,7 +69,6 @@ fun Player2(
     playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    context.setScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
     context.hideSystemUi()
 
     LaunchedEffect(Unit) { playerViewModel.setMovieData(hls, title, position, movieAlphaId) }
@@ -105,7 +106,6 @@ fun Player2(
         playerViewModel.player.playWhenReady = true
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
-            context.setScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
             context.showSystemUi()
         }
     }
@@ -152,7 +152,7 @@ fun Player2(
             enter = fadeIn(),
             exit = fadeOut()
         ) {
-            ExitButton(navigateUp)
+            TopControls(navigateUp, movieState.value.title)
         }
 
         SnackbarHost(
@@ -167,6 +167,12 @@ fun Player2(
                         playerViewModel.player.seekTo(position * 1000L)
                     },
                     shape = RoundedCornerShape(10.dp),
+                    colors = ButtonColors(
+                        containerColor = Color.DarkGray,
+                        contentColor = Color.DarkGray,
+                        disabledContentColor = Color.DarkGray,
+                        disabledContainerColor = Color.DarkGray
+                    ),
                     border = BorderStroke(width = 1.dp, color = Color.White)
                 ) {
                     Text(
@@ -175,7 +181,8 @@ fun Player2(
                             .padding(8.dp)
                             .wrapContentWidth()
                             .wrapContentHeight()
-                            .background(color = MaterialTheme.colorScheme.surface)
+                            .background(color = Color.DarkGray),
+                        color = Color.White
                     )
                 }
             }
@@ -185,17 +192,25 @@ fun Player2(
 }
 
 @Composable
-fun ExitButton(navigateUp: () -> Boolean) {
-    IconButton(
-        onClick = { navigateUp() },
+fun TopControls(navigateUp: () -> Boolean, title: String) {
+    Row(
         modifier = Modifier
-            .padding(16.dp)
-            .size(48.dp)
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = Icons.Default.Close,
-            contentDescription = "Exit",
-            tint = Color.Gray
-        )
+        IconButton(
+            onClick = { navigateUp() },
+            modifier = Modifier
+                .size(48.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Exit",
+                tint = Color.Gray
+            )
+        }
+        Text(text = title, fontWeight = FontWeight.Bold, color = Color.White)
     }
 }

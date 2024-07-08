@@ -480,7 +480,7 @@ fun SeriesDownloads(
     getLastMediaData: () -> UserContinueWatchSeries?,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
-    var seasonSelected by remember { mutableStateOf("Сезон 0$userLastSeason") }
+    var seasonSelected by remember { mutableStateOf("Сезон $userLastSeason") }
     val scrollState = rememberScrollState()
     Row(
         modifier = Modifier

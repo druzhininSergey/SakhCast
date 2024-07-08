@@ -31,10 +31,10 @@ fun Context.findActivity(): Activity? = when (this) {
     else -> null
 }
 
-fun Context.setScreenOrientation(orientation: Int) {
-    val activity = this.findActivity() ?: return
-    activity.requestedOrientation = orientation
-}
+//fun Context.setScreenOrientation(orientation: Int) {
+//    val activity = this.findActivity() ?: return
+//    activity.requestedOrientation = orientation
+//}
 
 fun Context.hideSystemUi() {
     val activity = this.findActivity() ?: return
@@ -46,6 +46,8 @@ fun Context.hideSystemUi() {
         controller.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
+    window.statusBarColor = activity.getColor(android.R.color.black)
+    window.navigationBarColor = activity.getColor(android.R.color.black)
 }
 
 fun Context.showSystemUi() {
