@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
@@ -58,7 +59,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
+import com.example.sakhcast.KINOPOISK_SERIES_SEARCH_URL
 import com.example.sakhcast.R
+import com.example.sakhcast.data.browserIntent
 import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.Genre
 import com.example.sakhcast.model.Network
@@ -279,7 +282,12 @@ fun SeriesInfo(
     ) {
 
         SeriesGenres(series.genres, navigateToSeriesCategoryScreen)
-        if (isRatingExists) SeriesRating(series.imdbRating, series.kpRating)
+        if (isRatingExists) SeriesRating(
+            series.imdbRating,
+            series.kpRating,
+            series.imdbUrl,
+            series.kpId
+        )
         SeriesCountryYearStatus(series.country, year, series.status)
         SeriesDownloads(
             series.seasons,
@@ -600,27 +608,51 @@ fun SeriesCountryYearStatus(
 }
 
 @Composable
-fun SeriesRating(_imdbRating: Double?, _kinopoiskRating: Double?) {
+fun SeriesRating(_imdbRating: Double?, _kinopoiskRating: Double?, imdbUrl: String?, kpId: Int?) {
     val imdbRating = String.format(Locale.US, "%.1f", _imdbRating)
     val kinopoiskRating = String.format(Locale.US, "%.1f", _kinopoiskRating)
+    val context = LocalContext.current
+
     Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
         if (_imdbRating != null && _imdbRating != 0.0) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "IMDb:", color = Color.Gray, fontSize = 14.sp)
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(text = imdbRating, color = MaterialTheme.colorScheme.scrim, fontSize = 18.sp)
-            }
-        }
-        if (_kinopoiskRating != null && _kinopoiskRating != 0.0) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Кинопоиск:", color = Color.Gray, fontSize = 14.sp)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .border(
+                        1.dp,
+                        Color.Gray,
+                        MaterialTheme.shapes.small
+                    )
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .clickable { imdbUrl?.let { context.browserIntent(it) } }
+            ) {
+                Text(text = "IMDb:", color = Color.Gray, fontSize = 16.sp)
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                    text = kinopoiskRating,
+                    text = imdbRating,
                     color = MaterialTheme.colorScheme.scrim,
                     fontSize = 18.sp
                 )
             }
+        }
+        if (_kinopoiskRating != null && _kinopoiskRating != 0.0) {
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .border(
+                            1.dp,
+                            Color.Gray,
+                            MaterialTheme.shapes.small
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .clickable { context.browserIntent("$KINOPOISK_SERIES_SEARCH_URL$kpId/") }) {
+                    Text(text = "Кинопоиск:", color = Color.Gray, fontSize = 16.sp)
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = kinopoiskRating,
+                        color = MaterialTheme.colorScheme.scrim,
+                        fontSize = 18.sp
+                    )
+                }
         }
     }
     DividerBase()
