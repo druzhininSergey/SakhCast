@@ -1,7 +1,6 @@
 package com.example.sakhcast.ui.log_in_screen
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -25,7 +24,6 @@ class LogInScreenViewModel @Inject constructor(
     val userDataState: LiveData<UserDataState> = _userDataState
 
     data class UserDataState(
-//        var userToken: String = "",
         var currentUser: CurrentUser? = null,
         var isLogged: Boolean? = null,
         var isPasswordCorrect: Boolean = true,
@@ -43,10 +41,6 @@ class LogInScreenViewModel @Inject constructor(
         }
     }
 
-//    private fun getTokenFromSharedPreferences(): String {
-//        return sharedPreferences.getString(SHARED_PREFS_TOKEN_KEY, "") ?: ""
-//    }
-
     fun checkTokenExist() {
         viewModelScope.launch {
             val token = sharedPreferences.getString(SHARED_PREFS_TOKEN_KEY, "")
@@ -62,12 +56,10 @@ class LogInScreenViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             val token = generateToken()
-            Log.e("!!!", "token VM = $token")
 
             saveUserTokenInSharedPrefs(token)
             val loginResponse: LoginResponse? =
                 sakhCastRepository.userLogin(loginInput, passwordInput)
-            Log.e("!!!", "userResponse = $loginResponse")
             if (loginResponse != null && loginResponse.user.pro) {
                 val user = loginResponse.user
                 _userDataState.value = userDataState.value?.copy(
@@ -77,7 +69,6 @@ class LogInScreenViewModel @Inject constructor(
                     isUserPro = true
                 )
             } else if (loginResponse != null && !loginResponse.user.pro) {
-                Log.i("!!!!", "userPro = ${loginResponse.user.pro}")
                 _userDataState.value = userDataState.value?.copy(
                     currentUser = null,
                     isLogged = false,
@@ -86,7 +77,6 @@ class LogInScreenViewModel @Inject constructor(
                 )
                 saveUserTokenInSharedPrefs("")
             } else if (loginResponse == null) {
-                Log.i("!!!", "Сработала ветка где isPassCorr = false")
                 _userDataState.value = userDataState.value?.copy(isPasswordCorrect = false)
                 saveUserTokenInSharedPrefs("")
             }
@@ -95,13 +85,11 @@ class LogInScreenViewModel @Inject constructor(
 
     fun checkLoggedUser() {
         viewModelScope.launch {
-//            while (true) {
             val currentUser = sakhCastRepository.checkLoginStatus()
             if (currentUser == null) {
                 saveUserTokenInSharedPrefs("")
                 _userDataState.value =
                     userDataState.value?.copy(isLogged = false)
-//                    break
             } else {
                 _userDataState.value =
                     userDataState.value?.copy(
@@ -109,8 +97,6 @@ class LogInScreenViewModel @Inject constructor(
                         isLogged = true,
                     )
             }
-//                delay(5000)
-//            }
         }
     }
 
@@ -120,7 +106,6 @@ class LogInScreenViewModel @Inject constructor(
             saveUserTokenInSharedPrefs("")
             _userDataState.value = userDataState.value?.copy(
                 isLogged = false,
-//                isPasswordCorrect = true
             )
         }
     }

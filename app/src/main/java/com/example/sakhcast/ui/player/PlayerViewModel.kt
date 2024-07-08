@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.player
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
@@ -31,7 +30,6 @@ class PlayerViewModel @Inject constructor(
     )
 
     fun startPlayer() {
-        Log.i("!!!", "вызов startPlayer")
         viewModelScope.launch {
             val uri = movieWatchState.value.hlsUri
             val title = movieWatchState.value.title

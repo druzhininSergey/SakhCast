@@ -1,6 +1,5 @@
 package com.example.sakhcast.data.repository
 
-import android.util.Log
 import com.example.sakhcast.data.api_service.SakhCastApiService
 import com.example.sakhcast.model.CurrentUser
 import com.example.sakhcast.model.Episode
@@ -485,7 +484,7 @@ class SakhCastRepository @Inject constructor(
                 val notificationListCall =
                     sakhCastApiService.setMoviePosition(alphaId, positionSec)
                 val responseBody = notificationListCall.execute()
-                Log.i("!!!", "send position to backend = ${responseBody.body()}")
+//                Log.i("!!!", "send position to backend = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
                 null

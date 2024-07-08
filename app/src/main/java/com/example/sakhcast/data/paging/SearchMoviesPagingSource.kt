@@ -1,6 +1,5 @@
 package com.example.sakhcast.data.paging
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.sakhcast.data.repository.SakhCastRepository
@@ -15,10 +14,7 @@ class SearchMoviesPagingSource(
         try {
             val page = params.key ?: 0
             val seriesList = searchSeries(textInput, page)
-            Log.i("!!!", "Loaded seriesList size: ${seriesList?.items?.size}")
-
             val nextKey = if (seriesList?.items?.size == 40) page + 1 else null
-            Log.i("!!!", "nextKey = $nextKey")
 
             return LoadResult.Page(
                 data = seriesList?.items ?: emptyList(),
@@ -36,7 +32,6 @@ class SearchMoviesPagingSource(
 
     override fun getRefreshKey(state: PagingState<Int, MovieCard>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
-            Log.i("!!!", "Refresh anchorPosition: $anchorPosition")
             val anchorPage = state.closestPageToPosition(anchorPosition)
             anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)
         }

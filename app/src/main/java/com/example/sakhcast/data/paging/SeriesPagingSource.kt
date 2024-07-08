@@ -1,6 +1,5 @@
 package com.example.sakhcast.data.paging
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.sakhcast.data.repository.SakhCastRepository
@@ -30,18 +29,12 @@ class SeriesPagingSource(
     )
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, SeriesCard> {
-        Log.i("!!!", "categoryName load() = $categoryName")
 
         try {
             val page = params.key ?: 0
             val categoryNameUrl = getCategoryNameUrl(categoryName)
-            Log.i("!!!", "Loading page: $page, categoryName: $categoryNameUrl")
             val seriesList = getSeriesList(page, categoryNameUrl)
-            Log.i("!!!", "Loaded seriesList size: ${seriesList?.items?.size}")
-
-
             val nextKey = if (seriesList?.items?.size == 40) page + 1 else null
-            Log.i("!!!", "nextkey = $nextKey")
 
             return LoadResult.Page(
                 data = seriesList?.items ?: emptyList(),
@@ -54,7 +47,6 @@ class SeriesPagingSource(
     }
 
     private fun getCategoryNameUrl(categoryName: String): String {
-        Log.i("!!!", "categoryName = $categoryName")
         return categoryList[categoryName] ?: genreList[categoryName]
         ?: categoryName
     }
@@ -75,7 +67,6 @@ class SeriesPagingSource(
 
     override fun getRefreshKey(state: PagingState<Int, SeriesCard>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
-            Log.i("!!!", "Refresh anchorPosition: $anchorPosition")
             val anchorPage = state.closestPageToPosition(anchorPosition)
             anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)
         }

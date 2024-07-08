@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.log_in_screen
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -139,7 +138,6 @@ fun LogInScreen(
                 }
             }
         )
-        Log.e("!!!", "isPasswordCorrect = ${logInScreenState.value.isPasswordCorrect}")
         if (!logInScreenState.value.isPasswordCorrect) {
             Text(
                 text = "Неверный логин или пароль",
