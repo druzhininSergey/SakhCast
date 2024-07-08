@@ -1,7 +1,6 @@
 package com.example.sakhcast.ui.player
 
 import android.content.pm.ActivityInfo
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -90,7 +89,6 @@ fun Player2(
 
         val userTime = (continueTime * 1000L).formatMinSec()
         if (continueTime != 0 && showSnackbar) scope.launch {
-            Log.i("!!!", "showSnackbar")
             snackbarHostState.showSnackbar(
                 message = "Продолжить с $userTime?",
                 duration = SnackbarDuration.Long,

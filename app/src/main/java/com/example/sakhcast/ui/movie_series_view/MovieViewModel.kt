@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.movie_series_view
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -41,7 +40,6 @@ class MovieViewModel @Inject constructor(
         if (_position.value == 0) {
             viewModelScope.launch {
                 val position = sakhCastRepository.getMoviePosition(alphaId) ?: 0
-                Log.i("!!!", "вызов getMoviePosition()///// position = ${_position.value}")
                 _position.value = position
             }
         }

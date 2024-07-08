@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.series_player
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
@@ -43,7 +42,6 @@ class SeriesPlayerViewModel @Inject constructor(
     )
 
     fun startPlayer() {
-        Log.i("!!!", "вызов startPlayer")
         viewModelScope.launch {
             _isPlaylistLoaded.collect { isLoaded ->
                 if (isLoaded) {
@@ -53,7 +51,6 @@ class SeriesPlayerViewModel @Inject constructor(
                     }
                     mediaItems?.let { player.setMediaItems(it) }
                     val episodeChosenIndex = _seriesWatchState.value.episodeChosenIndex
-                    Log.e("!!!", "Seeking to position: $episodeChosenIndex")
                     setCurrentEpisodeLastTimeWatched(episodeChosenIndex)
                     if (episodeChosenIndex == 0) player.seekToDefaultPosition(0)
                     else player.seekToDefaultPosition(episodeChosenIndex - 1)
@@ -70,10 +67,6 @@ class SeriesPlayerViewModel @Inject constructor(
         val episode = seriesWatchState.value.episodeList
             ?.find { it.index == episodeChosenIndex.toString() }
         val rg = episode?.rgs?.find {
-            Log.i(
-                "!!!",
-                "${it.rg.lowercase()} == ${seriesWatchState.value.rgChosen.lowercase()}"
-            )
             it.rg.lowercase() == seriesWatchState.value.rgChosen.lowercase()
         }
 
@@ -91,17 +84,10 @@ class SeriesPlayerViewModel @Inject constructor(
         val episode = seriesWatchState.value.episodeList
             ?.find { it.index == (trackIndex + 1).toString() }
         val currentEpisodeLastTime = episode?.isViewed ?: 0
-        Log.d(
-            "ExoPlayer",
-            "Track changed due to seek\nCurrentTrackIndex = $trackIndex\n currentEpisodeLastTime = $currentEpisodeLastTime"
-        )
         val playList = seriesWatchState.value.playlist
         val currentEpisodeId =
             playList?.find { it.episodeIndex.toInt() == trackIndex + 1 }?.mediaId ?: 0
-        Log.d(
-            "ExoPlayer",
-            "currentEpisodeId = $currentEpisodeId"
-        )
+
         _seriesWatchState.value = seriesWatchState.value.copy(
             lastWatchedTime = currentEpisodeLastTime,
             currentEpisodeId = currentEpisodeId
@@ -151,10 +137,6 @@ class SeriesPlayerViewModel @Inject constructor(
                     delay(5000)
                     val currentEpisodeId = _seriesWatchState.value.currentEpisodeId
                     val currentPosition = (player.currentPosition / 1000).toInt()
-                    Log.i(
-                        "!!!",
-                        "currentEpisodeId = $currentEpisodeId\ncurrentPosition = $currentPosition"
-                    )
                     sakhCastRepository.setSeriesEpisodePosition(currentEpisodeId, currentPosition)
                 } else {
                     delay(5000)

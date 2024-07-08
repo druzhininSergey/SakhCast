@@ -36,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
@@ -112,8 +111,8 @@ fun SeriesView(
         seasonId = series?.userLastSeasonId ?: 0
     }
 
-    SideEffect {
-        if (seasonId != 0 && seriesState.value.episodeList.isEmpty()) {
+    LaunchedEffect(seasonId) {
+        if (seasonId != 0) {
             seriesViewModel.getSeriesEpisodesBySeasonId(seasonId)
         }
     }
@@ -141,7 +140,7 @@ fun SeriesView(
         }
     }
 
-    Box{
+    Box {
         Column(
             modifier = Modifier
                 .padding(bottom = paddingValues.calculateBottomPadding())
@@ -546,7 +545,6 @@ fun SeriesDownloads(
                     if (lastMediaData != null) {
                         val lastIndex = lastMediaData.lastMediaIndex.toString()
                         val lastRg = lastMediaData.lastRgWatched
-//                        val userLastTime = lastMediaData.userLastTime
                         val lastSeasonId = lastMediaData.lastSeasonId
                         navigateToSeriesPlayer(
                             lastSeasonId.toString(),
