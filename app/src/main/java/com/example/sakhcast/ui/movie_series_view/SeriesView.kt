@@ -371,7 +371,7 @@ fun SeriesProductionCompanies(
                             company.name
                         )
                     }
-                    .padding(4.dp)
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
             )
         }
     }
@@ -633,16 +633,16 @@ fun SeriesGenres(genres: List<Genre>, navigateToSeriesCategoryScreen: (String) -
             TextButton(onClick = {}) {
                 Text(
                     text = genres.name.uppercase(),
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = Color.Gray,
                     fontSize = 10.sp,
                     modifier = Modifier
                         .border(
                             1.dp,
-                            MaterialTheme.colorScheme.onPrimary,
+                            Color.Gray,
                             MaterialTheme.shapes.small
                         )
                         .clickable { navigateToSeriesCategoryScreen(genres.name) }
-                        .padding(4.dp)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
         }

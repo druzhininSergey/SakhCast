@@ -408,7 +408,7 @@ fun MovieProductionCompanies(
                 fontSize = 14.sp,
                 modifier = Modifier
                     .border(1.dp, Color.Gray, MaterialTheme.shapes.small)
-                    .padding(4.dp)
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
                     .clickable {
                         navigateToMovieCategoriesByGenresId(
                             productionCompanyUri,
@@ -534,11 +534,10 @@ fun MovieDownloads(downloads: List<Download>, download: (String, String) -> Unit
                     fontSize = 14.sp,
                     modifier = Modifier
                         .border(1.dp, Color.Gray, MaterialTheme.shapes.small)
-                        .padding(4.dp)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
                         .clickable {
                             selectedItemIndex.intValue = index
                             openDialog.value = true
-//                            download(it.src, "$ruTitle.${it.h}p.")
                         }
                 )
             }
@@ -648,15 +647,15 @@ fun MovieGenres(
             }) {
                 Text(
                     text = genres.name.uppercase(),
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = Color.Gray,
                     fontSize = 10.sp,
                     modifier = Modifier
                         .border(
                             1.dp,
-                            MaterialTheme.colorScheme.onPrimary,
+                            Color.Gray,
                             MaterialTheme.shapes.small
                         )
-                        .padding(4.dp)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
         }
