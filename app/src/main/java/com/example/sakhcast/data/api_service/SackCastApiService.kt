@@ -20,7 +20,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SakhCastApiService {
-// LOGIN
+    // LOGIN
     @POST("v1/users/login")
     fun userLogin(
         @Query("login") login: String,
@@ -33,11 +33,11 @@ interface SakhCastApiService {
     @GET("v2/users/current")
     fun checkLoginStatus(): Call<CurrentUser>
 
-// HOME
+    // HOME
     @GET("v2/users/continue")
     fun getContinueWatchMovieAndSeries(): Call<LastWatched>
 
-// SERIES
+    // SERIES
     @GET("catalog.items")
     fun getSeriesListByCategoryName(
         @Query("category") category: String,
@@ -107,17 +107,17 @@ interface SakhCastApiService {
     ): Call<List<SeriesPlaylist>>
 
     @POST("v1/serial/watch/set_pos")
-    fun setSeriesEpisodePosition (
+    fun setSeriesEpisodePosition(
         @Query("media_id") mediaId: Int,
         @Query("t") time: Int,
     ): Call<Boolean>
 
     @GET("v1/serial/watch/get_pos")
-    fun getSeriesEpisodePosition (
+    fun getSeriesEpisodePosition(
         @Query("media_id") mediaId: Int,
     ): Call<Boolean>
 
-// Movies
+    // Movies
     @GET("v2/catalog/movies/items")
     fun getMoviesByCategoryName(
         @Query("category") category: String,
@@ -212,4 +212,14 @@ interface SakhCastApiService {
 
     @POST("v1/users/ack_all_notifies")
     fun makeAllNotificationsRead(): Call<Boolean>
+
+// General
+
+    @GET("v2/person/5701")
+    fun getContentListByPersonId(
+        @Query("page") page: Int,
+        @Query("amount") amount: Int = 40,
+        @Query("person") personId: String,
+    ): Call<MovieList>
+
 }

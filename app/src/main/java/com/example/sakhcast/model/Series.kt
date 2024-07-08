@@ -43,7 +43,8 @@ data class Series(
     @SerialName("views") val views: Int,
     @SerialName("website") val website: String,
     @SerialName("year") val year: Int,
-    @SerialName("year_end") val yearEnd: Int
+    @SerialName("year_end") val yearEnd: Int,
+    @SerialName("cast") val cast: Cast?,
 )
 
 @Serializable

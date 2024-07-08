@@ -1,5 +1,9 @@
 package com.example.sakhcast.ui.movie_series_view
 
+import android.os.Build
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,12 +21,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.twotone.PlayArrow
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -44,6 +51,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -51,6 +60,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
@@ -62,9 +72,11 @@ import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcast.KINOPOISK_SERIES_SEARCH_URL
 import com.example.sakhcast.R
 import com.example.sakhcast.data.browserIntent
+import com.example.sakhcast.model.Cast
 import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.Genre
 import com.example.sakhcast.model.Network
+import com.example.sakhcast.model.Person
 import com.example.sakhcast.model.Season
 import com.example.sakhcast.model.Series
 import com.example.sakhcast.model.UserContinueWatchSeries
@@ -300,8 +312,131 @@ fun SeriesInfo(
             getLastMediaData
         )
         SeriesOverview(series.about)
+        series.cast?.let { SeriesExpandableCastTab(cast = it, navigateToSeriesCategoryByCompany) }
         SeriesProductionCompanies(series.networks, navigateToSeriesCategoryByCompany)
         SeriesViewsCountInfo(series.views, series.favAmount)
+    }
+}
+
+@Composable
+fun SeriesExpandableCastTab(
+    cast: Cast,
+    navigateToSeriesCategoriesByGenresId: (String, String) -> Unit
+) {
+    var isExpanded by remember { mutableStateOf(false) }
+    val rotationAngle by animateFloatAsState(
+        targetValue = if (isExpanded) 90f else 0f,
+        animationSpec = tween(durationMillis = 300), label = ""
+    )
+
+    Row(
+        modifier = Modifier
+            .padding(bottom = 40.dp)
+            .fillMaxWidth()
+            .clickable { isExpanded = !isExpanded },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier.padding(start = 16.dp),
+            text = "Состав",
+            fontSize = 25.sp,
+            color = MaterialTheme.colorScheme.onPrimary
+        )
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier
+                .padding(top = 4.dp)
+                .rotate(rotationAngle)
+        )
+    }
+
+    AnimatedVisibility(visible = isExpanded) {
+        Column {
+
+            val castMembers = listOfNotNull(
+                cast.voiceActor?.let { "Актеры озвучки" to it },
+                cast.designer?.let { "Художники" to it },
+                cast.actor?.let { "Актеры" to it },
+                cast.composer?.let { "Композиторы" to it },
+                cast.director?.let { "Режиссеры" to it },
+                cast.producer?.let { "Продюсеры" to it },
+                cast.writer?.let { "Сценаристы" to it },
+                cast.editor?.let { "Монтажеры" to it },
+                cast.operator?.let { "Операторы" to it }
+            )
+
+            castMembers.forEach { (title, members) ->
+                Text(
+                    modifier = Modifier.padding(start = 16.dp),
+                    text = title,
+                    fontSize = 20.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(16.dp)
+                ) {
+                    items(members) { person ->
+                        SeriesPersonItem(person, navigateToSeriesCategoriesByGenresId)
+                    }
+                }
+                DividerBase()
+            }
+        }
+    }
+}
+
+@Composable
+fun SeriesPersonItem(person: Person, navigateToSeriesCategoriesByGenresId: (String, String) -> Unit) {
+    val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        person.photoAlt + ".avif"
+    } else {
+        person.photoAlt + ".webp"
+    }
+    val backdropColor1 = Color.Gray
+    val backdropColor2 = Color.Black
+    val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
+    Column(
+        modifier = Modifier
+            .width(70.dp)
+            .padding(vertical = 4.dp)
+            .clickable {
+//              TODO  navigateToSeriesCategoriesByGenresId(
+//                    person.ruName,
+//                    "${person.id}.person"
+//                )
+            },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        SubcomposeAsyncImage(
+            model = imageUrl,
+            contentDescription = null,
+            modifier = Modifier
+                .clip(CircleShape)
+                .size(60.dp),
+            contentScale = ContentScale.FillBounds,
+            loading = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(brush = brush)
+                )
+            }
+        )
+        Text(
+            text = person.ruName,
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onPrimary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp)
+        )
     }
 }
 
