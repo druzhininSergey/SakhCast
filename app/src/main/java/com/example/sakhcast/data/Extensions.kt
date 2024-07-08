@@ -5,9 +5,8 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.net.Uri
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
+import android.os.Build
+import android.view.WindowInsets
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -39,23 +38,32 @@ fun Context.findActivity(): Activity? = when (this) {
 fun Context.hideSystemUi() {
     val activity = this.findActivity() ?: return
     val window = activity.window ?: return
-    WindowCompat.setDecorFitsSystemWindows(window, false)
-    val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
-    windowInsetsController.let { controller ->
-        controller.hide(WindowInsetsCompat.Type.systemBars())
-        controller.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    val decorView = window.decorView
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+        decorView.windowInsetsController?.hide(WindowInsets.Type.systemBars())
     }
-    window.statusBarColor = activity.getColor(android.R.color.black)
-    window.navigationBarColor = activity.getColor(android.R.color.black)
+//    WindowCompat.setDecorFitsSystemWindows(window, false)
+//    val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+//    windowInsetsController.let { controller ->
+//        controller.hide(WindowInsetsCompat.Type.systemBars())
+//        controller.systemBarsBehavior =
+//            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+//    }
+//    window.statusBarColor = Color.Transparent.toArgb()
+//    window.navigationBarColor = activity.getColor(android.R.color.black)
+
 }
 
 fun Context.showSystemUi() {
     val activity = this.findActivity() ?: return
     val window = activity.window ?: return
-    WindowCompat.setDecorFitsSystemWindows(window, true)
-    val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
-    windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
+    val decorView = window.decorView
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+        decorView.windowInsetsController?.show(WindowInsets.Type.systemBars())
+    }
+//    WindowCompat.setDecorFitsSystemWindows(window, true)
+//    val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+//    windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
 }
 
 fun Context.browserIntent(dataLinc: String, secondVariantLinc: String = dataLinc) {
@@ -65,8 +73,8 @@ fun Context.browserIntent(dataLinc: String, secondVariantLinc: String = dataLinc
     if (repeat) this.startIntent(secondBrowserIntent)
 }
 
-fun Context.startIntent(intent: Intent): Boolean{
-    return  try {
+fun Context.startIntent(intent: Intent): Boolean {
+    return try {
         this.startActivity(intent)
         false
     } catch (e: Exception) {
