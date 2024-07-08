@@ -62,8 +62,10 @@ class MoviesPagingSource(
         } else if (categoryName.endsWith(".person")) {
             val personId = categoryName.substringBeforeLast(".person")
             sakhCastRepository.getMoviesListByPersonId(personId, page)
-        } else if (categoryName.endsWith(".favorite")) {
-            sakhCastRepository.getMovieFavorites(page)
+        } else if (categoryName.endsWith(".favorite.will")) {
+            sakhCastRepository.getMovieFavorites(page, "will")
+        } else if (categoryName.endsWith(".favorite.watched")) {
+            sakhCastRepository.getMovieFavorites(page, "watched")
         } else {
             sakhCastRepository.getMoviesListByGenreId(categoryNameUrl, page)
         }

@@ -25,40 +25,68 @@ import com.example.sakhcast.ui.main_screens.home_screen.movie.MovieItemView
 @Composable
 fun MoviesPage(
     movieCardsWillWatch: MovieList?,
+    movieCardsWatched: MovieList?,
     navigateToMovieByAlphaId: (String) -> Unit,
     navigateToMovieCategoriesByGenresId: (String, String) -> Unit,
 ) {
     Column {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                modifier = Modifier.padding(
+        MovieSection(
+            title = "Буду смотреть",
+            genreId = "movie.favorite.will",
+            movieList = movieCardsWillWatch,
+            navigateToMovieByAlphaId = navigateToMovieByAlphaId,
+            navigateToMovieCategoriesByGenresId = navigateToMovieCategoriesByGenresId
+        )
+
+        MovieSection(
+            title = "Просмотренные",
+            genreId = "movie.favorite.watched",
+            movieList = movieCardsWatched,
+            navigateToMovieByAlphaId = navigateToMovieByAlphaId,
+            navigateToMovieCategoriesByGenresId = navigateToMovieCategoriesByGenresId
+        )
+    }
+}
+
+@Composable
+fun MovieSection(
+    title: String,
+    genreId: String,
+    movieList: MovieList?,
+    navigateToMovieByAlphaId: (String) -> Unit,
+    navigateToMovieCategoriesByGenresId: (String, String) -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(
                     horizontal = Dimens.mainPadding,
                     vertical = Dimens.mainPadding
-                ).clickable { navigateToMovieCategoriesByGenresId("Буду смотреть", "movie.favorite") },
-                text = "Буду смотреть",
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-            )
-            Icon(
-                modifier = Modifier.padding(top = 4.dp),
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null
-            )
-        }
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = Dimens.mainPadding),
-            horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding)
-        ) {
-            if (movieCardsWillWatch != null) {
-                itemsIndexed(movieCardsWillWatch.items) { _, movie ->
-                    MovieItemView(
-                        movieCard = movie,
-                        navigateToMovieByAlphaId = navigateToMovieByAlphaId
-                    )
-                }
+                )
+                .clickable { navigateToMovieCategoriesByGenresId(title, genreId) },
+            text = title,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp
+        )
+        Icon(
+            modifier = Modifier.padding(top = 4.dp),
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null
+        )
+    }
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = Dimens.mainPadding),
+        horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding)
+    ) {
+        if (movieList != null) {
+            itemsIndexed(movieList.items) { _, movie ->
+                MovieItemView(
+                    movieCard = movie,
+                    navigateToMovieByAlphaId = navigateToMovieByAlphaId
+                )
             }
         }
     }

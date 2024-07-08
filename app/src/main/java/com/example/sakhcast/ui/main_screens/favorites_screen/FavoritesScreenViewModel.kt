@@ -12,7 +12,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FavoritesScreenViewModel @Inject constructor(private val sakhCastRepository: SakhCastRepository): ViewModel() {
+class FavoritesScreenViewModel @Inject constructor(private val sakhCastRepository: SakhCastRepository) :
+    ViewModel() {
 
     private var _favoritesScreenState = MutableLiveData(FavoritesScreenState())
     val favoritesScreenState: LiveData<FavoritesScreenState> = _favoritesScreenState
@@ -25,20 +26,27 @@ class FavoritesScreenViewModel @Inject constructor(private val sakhCastRepositor
         var seriesCardWatching: SeriesList? = null,
         var seriesCardWillWatch: SeriesList? = null,
         var seriesCardFinishedWatching: SeriesList? = null,
+        var seriesCardWatched: SeriesList? = null,
         var movieCardsWillWatch: MovieList? = null,
+        var movieCardsWatched: MovieList? = null,
     )
 
-    private fun getAllContent(){
+    private fun getAllContent() {
         viewModelScope.launch {
             val seriesCardWatching = sakhCastRepository.getSeriesFavorites("watching")
             val seriesCardWillWatch = sakhCastRepository.getSeriesFavorites("will")
             val seriesCardFinishedWatching = sakhCastRepository.getSeriesFavorites("stopped")
-            val movieCardsWillWatch = sakhCastRepository.getMovieFavorites()
+            val seriesCardWatched = sakhCastRepository.getSeriesFavorites("watched")
+            val movieCardsWillWatch = sakhCastRepository.getMovieFavorites(kind = "will")
+            val movieCardsWatched = sakhCastRepository.getMovieFavorites(kind = "watched")
+
             _favoritesScreenState.value = favoritesScreenState.value?.copy(
                 seriesCardWatching = seriesCardWatching,
                 seriesCardWillWatch = seriesCardWillWatch,
                 seriesCardFinishedWatching = seriesCardFinishedWatching,
+                seriesCardWatched = seriesCardWatched,
                 movieCardsWillWatch = movieCardsWillWatch,
+                movieCardsWatched = movieCardsWatched,
             )
         }
 
