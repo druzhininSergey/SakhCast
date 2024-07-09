@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.series_player
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
@@ -48,7 +47,7 @@ class SeriesPlayerViewModel @Inject constructor(
 
     fun startPlayer() {
         if (!isPositionSending.value) {
-            Log.i("!!!", "startPlayer")
+//            Log.i("!!!", "startPlayer")
             _isPositionSending.value = true
             viewModelScope.launch {
                 _isPlaylistLoaded.collect { isLoaded ->
@@ -158,7 +157,6 @@ class SeriesPlayerViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        Log.i("!!!", "player released")
         _isPositionSending.value = false
         player.release()
     }

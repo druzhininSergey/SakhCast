@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Build
 import android.view.WindowInsets
@@ -81,4 +82,12 @@ fun Context.startIntent(intent: Intent): Boolean {
         e.printStackTrace()
         true
     }
+}
+
+fun Activity.lockOrientationLandscape() {
+    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+}
+
+fun Activity.unlockOrientation() {
+    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 }
