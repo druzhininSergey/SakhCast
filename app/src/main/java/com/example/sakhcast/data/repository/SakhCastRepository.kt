@@ -315,11 +315,11 @@ class SakhCastRepository @Inject constructor(
         }
     }
 
-    suspend fun getMovieFavorites(page: Int = 0): MovieList? {
+    suspend fun getMovieFavorites(page: Int = 0, kind: String): MovieList? {
         return withContext(ioDispatcher) {
             try {
                 val movieFavoritesListCall =
-                    sakhCastApiService.getMovieFavorites(page = page)
+                    sakhCastApiService.getMovieFavorites(page = page, kind = kind)
                 val responseBody = movieFavoritesListCall.execute()
 //                Log.i("!!!", "MoviesFavorites from repo = ${responseBody.body()}")
                 responseBody.body()

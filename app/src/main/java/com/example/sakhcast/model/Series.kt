@@ -17,8 +17,10 @@ data class Series(
     @SerialName("genres") val genres: List<Genre>,
     @SerialName("id") val id: Int,
     @SerialName("imdb_rating") val imdbRating: Double?,
+    @SerialName("imdb_url") val imdbUrl: String?,
     @SerialName("is_dark_backdrop") val isDarkBackdrop: Boolean,
     @SerialName("kp_rating") val kpRating: Double?,
+    @SerialName("kp_id") val kpId: Int?,
     @SerialName("name") val name: String,
     @SerialName("network") val network: String,
     @SerialName("networks") val networks: List<Network>,
@@ -41,7 +43,8 @@ data class Series(
     @SerialName("views") val views: Int,
     @SerialName("website") val website: String,
     @SerialName("year") val year: Int,
-    @SerialName("year_end") val yearEnd: Int
+    @SerialName("year_end") val yearEnd: Int,
+    @SerialName("cast") val cast: Cast?,
 )
 
 @Serializable

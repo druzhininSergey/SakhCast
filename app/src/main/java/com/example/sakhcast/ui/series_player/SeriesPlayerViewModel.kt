@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.series_player
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
@@ -11,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,6 +31,9 @@ class SeriesPlayerViewModel @Inject constructor(
     private var _isDataLoaded = MutableStateFlow(false)
     val isDataLoaded: StateFlow<Boolean> = _isDataLoaded
 
+    private var _isPositionSending = MutableStateFlow(false)
+    private val isPositionSending = _isPositionSending.asStateFlow()
+
     data class SeriesWatchState(
         var episodeList: List<Episode>? = null,
         var playlist: List<SeriesPlaylist>? = null,
@@ -42,25 +47,30 @@ class SeriesPlayerViewModel @Inject constructor(
     )
 
     fun startPlayer() {
-        viewModelScope.launch {
-            _isPlaylistLoaded.collect { isLoaded ->
-                if (isLoaded) {
-                    val playlistUriList = seriesWatchState.value.playlistUriList
-                    val mediaItems = playlistUriList?.map { url ->
-                        MediaItem.fromUri(url)
+        if (!isPositionSending.value) {
+            Log.i("!!!", "startPlayer")
+            _isPositionSending.value = true
+            viewModelScope.launch {
+                _isPlaylistLoaded.collect { isLoaded ->
+                    if (isLoaded) {
+                        val playlistUriList = seriesWatchState.value.playlistUriList
+                        val mediaItems = playlistUriList?.map { url ->
+                            MediaItem.fromUri(url)
+                        }
+                        mediaItems?.let { player.setMediaItems(it) }
+                        val episodeChosenIndex = _seriesWatchState.value.episodeChosenIndex
+                        setCurrentEpisodeLastTimeWatched(episodeChosenIndex)
+                        if (episodeChosenIndex == 0) player.seekToDefaultPosition(0)
+                        else player.seekToDefaultPosition(episodeChosenIndex - 1)
+                        setEpisodePosition()
+                        player.prepare()
+                        delay(1000)
+                        player.playWhenReady = true
                     }
-                    mediaItems?.let { player.setMediaItems(it) }
-                    val episodeChosenIndex = _seriesWatchState.value.episodeChosenIndex
-                    setCurrentEpisodeLastTimeWatched(episodeChosenIndex)
-                    if (episodeChosenIndex == 0) player.seekToDefaultPosition(0)
-                    else player.seekToDefaultPosition(episodeChosenIndex - 1)
-                    setEpisodePosition()
-                    player.prepare()
-                    delay(1000)
-                    player.playWhenReady = true
                 }
             }
         }
+
     }
 
     private fun setCurrentEpisodeLastTimeWatched(episodeChosenIndex: Int) {
@@ -148,6 +158,8 @@ class SeriesPlayerViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+        Log.i("!!!", "player released")
+        _isPositionSending.value = false
         player.release()
     }
 

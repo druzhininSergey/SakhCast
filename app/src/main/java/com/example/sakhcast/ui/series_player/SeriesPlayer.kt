@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.series_player
 
-import android.content.pm.ActivityInfo
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -23,9 +22,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -56,7 +55,6 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import com.example.sakhcast.data.formatMinSec
 import com.example.sakhcast.data.hideSystemUi
-import com.example.sakhcast.data.setScreenOrientation
 import com.example.sakhcast.data.showSystemUi
 import kotlinx.coroutines.launch
 
@@ -71,7 +69,6 @@ fun SeriesPlayer(
     onEpisodeChanged: () -> Unit,
 ) {
     val context = LocalContext.current
-    context.setScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
     context.hideSystemUi()
 
     var continueTime by remember { mutableIntStateOf(0) }
@@ -117,6 +114,7 @@ fun SeriesPlayer(
         }
     }
 
+
     DisposableEffect(key1 = lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             lifecycle = event
@@ -128,7 +126,6 @@ fun SeriesPlayer(
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
             player.removeListener(playerListener)
-            context.setScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
             context.showSystemUi()
         }
     }
@@ -187,6 +184,12 @@ fun SeriesPlayer(
                         player.seekTo(continueTime * 1000L)
                     },
                     shape = RoundedCornerShape(10.dp),
+                    colors = ButtonColors(
+                        containerColor = Color.DarkGray,
+                        contentColor = Color.DarkGray,
+                        disabledContentColor = Color.DarkGray,
+                        disabledContainerColor = Color.DarkGray
+                    ),
                     border = BorderStroke(width = 1.dp, color = Color.White)
                 ) {
                     Text(
@@ -195,7 +198,8 @@ fun SeriesPlayer(
                             .padding(8.dp)
                             .wrapContentWidth()
                             .wrapContentHeight()
-                            .background(color = MaterialTheme.colorScheme.surface)
+                            .background(color = Color.DarkGray),
+                        color = Color.White
                     )
                 }
             }
@@ -224,9 +228,9 @@ fun SeriesTopControls(navigateUp: () -> Boolean, seriesTitle: String, currentMed
             )
         }
         Row {
-            Text(text = seriesTitle, fontWeight = FontWeight.Bold)
-            Text(text = " | ", fontWeight = FontWeight.Bold)
-            Text(text = "Эпизод ${currentMediaItemIndex + 1}")
+            Text(text = seriesTitle, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(text = " | ", fontWeight = FontWeight.Bold, color = Color.White)
+            Text(text = "Эпизод ${currentMediaItemIndex + 1}", color = Color.White)
         }
     }
 }

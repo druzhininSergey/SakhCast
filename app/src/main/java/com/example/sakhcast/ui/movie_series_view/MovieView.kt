@@ -56,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -65,7 +66,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
+import com.example.sakhcast.IMDB_SEARCH_URL
+import com.example.sakhcast.KINOPOISK_MOVIE_SEARCH_URL
 import com.example.sakhcast.R
+import com.example.sakhcast.data.browserIntent
 import com.example.sakhcast.model.Cast
 import com.example.sakhcast.model.Download
 import com.example.sakhcast.model.Genre
@@ -297,7 +301,7 @@ fun MovieInfo(
         modifier = Modifier.background(MaterialTheme.colorScheme.primary)
     ) {
         MovieGenres(movie.genres, navigateToMovieCategoriesByGenresId)
-        if (isRatingExists) MovieRating(movie.imdbRating, movie.kpRating)
+        if (isRatingExists) MovieRating(movie.imdbRating, movie.kpRating, movie.imdbId, movie.kpId)
         MovieCountryYearStatus(movie.productionCountries, movie.releaseDate, movie.status)
         MovieDownloads(movie.downloads, download, movie.ruTitle)
         movie.overview?.let { MovieOverview(it) }
@@ -408,7 +412,7 @@ fun MovieProductionCompanies(
                 fontSize = 14.sp,
                 modifier = Modifier
                     .border(1.dp, Color.Gray, MaterialTheme.shapes.small)
-                    .padding(4.dp)
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
                     .clickable {
                         navigateToMovieCategoriesByGenresId(
                             productionCompanyUri,
@@ -534,11 +538,10 @@ fun MovieDownloads(downloads: List<Download>, download: (String, String) -> Unit
                     fontSize = 14.sp,
                     modifier = Modifier
                         .border(1.dp, Color.Gray, MaterialTheme.shapes.small)
-                        .padding(4.dp)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
                         .clickable {
                             selectedItemIndex.intValue = index
                             openDialog.value = true
-//                            download(it.src, "$ruTitle.${it.h}p.")
                         }
                 )
             }
@@ -614,20 +617,49 @@ fun MovieCountryYearStatus(
 }
 
 @Composable
-fun MovieRating(_imdbRating: Double?, _kinopoiskRating: Double?) {
+fun MovieRating(_imdbRating: Double?, _kinopoiskRating: Double?, imdbId: String?, kpId: Int?) {
     val imdbRating = String.format(Locale.US, "%.1f", _imdbRating)
     val kinopoiskRating = String.format(Locale.US, "%.1f", _kinopoiskRating)
+    val context = LocalContext.current
 
     Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
-        if (_imdbRating != null && _imdbRating != 0.0) Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "IMDb:", color = Color.Gray, fontSize = 14.sp)
-            Spacer(modifier = Modifier.width(10.dp))
-            Text(text = imdbRating, color = MaterialTheme.colorScheme.scrim, fontSize = 18.sp)
+        if (_imdbRating != null && _imdbRating != 0.0) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .border(
+                        1.dp,
+                        Color.Gray,
+                        MaterialTheme.shapes.small
+                    )
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .clickable { context.browserIntent("$IMDB_SEARCH_URL$imdbId/") }
+            ) {
+                Text(text = "IMDb:", color = Color.Gray, fontSize = 16.sp)
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = imdbRating, color = MaterialTheme.colorScheme.scrim, fontSize = 18.sp)
+            }
         }
-        if (_kinopoiskRating != null && _kinopoiskRating != 0.0) Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "Кинопоиск:", color = Color.Gray, fontSize = 14.sp)
-            Spacer(modifier = Modifier.width(10.dp))
-            Text(text = kinopoiskRating, color = MaterialTheme.colorScheme.scrim, fontSize = 18.sp)
+        if (_kinopoiskRating != null && _kinopoiskRating != 0.0) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .border(
+                        1.dp,
+                        Color.Gray,
+                        MaterialTheme.shapes.small
+                    )
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .clickable { context.browserIntent("$KINOPOISK_MOVIE_SEARCH_URL$kpId/") }
+            ) {
+                Text(text = "Кинопоиск:", color = Color.Gray, fontSize = 16.sp)
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = kinopoiskRating,
+                    color = MaterialTheme.colorScheme.scrim,
+                    fontSize = 18.sp
+                )
+            }
         }
     }
     DividerBase()
@@ -648,15 +680,15 @@ fun MovieGenres(
             }) {
                 Text(
                     text = genres.name.uppercase(),
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = Color.Gray,
                     fontSize = 10.sp,
                     modifier = Modifier
                         .border(
                             1.dp,
-                            MaterialTheme.colorScheme.onPrimary,
+                            Color.Gray,
                             MaterialTheme.shapes.small
                         )
-                        .padding(4.dp)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
         }

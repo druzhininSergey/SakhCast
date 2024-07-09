@@ -60,6 +60,9 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
 
+    //accompanist . systemuicontroller
+    implementation(libs.accompanist.systemuicontroller)
+
     //kotlinx.serialization
     implementation(libs.kotlinx.serialization.json)
 
@@ -93,8 +96,8 @@ dependencies {
     implementation(libs.coil.compose)
 
     //Paging 3
-    implementation (libs.androidx.paging.runtime)
-    implementation (libs.androidx.paging.compose)
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
 
     //Media3 ExoPlayer
     implementation(libs.androidx.media3.exoplayer)
@@ -104,7 +107,7 @@ dependencies {
     implementation(libs.androidx.media3.common)
 
     //material
-    implementation (libs.androidx.material)
+    implementation(libs.androidx.material)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

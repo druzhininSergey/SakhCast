@@ -33,10 +33,16 @@ fun SeriesPage(
     seriesCardWatching: SeriesList?,
     seriesCardWillWatch: SeriesList?,
     seriesCardFinishedWatching: SeriesList?,
+    seriesCardWatched: SeriesList?,
     navigateToSeriesById: (String) -> Unit,
     navigateToSeriesCategoryByType: (String, String) -> Unit,
 ) {
-    val categoryNames = mapOf("Cмотрю" to "watching", "Буду смотреть" to "will", "Перестал" to "stopped")
+    val categoryNames = mapOf(
+        "Cмотрю" to "watching",
+        "Буду смотреть" to "will",
+        "Перестал" to "stopped",
+        "Досмотрел" to "watched"
+    )
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
@@ -44,10 +50,17 @@ fun SeriesPage(
     ) {
         categoryNames.entries.forEachIndexed { index, category ->
             Row(
-                modifier = Modifier.padding(
-                    horizontal = Dimens.mainPadding,
-                    vertical = Dimens.mainPadding
-                ).clickable { navigateToSeriesCategoryByType("${category.value}.favorite", category.key) },
+                modifier = Modifier
+                    .padding(
+                        horizontal = Dimens.mainPadding,
+                        vertical = Dimens.mainPadding
+                    )
+                    .clickable {
+                        navigateToSeriesCategoryByType(
+                            "${category.value}.favorite",
+                            category.key
+                        )
+                    },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -65,7 +78,8 @@ fun SeriesPage(
             if (
                 seriesCardWatching != null &&
                 seriesCardWillWatch != null &&
-                seriesCardFinishedWatching != null
+                seriesCardFinishedWatching != null &&
+                seriesCardWatched != null
             ) {
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = Dimens.mainPadding),
@@ -77,6 +91,7 @@ fun SeriesPage(
                             0 -> seriesCardWatching.items
                             1 -> seriesCardWillWatch.items
                             2 -> seriesCardFinishedWatching.items
+                            3 -> seriesCardWatched.items
                             else -> emptyList()
                         }
                     ) { _, series ->
@@ -87,7 +102,7 @@ fun SeriesPage(
                     }
 
                 }
-            } else{
+            } else {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()

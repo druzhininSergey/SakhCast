@@ -57,7 +57,12 @@ class SeriesPagingSource(
         } else if (categoryName.endsWith(".company")) {
             val companyId = categoryName.substringBeforeLast(".company")
             sakhCastRepository.getSeriesListByCompany(companyId, page)
-        } else if (categoryName.endsWith(".favorite")) {
+        }
+//        else if (categoryName.endsWith(".person")) {
+//            val personId = categoryName.substringBeforeLast(".person")
+//            sakhCastRepository.getMoviesListByPersonId(personId, page)
+//        }
+        else if (categoryName.endsWith(".favorite")) {
             val companyId = categoryName.substringBeforeLast(".favorite")
             sakhCastRepository.getSeriesFavorites(companyId, page)
         } else {

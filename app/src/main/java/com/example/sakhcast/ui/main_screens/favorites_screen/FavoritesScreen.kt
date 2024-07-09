@@ -45,7 +45,9 @@ fun FavoritesScreen(
     val seriesCardWillWatch = favoritesScreenState.value.seriesCardWillWatch
     val seriesCardFinishedWatching =
         favoritesScreenState.value.seriesCardFinishedWatching
+    val seriesCardWatched = favoritesScreenState.value.seriesCardWatched
     val movieCardsWillWatch = favoritesScreenState.value.movieCardsWillWatch
+    val movieCardsWatched = favoritesScreenState.value.movieCardsWatched
 
     val tabList = listOf("Сериалы", "Фильмы")
     var tabIndex by remember {
@@ -100,10 +102,16 @@ fun FavoritesScreen(
                     seriesCardWatching,
                     seriesCardWillWatch,
                     seriesCardFinishedWatching,
+                    seriesCardWatched,
                     navigateToSeriesById,
                     navigateToSeriesCategoryByType
                 )
-            else MoviesPage(movieCardsWillWatch, navigateToMovieByAlphaId, navigateToMovieCategoriesByGenresId)
+            else MoviesPage(
+                movieCardsWillWatch,
+                movieCardsWatched,
+                navigateToMovieByAlphaId,
+                navigateToMovieCategoriesByGenresId
+            )
         }
     }
 }

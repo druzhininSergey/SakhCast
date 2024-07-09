@@ -1,7 +1,7 @@
 package com.example.sakhcast
 
 //navigation
-const val LOG_IN_SCREEN = "login_screen"
+//const val LOG_IN_SCREEN = "login_screen"
 const val HOME_SCREEN = "home_screen"
 const val CATALOG_SCREEN = "catalog_screen"
 const val FAVORITES_SCREEN = "favorites_screen"
@@ -16,7 +16,10 @@ const val SERIES_PLAYER = "series_player"
 
 const val BASE_URL = "https://api.sakh.tv"
 const val TELEGRAM_URL = "https://t.me/sakhtvandroid"
+const val KINOPOISK_SERIES_SEARCH_URL = "https://www.kinopoisk.ru/series/"
+const val KINOPOISK_MOVIE_SEARCH_URL = "https://www.kinopoisk.ru/film/"
+const val IMDB_SEARCH_URL = "https://www.imdb.com/title/"
 
 const val SHARED_PREFS_TOKEN_KEY = "shared_preferences_token"
 
-const val USER_TOKEN_KEY = "user_token"
+//const val USER_TOKEN_KEY = "user_token"
