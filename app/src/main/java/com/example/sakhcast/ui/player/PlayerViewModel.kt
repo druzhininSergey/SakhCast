@@ -2,9 +2,12 @@ package com.example.sakhcast.ui.player
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.TrackSelectionOverride
+import androidx.media3.common.TrackSelectionParameters
 import com.example.sakhcast.data.repository.SakhCastRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -85,6 +88,33 @@ class PlayerViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun getAvailableVideoQualities(): List<Pair<String, TrackSelectionParameters>> {
+        val tracks = player.currentTracks
+        val videoTracks = tracks.groups.filter { it.type == C.TRACK_TYPE_VIDEO }
+
+        val qualities = videoTracks.flatMap { trackGroup ->
+            (0 until trackGroup.length).map { index ->
+                val format = trackGroup.getTrackFormat(index)
+                val quality = "${format.height}p"
+                val parameters = player.trackSelectionParameters
+                    .buildUpon()
+                    .setOverrideForType(
+                        TrackSelectionOverride(trackGroup.mediaTrackGroup, index)
+                    )
+                    .build()
+                quality to parameters
+            }
+        }.distinctBy { it.first }
+            .sortedByDescending { it.first.removeSuffix("p").toIntOrNull() ?: 0 }
+
+        val autoParameters = player.trackSelectionParameters.buildUpon().clearOverrides().build()
+        return listOf("Авто" to autoParameters) + qualities
+    }
+
+    fun setVideoQuality(parameters: TrackSelectionParameters) {
+        player.trackSelectionParameters = parameters
     }
 
     override fun onCleared() {

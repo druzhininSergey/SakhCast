@@ -82,6 +82,7 @@ dependencies {
 
     //okhttp3
     implementation(libs.okhttp)
+
     //logging interceptor
     implementation(libs.logging.interceptor)
 

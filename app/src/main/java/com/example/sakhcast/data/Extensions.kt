@@ -8,6 +8,10 @@ import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Build
 import android.view.WindowInsets
+import androidx.media3.common.C
+import androidx.media3.common.TrackSelectionOverride
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.exoplayer.trackselection.MappingTrackSelector
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -40,7 +44,7 @@ fun Context.hideSystemUi() {
     val activity = this.findActivity() ?: return
     val window = activity.window ?: return
     val decorView = window.decorView
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         decorView.windowInsetsController?.hide(WindowInsets.Type.systemBars())
     }
 //    WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -59,7 +63,7 @@ fun Context.showSystemUi() {
     val activity = this.findActivity() ?: return
     val window = activity.window ?: return
     val decorView = window.decorView
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         decorView.windowInsetsController?.show(WindowInsets.Type.systemBars())
     }
 //    WindowCompat.setDecorFitsSystemWindows(window, true)
@@ -90,4 +94,54 @@ fun Activity.lockOrientationLandscape() {
 
 fun Activity.unlockOrientation() {
     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+}
+
+fun DefaultTrackSelector.generateQualityList(): ArrayList<Pair<String, TrackSelectionOverride>> {
+    val trackOverrideList = ArrayList<Pair<String, TrackSelectionOverride>>()
+
+    val renderTrack = this.currentMappedTrackInfo
+    val renderCount = renderTrack?.rendererCount ?: 0
+    for (rendererIndex in 0 until renderCount) {
+        if (isSupportedFormat(renderTrack, rendererIndex)) {
+            val trackGroupType = renderTrack?.getRendererType(rendererIndex)
+            val trackGroups = renderTrack?.getTrackGroups(rendererIndex)
+            val trackGroupsCount = trackGroups?.length ?: 0
+            if (trackGroupType == C.TRACK_TYPE_VIDEO) {
+                for (groupIndex in 0 until trackGroupsCount) {
+                    val videoQualityTrackCount = trackGroups?.get(groupIndex)?.length
+                    if (videoQualityTrackCount != null) {
+                        for (trackIndex in 0 until videoQualityTrackCount) {
+                            val isTrackSupported = renderTrack.getTrackSupport(
+                                rendererIndex,
+                                groupIndex,
+                                trackIndex
+                            ) == C.FORMAT_HANDLED
+                            if (isTrackSupported) {
+                                val track = trackGroups.get(groupIndex)
+                                val trackName =
+                                    "${track.getFormat(trackIndex).width} x ${
+                                        track.getFormat(
+                                            trackIndex
+                                        ).height
+                                    }"
+                                val trackOverride = TrackSelectionOverride(track, trackIndex)
+                                trackOverrideList.add(Pair(trackName, trackOverride))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return trackOverrideList
+}
+
+fun isSupportedFormat(
+    mappedTrackInfo: MappingTrackSelector.MappedTrackInfo?,
+    rendererIndex: Int
+): Boolean {
+    val trackGroupArray = mappedTrackInfo?.getTrackGroups(rendererIndex)
+    return if (trackGroupArray?.length == 0) {
+        false
+    } else mappedTrackInfo?.getRendererType(rendererIndex) == C.TRACK_TYPE_VIDEO
 }
