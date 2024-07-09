@@ -1,7 +1,9 @@
 package com.example.sakhcast.ui.series_player
 
+import android.app.Activity
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedVisibility
@@ -55,7 +57,9 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import com.example.sakhcast.data.formatMinSec
 import com.example.sakhcast.data.hideSystemUi
+import com.example.sakhcast.data.lockOrientationLandscape
 import com.example.sakhcast.data.showSystemUi
+import com.example.sakhcast.data.unlockOrientation
 import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
@@ -70,6 +74,8 @@ fun SeriesPlayer(
 ) {
     val context = LocalContext.current
     context.hideSystemUi()
+    val activity = context as? Activity
+    activity?.lockOrientationLandscape()
 
     var continueTime by remember { mutableIntStateOf(0) }
 
@@ -119,13 +125,17 @@ fun SeriesPlayer(
         val observer = LifecycleEventObserver { _, event ->
             lifecycle = event
         }
+        val window = (context as? Activity)?.window
+        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         lifecycleOwner.lifecycle.addObserver(observer)
         player.playWhenReady = true
         player.addListener(playerListener)
 
         onDispose {
+            window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             lifecycleOwner.lifecycle.removeObserver(observer)
             player.removeListener(playerListener)
+            activity?.unlockOrientation()
             context.showSystemUi()
         }
     }
