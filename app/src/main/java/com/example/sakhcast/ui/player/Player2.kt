@@ -22,9 +22,13 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarDuration
@@ -53,6 +57,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.media3.common.Player
+import androidx.media3.common.TrackSelectionParameters
+import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import com.example.sakhcast.data.formatMinSec
@@ -81,14 +88,19 @@ fun Player2(
     val movieState = playerViewModel.movieWatchState.collectAsState()
 
     var continueTime by remember { mutableIntStateOf(0) }
-
-
     var lifecycle by remember { mutableStateOf(Lifecycle.Event.ON_CREATE) }
     val lifecycleOwner = LocalLifecycleOwner.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     var showSnackbar by rememberSaveable { mutableStateOf(true) }
     var isControllerVisible by remember { mutableStateOf(false) }
+
+    var availableQualities by remember {
+        mutableStateOf<List<Pair<String, TrackSelectionParameters>>>(
+            emptyList()
+        )
+    }
+    var currentQuality by remember { mutableStateOf("Авто") }
 
     LaunchedEffect(Unit) {
         playerViewModel.startPlayer()
@@ -111,10 +123,22 @@ fun Player2(
         val window = (context as? Activity)?.window
         window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         lifecycleOwner.lifecycle.addObserver(observer)
+
+        val playerListener = object : Player.Listener {
+            override fun onTracksChanged(tracks: Tracks) {
+                availableQualities = playerViewModel.getAvailableVideoQualities()
+                if (availableQualities.none { it.first == currentQuality }) {
+                    currentQuality = "Авто"
+                }
+            }
+        }
+        playerViewModel.player.addListener(playerListener)
+
         playerViewModel.player.playWhenReady = true
         onDispose {
             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             lifecycleOwner.lifecycle.removeObserver(observer)
+            playerViewModel.player.removeListener(playerListener)
             activity?.unlockOrientation()
             context.showSystemUi()
         }
@@ -162,7 +186,17 @@ fun Player2(
             enter = fadeIn(),
             exit = fadeOut()
         ) {
-            TopControls(navigateUp, movieState.value.title)
+            TopControls(
+                navigateUp = navigateUp,
+                title = movieState.value.title,
+                qualities = availableQualities,
+                currentQuality = currentQuality,
+                onQualitySelected = { parameters ->
+                    playerViewModel.setVideoQuality(parameters)
+                    currentQuality =
+                        availableQualities.find { it.second == parameters }?.first ?: "Авто"
+                }
+            )
         }
 
         SnackbarHost(
@@ -202,7 +236,13 @@ fun Player2(
 }
 
 @Composable
-fun TopControls(navigateUp: () -> Boolean, title: String) {
+fun TopControls(
+    navigateUp: () -> Boolean,
+    title: String,
+    qualities: List<Pair<String, TrackSelectionParameters>>,
+    currentQuality: String,
+    onQualitySelected: (TrackSelectionParameters) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -222,5 +262,56 @@ fun TopControls(navigateUp: () -> Boolean, title: String) {
             )
         }
         Text(text = title, fontWeight = FontWeight.Bold, color = Color.White)
+        QualitySelector(
+            qualities = qualities,
+            currentQuality = currentQuality,
+            onQualitySelected = onQualitySelected
+        )
+    }
+}
+
+@Composable
+fun QualitySelector(
+    qualities: List<Pair<String, TrackSelectionParameters>>,
+    currentQuality: String,
+    onQualitySelected: (TrackSelectionParameters) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "Quality"
+            )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            qualities.forEach { (quality, parameters) ->
+                DropdownMenuItem(
+                    onClick = {
+                        onQualitySelected(parameters)
+                        expanded = false
+                    },
+                    text = {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(quality)
+                            if (quality == currentQuality) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = "Selected",
+                                    tint = Color.Green
+                                )
+                            }
+                        }
+                    }
+                )
+            }
+        }
     }
 }
