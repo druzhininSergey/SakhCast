@@ -28,6 +28,7 @@ googleGmsGoogleServices = "4.4.2"
 firebaseAnalytics = "22.0.2"
 firebaseCrashlytics = "19.0.2"
 googleFirebaseCrashlytics = "3.0.2"
+firebaseMessaging = "24.0.0"
 
 [libraries]
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
@@ -69,6 +70,7 @@ retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit
 androidx-media3-common = { group = "androidx.media3", name = "media3-common", version.ref = "media3Common" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
