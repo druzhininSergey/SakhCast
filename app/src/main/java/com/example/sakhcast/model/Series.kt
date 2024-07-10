@@ -10,7 +10,7 @@ data class Series(
     @SerialName("agelimits") val ageLimits: Int,
     @SerialName("backdrop") val backdrop: String,
     @SerialName("backdrop_alt") val backdropAlt: String,
-    @SerialName("backdrop_colors") val backdropColors: BackdropColors,
+    @SerialName("backdrop_colors") val backdropColors: BackdropColors?,
     @SerialName("country") val country: String,
     @SerialName("ename") val eName: String,
     @SerialName("fav_amount") val favAmount: Int,

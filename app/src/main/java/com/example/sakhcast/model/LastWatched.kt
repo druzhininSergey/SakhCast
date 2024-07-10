@@ -66,7 +66,7 @@ data class SerialDataRecent(
     @SerialName("agelimits") val ageLimits: Int,
     @SerialName("backdrop") val backdrop: String,
     @SerialName("backdrop_alt") val backdropAlt: String,
-    @SerialName("backdrop_colors") val backdropColors: BackdropColors,
+    @SerialName("backdrop_colors") val backdropColors: BackdropColors?,
     @SerialName("country") val country: String,
     @SerialName("ename") val ename: String,
     @SerialName("id") val id: Int,
