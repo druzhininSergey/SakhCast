@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.sakhcast.CURRENT_VERSION
 import com.example.sakhcast.Colors
 import com.example.sakhcast.R
 import com.example.sakhcast.TELEGRAM_URL
@@ -140,6 +141,14 @@ fun ProfileScreen(
                         }
                     }
                 }
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .align(Alignment.End)
+            ) {
+                Text(text = "Текущая версия: $CURRENT_VERSION")
             }
             TextButton(
                 onClick = {

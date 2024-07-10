@@ -113,7 +113,7 @@ fun AuthNavGraph(
                 notificationScreenViewModel.notificationScreenState.observeAsState(
                     NotificationScreenViewModel.NotificationScreenState()
                 )
-            NotificationScreen(paddingValues, notificationScreenState, notificationScreenViewModel::makeAllNotificationsRead)
+            NotificationScreen(paddingValues, notificationScreenState, notificationScreenViewModel::makeAllNotificationsRead, navigateToSeriesById)
         }
         composable(SEARCH_SCREEN) {
             SearchScreen(
