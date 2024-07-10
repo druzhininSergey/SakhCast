@@ -2,6 +2,7 @@ package com.example.sakhcast.data.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.example.sakhcast.Genres
 import com.example.sakhcast.data.repository.SakhCastRepository
 import com.example.sakhcast.model.MovieCard
 import com.example.sakhcast.model.MovieList
@@ -17,12 +18,6 @@ class MoviesPagingSource(
         "Сейчас смотрят" to "Movie.popularity",
         "Российский топ" to "Movie.kp_rating",
         "Мировой топ" to "Movie.imdb_rating",
-    )
-    private val genreList = mapOf(
-        "Боевики" to "6",
-        "Комедии" to "4",
-        "Мультфильмы" to "9",
-        "Стендап" to "20",
     )
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieCard> {
@@ -50,7 +45,7 @@ class MoviesPagingSource(
     }
 
     private fun getCategoryNameUrl(categoryName: String): String {
-        return categoryList[categoryName] ?: genreList[categoryName] ?: categoryName
+        return categoryList[categoryName] ?: Genres.movieGenresMap[categoryName] ?: categoryName
     }
 
     private suspend fun getMoviesList(page: Int, categoryNameUrl: String): MovieList? {

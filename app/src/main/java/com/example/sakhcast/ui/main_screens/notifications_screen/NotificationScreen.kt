@@ -45,7 +45,8 @@ fun PreviewNotificationScreen() {
 fun NotificationScreen(
     paddingValues: PaddingValues,
     notificationScreenState: State<NotificationScreenViewModel.NotificationScreenState>,
-    makeAllNotificationsRead: () -> Unit
+    makeAllNotificationsRead: () -> Unit,
+    navigateToSeriesById: (String) -> Unit
 ) {
     val notificationList = notificationScreenState.value.notificationsList?.items
 
@@ -65,7 +66,7 @@ fun NotificationScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { },
+                            .clickable { navigateToSeriesById(notification.summary.notificationData.serialId.toString()) },
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {

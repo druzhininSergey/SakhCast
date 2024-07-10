@@ -1,7 +1,6 @@
 package com.example.sakhcast
 
 //navigation
-//const val LOG_IN_SCREEN = "login_screen"
 const val HOME_SCREEN = "home_screen"
 const val CATALOG_SCREEN = "catalog_screen"
 const val FAVORITES_SCREEN = "favorites_screen"
@@ -22,4 +21,7 @@ const val IMDB_SEARCH_URL = "https://www.imdb.com/title/"
 
 const val SHARED_PREFS_TOKEN_KEY = "shared_preferences_token"
 
+const val CURRENT_VERSION = "0.36"
+
+//const val LOG_IN_SCREEN = "login_screen"
 //const val USER_TOKEN_KEY = "user_token"

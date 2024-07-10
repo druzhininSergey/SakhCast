@@ -19,6 +19,7 @@ class CatalogScreenViewModel @Inject constructor() : ViewModel() {
 
     companion object {
         fun getMoviesCategories(): List<String> = listOf(
+            "Все жанры",
             "Все",
             "Свежее",
             "Новинки",
@@ -32,6 +33,7 @@ class CatalogScreenViewModel @Inject constructor() : ViewModel() {
         )
 
         fun getSeriesCategories(): List<String> = listOf(
+            "Все жанры",
             "Все",
             "Новинки",
             "Российский топ",
@@ -43,7 +45,7 @@ class CatalogScreenViewModel @Inject constructor() : ViewModel() {
             "Подкасты",
             "Аниме",
             "Мультсериалы",
-            "Комедии"
+            "Комедии",
         )
     }
 
