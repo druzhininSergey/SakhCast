@@ -7,7 +7,9 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Build
+import android.view.View
 import android.view.WindowInsets
+import android.view.WindowInsetsController
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -40,8 +42,22 @@ fun Context.hideSystemUi() {
     val activity = this.findActivity() ?: return
     val window = activity.window ?: return
     val decorView = window.decorView
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-        decorView.windowInsetsController?.hide(WindowInsets.Type.systemBars())
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            decorView.windowInsetsController?.let { controller ->
+                controller.systemBarsBehavior =
+                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                controller.hide(WindowInsets.Type.systemBars())
+            }
+        }
+    } else {
+        @Suppress("DEPRECATION")
+        decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_FULLSCREEN)
     }
 //    WindowCompat.setDecorFitsSystemWindows(window, false)
 //    val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
@@ -52,15 +68,19 @@ fun Context.hideSystemUi() {
 //    }
 //    window.statusBarColor = Color.Transparent.toArgb()
 //    window.navigationBarColor = activity.getColor(android.R.color.black)
-
 }
 
 fun Context.showSystemUi() {
     val activity = this.findActivity() ?: return
     val window = activity.window ?: return
     val decorView = window.decorView
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         decorView.windowInsetsController?.show(WindowInsets.Type.systemBars())
+    } else {
+        @Suppress("DEPRECATION")
+        decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
     }
 //    WindowCompat.setDecorFitsSystemWindows(window, true)
 //    val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
