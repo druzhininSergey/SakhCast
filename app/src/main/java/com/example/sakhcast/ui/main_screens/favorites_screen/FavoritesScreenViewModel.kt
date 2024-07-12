@@ -1,6 +1,5 @@
 package com.example.sakhcast.ui.main_screens.favorites_screen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sakhcast.data.repository.SakhCastRepository
@@ -31,7 +30,6 @@ class FavoritesScreenViewModel @Inject constructor(private val sakhCastRepositor
     )
 
     fun getAllContent() {
-        Log.i("!!!", "getAllContent")
         _favoritesScreenState.update { currentState ->
             currentState.copy(isLoading = true)
         }

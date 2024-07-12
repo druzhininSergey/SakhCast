@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sakhcast.Colors
+import com.example.sakhcast.data.formatMinSec
 import com.example.sakhcast.ui.main_screens.home_screen.movie.MovieCategoryView
 import com.example.sakhcast.ui.main_screens.home_screen.recently_watched.ContinueWatchView
 import com.example.sakhcast.ui.main_screens.home_screen.series.SeriesCategoryView
@@ -47,7 +48,8 @@ fun HomeScreen(
     homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     val homeScreenState by homeScreenViewModel.homeScreenState.collectAsState()
-    val allScreensStateCollected = allScreensHomeState.collectAsState()
+    val isLoading by homeScreenViewModel.isLoading.collectAsState()
+    val allScreensStateCollected by allScreensHomeState.collectAsState()
 
     LaunchedEffect(Unit) {
         if (allScreensHomeState.value.lastWatched == null) {
@@ -55,23 +57,25 @@ fun HomeScreen(
         }
     }
     LaunchedEffect(homeScreenState) {
-        if (!homeScreenState.isLoading) {
+        if (!isLoading && homeScreenState.lastWatched != null) {
             loadDataToHomeScreen(homeScreenState)
         }
     }
 
-    val seriesList = allScreensStateCollected.value.seriesList
-    val movieList = allScreensStateCollected.value.moviesList
-    val lastWatchedMovieTime = allScreensStateCollected.value.lastWatchedMovieTime
-    val movie = allScreensStateCollected.value.lastWatched?.movie
-    val series = allScreensStateCollected.value.lastWatched?.serial
+    val seriesList = allScreensStateCollected.seriesList
+    val movieList = allScreensStateCollected.moviesList
+    val lastWatchedMovieTime =
+        allScreensStateCollected.lastWatched?.movie?.data?.userFavourite?.position?.formatMinSec()
+            ?: "0"
+    val movie = allScreensStateCollected.lastWatched?.movie
+    val series = allScreensStateCollected.lastWatched?.serial
     val scrollState = rememberScrollState()
 
     var refreshing by remember { mutableStateOf(false) }
     val pullRefreshState = rememberPullRefreshState(refreshing, { refreshing = true })
     LaunchedEffect(refreshing) {
         if (refreshing) {
-            homeScreenViewModel.refreshLastWatched()
+            homeScreenViewModel.refreshData()
             delay(2000)
             refreshing = false
         }
@@ -86,7 +90,7 @@ fun HomeScreen(
                     .verticalScroll(scrollState)
                     .background(color = MaterialTheme.colorScheme.primary)
             ) {
-                if (allScreensStateCollected.value.isLoading) {
+                if (isLoading) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()

@@ -8,7 +8,6 @@ import com.example.sakhcast.model.MovieList
 import com.example.sakhcast.model.SeriesList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -19,63 +18,59 @@ class HomeScreenViewModel @Inject constructor(private val sakhCastRepository: Sa
     ViewModel() {
 
     private val _homeScreenState = MutableStateFlow(HomeScreenState())
-    val homeScreenState: StateFlow<HomeScreenState> = _homeScreenState.asStateFlow()
+    val homeScreenState = _homeScreenState.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
 
     data class HomeScreenState(
         var seriesList: SeriesList? = null,
         var moviesList: MovieList? = null,
         var lastWatched: LastWatched? = null,
-        var lastWatchedMovieTime: String = "",
-        var isLoading: Boolean = true,
     )
 
-    fun refreshLastWatched() {
+    fun refreshData() {
         viewModelScope.launch {
-            val lastWatched = sakhCastRepository.getContinueWatchMovieAndSeries()
-            _homeScreenState.update { currentState ->
-                currentState.copy(lastWatched = lastWatched)
-            }
-        }
-    }
-
-    fun getAllScreenData() {
-        viewModelScope.launch {
-            _homeScreenState.update { currentState ->
-                currentState.copy(isLoading = true) }
             try {
                 val lastWatched = sakhCastRepository.getContinueWatchMovieAndSeries()
-                val seriesList = sakhCastRepository.getSeriesListByCategoryName(categoryName = "all", page = 0)
-                val moviesList = sakhCastRepository.getMoviesListByCategoryName(categoryName = "all", page = 0)
-                lastWatched?.movie?.data?.userFavourite?.position?.let { convertSeconds(it) }
+                val seriesList =
+                    sakhCastRepository.getSeriesListByCategoryName(categoryName = "all", page = 0)
+                val moviesList =
+                    sakhCastRepository.getMoviesListByCategoryName(categoryName = "all", page = 0)
 
                 _homeScreenState.update { currentState ->
                     currentState.copy(
                         lastWatched = lastWatched,
                         seriesList = seriesList,
                         moviesList = moviesList,
-                        isLoading = false
                     )
                 }
             } catch (e: Exception) {
-                _homeScreenState.update { it.copy(isLoading = false) }
+                _isLoading.update { false }
             }
         }
     }
 
-    private fun convertSeconds(seconds: Int) {
+    fun getAllScreenData() {
         viewModelScope.launch {
-            val hours = seconds / 3600
-            val remainingSecondsAfterHours = seconds % 3600
-            val minutes = remainingSecondsAfterHours / 60
-            val finalSeconds = remainingSecondsAfterHours % 60
+            _isLoading.update { true }
+            try {
+                val lastWatched = sakhCastRepository.getContinueWatchMovieAndSeries()
+                val seriesList =
+                    sakhCastRepository.getSeriesListByCategoryName(categoryName = "all", page = 0)
+                val moviesList =
+                    sakhCastRepository.getMoviesListByCategoryName(categoryName = "all", page = 0)
 
-            val hoursPart = if (hours > 0) "${hours}час. " else ""
-            val minutesPart = if (minutes > 0) "${minutes}мин. " else ""
-            val secondsPart =
-                if (finalSeconds > 0 || (hours == 0 && minutes == 0)) "${finalSeconds}с." else ""
-
-            _homeScreenState.update { currentState: HomeScreenState ->
-                currentState.copy(lastWatchedMovieTime = "$hoursPart$minutesPart$secondsPart".trim())
+                _homeScreenState.update { currentState ->
+                    currentState.copy(
+                        lastWatched = lastWatched,
+                        seriesList = seriesList,
+                        moviesList = moviesList,
+                    )
+                }
+                _isLoading.update { false }
+            } catch (e: Exception) {
+                _isLoading.update { false }
             }
         }
     }

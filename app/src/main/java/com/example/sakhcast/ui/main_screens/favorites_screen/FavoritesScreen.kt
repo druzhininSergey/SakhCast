@@ -97,6 +97,7 @@ fun FavoritesScreen(
     LaunchedEffect(pagerState.currentPage) {
         tabIndex = pagerState.currentPage
     }
+
     Box {
         Column(modifier = Modifier.padding(paddingValues).pullRefresh(pullRefreshState)) {
             TabRow(

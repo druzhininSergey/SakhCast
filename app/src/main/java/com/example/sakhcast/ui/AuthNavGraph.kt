@@ -87,7 +87,7 @@ fun AuthNavGraph(
                 navigateToCatalogAllSeries = navigateToCatalogAllSeries,
                 navigateToCatalogAllMovies = navigateToCatalogAllMovies,
                 allScreensHomeState = mainScreensViewModel.homeScreenState,
-                loadDataToHomeScreen = mainScreensViewModel::loadDataToHomeScreen
+                loadDataToHomeScreen = mainScreensViewModel::loadDataToHomeScreen,
             )
         }
         composable(CATALOG_SCREEN) {
@@ -110,7 +110,7 @@ fun AuthNavGraph(
                 navigateToSeriesCategoryByType = navigateToSeriesCategoryByType,
                 navigateToMovieCategoriesByGenresId = navigateToMovieCategoriesByGenresId,
                 allScreensFavoriteState = mainScreensViewModel.favoritesScreenState,
-                loadDataToHomeScreen = mainScreensViewModel::loadDataToFavoritesScreen
+                loadDataToHomeScreen = mainScreensViewModel::loadDataToFavoritesScreen,
             )
         }
         composable(NOTIFICATION_SCREEN) {

@@ -49,8 +49,8 @@ fun ContinueWatchView(
             state = pagerState
         ) { index ->
             when (index) {
-                0 -> ContinueWatchSeriesView(series, navigateToSeriesById)
-                1 -> ContinueWatchMovieView(movie, lastWatchedMovieTime, navigateToMovieByAlphaId)
+                0 -> ContinueWatchMovieView(movie, lastWatchedMovieTime, navigateToMovieByAlphaId)
+                1 -> ContinueWatchSeriesView(series, navigateToSeriesById)
             }
         }
     }
