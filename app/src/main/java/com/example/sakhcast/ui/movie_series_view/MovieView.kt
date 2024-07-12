@@ -117,7 +117,6 @@ fun MovieView(
         mutableIntStateOf(movieViewModel.position.value)
     }
 
-
     LaunchedEffect(alphaId) {
         if (alphaId != null && movie == null) movieViewModel.getFullMovieWithRecommendations(alphaId)
         if (alphaId != null && movie != null) movieViewModel.getMoviePosition(alphaId)
