@@ -441,10 +441,18 @@ fun TopMovieBar(
     val primaryColor = MaterialTheme.colorScheme.primary
     val favIcon = if (isFavorite) painterResource(R.drawable.ic_star_full2)
     else painterResource(R.drawable.ic_star_empty2)
-    val listFavoriteType = mapOf(
-        "Буду смотреть" to "will",
-        "Просмотренно" to "watched"
-    )
+    val listFavoriteType = if (isFavorite) {
+        mapOf(
+            "Убрать из избранного" to "delete",
+            "Буду смотреть" to "will",
+            "Просмотренно" to "watched"
+        )
+    } else {
+        mapOf(
+            "Буду смотреть" to "will",
+            "Просмотренно" to "watched"
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -480,10 +488,7 @@ fun TopMovieBar(
                     modifier = Modifier
                         .padding(8.dp)
                         .size(40.dp)
-                        .clickable {
-                            if (isFavorite) onFavoriteButtonPushed("")
-                            else isExpandedFavorite = true
-                        },
+                        .clickable { isExpandedFavorite = true },
                     tint = if (isFavorite) Color(0xFFFFD700) else Color.White
                 )
                 DropdownMenu(

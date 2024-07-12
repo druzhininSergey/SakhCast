@@ -1,5 +1,6 @@
 package com.example.sakhcast.ui.movie_series_view
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -60,17 +61,29 @@ class MovieViewModel @Inject constructor(
     }
 
     fun onFavoriteButtonPushed(kind: String) {
+        Log.i("!!!", "kind = $kind")
         viewModelScope.launch {
+            val currentFavType = _movieState.value?.movie?.userFavourite?.favKind
             val movieAlphaId = movieState.value?.movie?.idAlpha ?: "0"
-            if (movieState.value?.isFavorite == false) {
+            if (kind == "delete") {
+                val response = sakhCastRepository.deleteMovieFromFavorites(movieAlphaId)
+                if (response?.result == true) _movieState.value =
+                    movieState.value?.copy(isFavorite = false)
+            } else if (_movieState.value?.isFavorite == true && kind != currentFavType) {
+                Log.i("!!!", "else if $kind")
+                val response =
+                    sakhCastRepository.changeMovieFavoritesType(
+                        movieAlphaId = movieAlphaId,
+                        kind = kind
+                    )
+                if (response?.result == true) _movieState.value =
+                    movieState.value?.copy(isFavorite = true)
+            } else {
+                Log.i("!!!", "else $kind")
                 val response =
                     sakhCastRepository.putMovieInFavorites(movieAlphaId = movieAlphaId, kind = kind)
                 if (response?.result == true) _movieState.value =
                     movieState.value?.copy(isFavorite = true)
-            } else {
-                val response = sakhCastRepository.deleteMovieFromFavorites(movieAlphaId)
-                if (response?.result == true) _movieState.value =
-                    movieState.value?.copy(isFavorite = false)
             }
         }
     }

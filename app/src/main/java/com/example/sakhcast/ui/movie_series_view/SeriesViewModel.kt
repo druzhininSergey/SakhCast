@@ -48,16 +48,17 @@ class SeriesViewModel @Inject constructor(private val sakhCastRepository: SakhCa
     fun onFavoriteButtonPushed(kind: String) {
         viewModelScope.launch {
             val seriesId = seriesState.value?.series?.id ?: 0
-            if (seriesState.value?.isFavorite == false) {
+            if (kind == "delete") {
+                val response = sakhCastRepository.removeSeriesFromFavorites(seriesId)
+                if (response == "ok") _seriesState.value =
+                    seriesState.value?.copy(isFavorite = false)
+            } else {
                 val response =
                     sakhCastRepository.addSeriesInFavorites(seriesId = seriesId, kind = kind)
                 if (response == "ok") _seriesState.value =
                     seriesState.value?.copy(isFavorite = true)
-            } else {
-                val response = sakhCastRepository.removeSeriesFromFavorites(seriesId)
-                if (response == "ok") _seriesState.value =
-                    seriesState.value?.copy(isFavorite = false)
             }
+
         }
     }
 

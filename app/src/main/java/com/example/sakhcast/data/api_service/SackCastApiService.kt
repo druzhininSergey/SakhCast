@@ -180,6 +180,12 @@ interface SakhCastApiService {
         @Query("kind") kind: String,
     ): Call<Result>
 
+    @POST("v2/movie/{movie}/fav")
+    fun changeMovieFavoritesType(
+        @Path("movie") movieAlphaId: String,
+        @Query("kind") kind: String,
+    ): Call<Result>
+
     @DELETE("v2/movie/{movie}/fav")
     fun deleteMovieFromFavorites(
         @Path("movie") movieAlphaId: String,

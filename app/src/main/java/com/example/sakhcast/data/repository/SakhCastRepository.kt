@@ -536,6 +536,30 @@ class SakhCastRepository @Inject constructor(
         }
     }
 
+    suspend fun changeMovieFavoritesType(movieAlphaId: String, kind: String): Result? {
+        return withContext(ioDispatcher) {
+            try {
+                val addMovieInFavCall =
+                    sakhCastApiService.changeMovieFavoritesType(
+                        movieAlphaId = movieAlphaId,
+                        kind = kind
+                    )
+                val responseBody = addMovieInFavCall.execute()
+//                Log.i("!!!", "addMovieInFavCall REPO = $addMovieInFavCall")
+//                Log.i("!!!", "addMovieInFavorites REPO= ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in putMovieInFavorites")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
+//                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
     suspend fun deleteMovieFromFavorites(movieAlphaId: String): Result? {
         return withContext(ioDispatcher) {
             try {

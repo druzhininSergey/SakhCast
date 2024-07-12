@@ -391,7 +391,10 @@ fun SeriesExpandableCastTab(
 }
 
 @Composable
-fun SeriesPersonItem(person: Person, navigateToSeriesCategoriesByGenresId: (String, String) -> Unit) {
+fun SeriesPersonItem(
+    person: Person,
+    navigateToSeriesCategoriesByGenresId: (String, String) -> Unit
+) {
     val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         person.photoAlt + ".avif"
     } else {
@@ -538,12 +541,22 @@ fun TopSeriesBar(
     val primaryColor = MaterialTheme.colorScheme.primary
     val favIcon = if (isFavorite) painterResource(R.drawable.ic_star_full2)
     else painterResource(R.drawable.ic_star_empty2)
-    val listFavoriteType = mapOf(
-        "Смотрю" to "watching",
-        "Буду смотреть" to "will",
-        "Перестал" to "stopped",
-        "Досмотрел" to "watched"
-    )
+    val listFavoriteType = if (!isFavorite) {
+        mapOf(
+            "Смотрю" to "watching",
+            "Буду смотреть" to "will",
+            "Перестал" to "stopped",
+            "Досмотрел" to "watched"
+        )
+    } else {
+        mapOf(
+            "Убрать из избранного" to "delete",
+            "Смотрю" to "watching",
+            "Буду смотреть" to "will",
+            "Перестал" to "stopped",
+            "Досмотрел" to "watched"
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -579,11 +592,7 @@ fun TopSeriesBar(
                     modifier = Modifier
                         .padding(8.dp)
                         .size(40.dp)
-                        .clickable {
-                            if (isFavorite) onFavoriteButtonPushed("")
-                            else isExpandedFavorite = true
-
-                        },
+                        .clickable { isExpandedFavorite = true },
                     tint = if (isFavorite) Color(0xFFFFD700) else Color.White
                 )
                 DropdownMenu(
@@ -596,11 +605,7 @@ fun TopSeriesBar(
                 ) {
                     listFavoriteType.keys.forEach { favType ->
                         DropdownMenuItem(text = { Text(text = favType) }, onClick = {
-                            listFavoriteType[favType]?.let {
-                                onFavoriteButtonPushed(
-                                    it
-                                )
-                            }
+                            listFavoriteType[favType]?.let { onFavoriteButtonPushed(it) }
                             isExpandedFavorite = false
                         })
                     }
@@ -771,23 +776,23 @@ fun SeriesRating(_imdbRating: Double?, _kinopoiskRating: Double?, imdbUrl: Strin
             }
         }
         if (_kinopoiskRating != null && _kinopoiskRating != 0.0) {
-                Row(verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .border(
-                            1.dp,
-                            Color.Gray,
-                            MaterialTheme.shapes.small
-                        )
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                        .clickable { context.browserIntent("$KINOPOISK_SERIES_SEARCH_URL$kpId/") }) {
-                    Text(text = "Кинопоиск:", color = Color.Gray, fontSize = 16.sp)
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = kinopoiskRating,
-                        color = MaterialTheme.colorScheme.scrim,
-                        fontSize = 18.sp
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .border(
+                        1.dp,
+                        Color.Gray,
+                        MaterialTheme.shapes.small
                     )
-                }
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .clickable { context.browserIntent("$KINOPOISK_SERIES_SEARCH_URL$kpId/") }) {
+                Text(text = "Кинопоиск:", color = Color.Gray, fontSize = 16.sp)
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = kinopoiskRating,
+                    color = MaterialTheme.colorScheme.scrim,
+                    fontSize = 18.sp
+                )
+            }
         }
     }
     DividerBase()
