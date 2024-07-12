@@ -29,9 +29,6 @@ class SakhCastRepository @Inject constructor(
             try {
                 val loginCall = sakhCastApiService.userLogin(loginInput, passwordInput)
                 val responseBody = loginCall.execute()
-//                Log.i("!!!", "Login response body: ${responseBody.body()}")
-//                Log.i("!!!", "Login response body: ${responseBody.code()}")
-//                Log.i("!!!", "Login response body: $responseBody")
                 responseBody.body()
             } catch (e: Exception) {
                 crashReporter.apply {

@@ -1,7 +1,5 @@
 package com.example.sakhcast.ui.main_screens.home_screen
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sakhcast.data.repository.SakhCastRepository
@@ -9,6 +7,10 @@ import com.example.sakhcast.model.LastWatched
 import com.example.sakhcast.model.MovieList
 import com.example.sakhcast.model.SeriesList
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,47 +18,47 @@ import javax.inject.Inject
 class HomeScreenViewModel @Inject constructor(private val sakhCastRepository: SakhCastRepository) :
     ViewModel() {
 
-    private var _homeScreenState = MutableLiveData(HomeScreenState())
-    val homeScreenState: LiveData<HomeScreenState> = _homeScreenState
-
-    init {
-        getAllScreenData()
-    }
+    private val _homeScreenState = MutableStateFlow(HomeScreenState())
+    val homeScreenState: StateFlow<HomeScreenState> = _homeScreenState.asStateFlow()
 
     data class HomeScreenState(
         var seriesList: SeriesList? = null,
         var moviesList: MovieList? = null,
         var lastWatched: LastWatched? = null,
         var lastWatchedMovieTime: String = "",
+        var isLoading: Boolean = true,
     )
 
-    fun refreshLastWatched(){
+    fun refreshLastWatched() {
         viewModelScope.launch {
             val lastWatched = sakhCastRepository.getContinueWatchMovieAndSeries()
-            _homeScreenState.value = homeScreenState.value?.copy(
-                lastWatched = lastWatched,
-            )
+            _homeScreenState.update { currentState ->
+                currentState.copy(lastWatched = lastWatched)
+            }
         }
     }
 
-    private fun getAllScreenData() {
+    fun getAllScreenData() {
         viewModelScope.launch {
-            val lastWatched = sakhCastRepository.getContinueWatchMovieAndSeries()
-            val seriesList =
-                sakhCastRepository.getSeriesListByCategoryName(categoryName = "all", page = 0)
-            val moviesList =
-                sakhCastRepository.getMoviesListByCategoryName(categoryName = "all", page = 0)
-            lastWatched?.movie?.data?.userFavourite?.position?.let { convertSeconds(it) }
+            _homeScreenState.update { currentState ->
+                currentState.copy(isLoading = true) }
+            try {
+                val lastWatched = sakhCastRepository.getContinueWatchMovieAndSeries()
+                val seriesList = sakhCastRepository.getSeriesListByCategoryName(categoryName = "all", page = 0)
+                val moviesList = sakhCastRepository.getMoviesListByCategoryName(categoryName = "all", page = 0)
+                lastWatched?.movie?.data?.userFavourite?.position?.let { convertSeconds(it) }
 
-//            Log.i("!!!", "lastWatched = $lastWatched")
-//            Log.i("!!!", "seriesList = $seriesList")
-//            Log.i("!!!", "moviesList = $moviesList")
-
-            _homeScreenState.value = homeScreenState.value?.copy(
-                lastWatched = lastWatched,
-                seriesList = seriesList,
-                moviesList = moviesList,
-            )
+                _homeScreenState.update { currentState ->
+                    currentState.copy(
+                        lastWatched = lastWatched,
+                        seriesList = seriesList,
+                        moviesList = moviesList,
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                _homeScreenState.update { it.copy(isLoading = false) }
+            }
         }
     }
 
@@ -72,8 +74,9 @@ class HomeScreenViewModel @Inject constructor(private val sakhCastRepository: Sa
             val secondsPart =
                 if (finalSeconds > 0 || (hours == 0 && minutes == 0)) "${finalSeconds}с." else ""
 
-            _homeScreenState.value =
-                homeScreenState.value?.copy(lastWatchedMovieTime = "$hoursPart$minutesPart$secondsPart".trim())
+            _homeScreenState.update { currentState: HomeScreenState ->
+                currentState.copy(lastWatchedMovieTime = "$hoursPart$minutesPart$secondsPart".trim())
+            }
         }
     }
 

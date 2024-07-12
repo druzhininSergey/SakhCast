@@ -26,6 +26,7 @@ import com.example.sakhcast.SERIES_PLAYER
 import com.example.sakhcast.SERIES_VIEW
 import com.example.sakhcast.ui.category_screens.MovieCategoryScreen
 import com.example.sakhcast.ui.category_screens.SeriesCategoryScreen
+import com.example.sakhcast.ui.main_screens.MainScreensViewModel
 import com.example.sakhcast.ui.main_screens.catalog_screen.CatalogScreen
 import com.example.sakhcast.ui.main_screens.catalog_screen.CatalogScreenViewModel
 import com.example.sakhcast.ui.main_screens.favorites_screen.FavoritesScreen
@@ -43,6 +44,7 @@ import com.example.sakhcast.ui.series_player.SeriesPlayerViewModel
 fun AuthNavGraph(
     navHostController: NavHostController,
     paddingValues: PaddingValues,
+    mainScreensViewModel: MainScreensViewModel = hiltViewModel()
 ) {
     val navigateUp = { navHostController.navigateUp() }
     val navigate = { route: String -> navHostController.navigate(route) }
@@ -83,7 +85,9 @@ fun AuthNavGraph(
                 navigateToMovieByAlphaId = navigateToMovieByAlphaId,
                 navigateToSeriesById = navigateToSeriesById,
                 navigateToCatalogAllSeries = navigateToCatalogAllSeries,
-                navigateToCatalogAllMovies = navigateToCatalogAllMovies
+                navigateToCatalogAllMovies = navigateToCatalogAllMovies,
+                allScreensHomeState = mainScreensViewModel.homeScreenState,
+                loadDataToHomeScreen = mainScreensViewModel::loadDataToHomeScreen
             )
         }
         composable(CATALOG_SCREEN) {
@@ -105,15 +109,32 @@ fun AuthNavGraph(
                 navigateToSeriesById = navigateToSeriesById,
                 navigateToSeriesCategoryByType = navigateToSeriesCategoryByType,
                 navigateToMovieCategoriesByGenresId = navigateToMovieCategoriesByGenresId,
+                allScreensFavoriteState = mainScreensViewModel.favoritesScreenState,
+                loadDataToHomeScreen = mainScreensViewModel::loadDataToFavoritesScreen
             )
         }
         composable(NOTIFICATION_SCREEN) {
             val notificationScreenViewModel: NotificationScreenViewModel = hiltViewModel()
-            val notificationScreenState =
-                notificationScreenViewModel.notificationScreenState.observeAsState(
-                    NotificationScreenViewModel.NotificationScreenState()
-                )
-            NotificationScreen(paddingValues, notificationScreenState, notificationScreenViewModel::makeAllNotificationsRead, navigateToSeriesById)
+            val notificationScreenState by notificationScreenViewModel.notificationScreenState.collectAsState()
+            val allScreensNotificationsState by mainScreensViewModel.notificationScreenState.collectAsState()
+            LaunchedEffect(Unit) {
+                if (allScreensNotificationsState.notificationsList == null) {
+                    notificationScreenViewModel.getNotifications()
+                }
+            }
+            LaunchedEffect(notificationScreenState) {
+                if (!notificationScreenState.isLoading) {
+                    mainScreensViewModel.loadDataToNotificationsScreen(notificationScreenState)
+                }
+            }
+
+            NotificationScreen(
+                paddingValues,
+                allScreensNotificationsState,
+                notificationScreenViewModel::makeAllNotificationsRead,
+                notificationScreenViewModel::getNotifications,
+                navigateToSeriesById
+            )
         }
         composable(SEARCH_SCREEN) {
             SearchScreen(

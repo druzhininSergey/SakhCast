@@ -17,8 +17,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,25 +32,39 @@ import com.example.sakhcast.ui.main_screens.home_screen.recently_watched.Continu
 import com.example.sakhcast.ui.main_screens.home_screen.series.SeriesCategoryView
 import com.example.sakhcast.ui.theme.SakhCastTheme
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
     paddingValues: PaddingValues,
-    homeScreenViewModel: HomeScreenViewModel = hiltViewModel(),
     navigateToMovieByAlphaId: (String) -> Unit,
     navigateToSeriesById: (String) -> Unit,
     navigateToCatalogAllSeries: () -> Unit,
-    navigateToCatalogAllMovies: () -> Unit
+    navigateToCatalogAllMovies: () -> Unit,
+    allScreensHomeState: StateFlow<HomeScreenViewModel.HomeScreenState>,
+    loadDataToHomeScreen: (HomeScreenViewModel.HomeScreenState) -> Unit,
+    homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
-    val homeScreenState by
-    homeScreenViewModel.homeScreenState.observeAsState(HomeScreenViewModel.HomeScreenState())
+    val homeScreenState by homeScreenViewModel.homeScreenState.collectAsState()
+    val allScreensStateCollected = allScreensHomeState.collectAsState()
 
-    val seriesList = homeScreenState.seriesList
-    val movieList = homeScreenState.moviesList
-    val lastWatchedMovieTime = homeScreenState.lastWatchedMovieTime
-    val movie = homeScreenState.lastWatched?.movie
-    val series = homeScreenState.lastWatched?.serial
+    LaunchedEffect(Unit) {
+        if (allScreensHomeState.value.lastWatched == null) {
+            homeScreenViewModel.getAllScreenData()
+        }
+    }
+    LaunchedEffect(homeScreenState) {
+        if (!homeScreenState.isLoading) {
+            loadDataToHomeScreen(homeScreenState)
+        }
+    }
+
+    val seriesList = allScreensStateCollected.value.seriesList
+    val movieList = allScreensStateCollected.value.moviesList
+    val lastWatchedMovieTime = allScreensStateCollected.value.lastWatchedMovieTime
+    val movie = allScreensStateCollected.value.lastWatched?.movie
+    val series = allScreensStateCollected.value.lastWatched?.serial
     val scrollState = rememberScrollState()
 
     var refreshing by remember { mutableStateOf(false) }
@@ -72,21 +86,7 @@ fun HomeScreen(
                     .verticalScroll(scrollState)
                     .background(color = MaterialTheme.colorScheme.primary)
             ) {
-                if (movie != null && series != null && seriesList != null && movieList != null) {
-                    ContinueWatchView(
-                        movie,
-                        series,
-                        lastWatchedMovieTime,
-                        navigateToMovieByAlphaId,
-                        navigateToSeriesById
-                    )
-                    SeriesCategoryView(seriesList, navigateToSeriesById, navigateToCatalogAllSeries)
-                    MovieCategoryView(
-                        movieList,
-                        navigateToMovieByAlphaId,
-                        navigateToCatalogAllMovies
-                    )
-                } else {
+                if (allScreensStateCollected.value.isLoading) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -97,6 +97,30 @@ fun HomeScreen(
                         CircularProgressIndicator(
                             color = MaterialTheme.colorScheme.onPrimary,
                             trackColor = Colors.blueColor
+                        )
+                    }
+                } else {
+                    if (movie != null && series != null) {
+                        ContinueWatchView(
+                            movie,
+                            series,
+                            lastWatchedMovieTime,
+                            navigateToMovieByAlphaId,
+                            navigateToSeriesById
+                        )
+                    }
+                    if (seriesList != null) {
+                        SeriesCategoryView(
+                            seriesList,
+                            navigateToSeriesById,
+                            navigateToCatalogAllSeries
+                        )
+                    }
+                    if (movieList != null) {
+                        MovieCategoryView(
+                            movieList,
+                            navigateToMovieByAlphaId,
+                            navigateToCatalogAllMovies
                         )
                     }
                 }

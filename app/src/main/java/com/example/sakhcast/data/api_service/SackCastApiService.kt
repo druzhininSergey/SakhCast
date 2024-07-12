@@ -115,7 +115,7 @@ interface SakhCastApiService {
     @GET("v1/serial/watch/get_pos")
     fun getSeriesEpisodePosition(
         @Query("media_id") mediaId: Int,
-    ): Call<Boolean>
+    ): Call<Map<String, Int>>
 
     // Movies
     @GET("v2/catalog/movies/items")
