@@ -678,4 +678,21 @@ class SakhCastRepository @Inject constructor(
         }
     }
 
+    suspend fun fetchHlsManifest(uri: String): String? {
+        return withContext(ioDispatcher) {
+            try {
+                val call = sakhCastApiService.fetchHlsManifest(uri)
+                val response = call.execute()
+                response.body()
+            } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in fetchHlsManifest")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
+                null
+            }
+        }
+    }
+
 }

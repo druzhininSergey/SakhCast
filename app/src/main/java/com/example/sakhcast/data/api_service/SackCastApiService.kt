@@ -18,6 +18,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 interface SakhCastApiService {
     // LOGIN
@@ -210,6 +211,12 @@ interface SakhCastApiService {
         @Path("movie") movieAlphaId: String,
     ): Call<Int>
 
+    @GET
+    fun fetchHlsManifest(@Url url: String): Call<String>
+
+
+// General
+
     @GET("v1/users/get_notifies?amount=20&from=0&subject_only=0")
     fun getNotificationsList(
         @Query("amount") amount: Int = 40,
@@ -219,8 +226,6 @@ interface SakhCastApiService {
 
     @POST("v1/users/ack_all_notifies")
     fun makeAllNotificationsRead(): Call<Boolean>
-
-// General
 
     @GET("v2/person/5701")
     fun getContentListByPersonId(
