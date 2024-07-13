@@ -18,6 +18,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 interface SakhCastApiService {
     // LOGIN
@@ -115,7 +116,7 @@ interface SakhCastApiService {
     @GET("v1/serial/watch/get_pos")
     fun getSeriesEpisodePosition(
         @Query("media_id") mediaId: Int,
-    ): Call<Boolean>
+    ): Call<Map<String, Int>>
 
     // Movies
     @GET("v2/catalog/movies/items")
@@ -180,6 +181,12 @@ interface SakhCastApiService {
         @Query("kind") kind: String,
     ): Call<Result>
 
+    @POST("v2/movie/{movie}/fav")
+    fun changeMovieFavoritesType(
+        @Path("movie") movieAlphaId: String,
+        @Query("kind") kind: String,
+    ): Call<Result>
+
     @DELETE("v2/movie/{movie}/fav")
     fun deleteMovieFromFavorites(
         @Path("movie") movieAlphaId: String,
@@ -204,6 +211,12 @@ interface SakhCastApiService {
         @Path("movie") movieAlphaId: String,
     ): Call<Int>
 
+    @GET
+    fun fetchHlsManifest(@Url url: String): Call<String>
+
+
+// General
+
     @GET("v1/users/get_notifies?amount=20&from=0&subject_only=0")
     fun getNotificationsList(
         @Query("amount") amount: Int = 40,
@@ -213,8 +226,6 @@ interface SakhCastApiService {
 
     @POST("v1/users/ack_all_notifies")
     fun makeAllNotificationsRead(): Call<Boolean>
-
-// General
 
     @GET("v2/person/5701")
     fun getContentListByPersonId(

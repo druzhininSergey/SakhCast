@@ -1,6 +1,7 @@
 package com.example.sakhcast.data.repository
 
 import com.example.sakhcast.data.api_service.SakhCastApiService
+import com.example.sakhcast.data.firebase_messaging.CrashReporter
 import com.example.sakhcast.model.CurrentUser
 import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.LastWatched
@@ -19,6 +20,7 @@ import kotlin.coroutines.CoroutineContext
 
 class SakhCastRepository @Inject constructor(
     private val sakhCastApiService: SakhCastApiService,
+    private val crashReporter: CrashReporter,
 ) {
     private val ioDispatcher: CoroutineContext = Dispatchers.IO
 
@@ -27,11 +29,13 @@ class SakhCastRepository @Inject constructor(
             try {
                 val loginCall = sakhCastApiService.userLogin(loginInput, passwordInput)
                 val responseBody = loginCall.execute()
-//                Log.i("!!!", "Login response body: ${responseBody.body()}")
-//                Log.i("!!!", "Login response body: ${responseBody.code()}")
-//                Log.i("!!!", "Login response body: $responseBody")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in userLogin")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "Login from repo = exception")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -47,6 +51,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "Logout response body: ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in userLogout")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "Logout exception = null запрос не отправлен")
                 null
             }
@@ -61,6 +70,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "userCheck = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in checkLoginStatus")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
                 null
             }
         }
@@ -76,6 +90,11 @@ class SakhCastRepository @Inject constructor(
             } catch (e: Exception) {
 //                Log.i("!!!", "LastWatched = exception")
 //                Log.i("!!!", "${e.message}")
+                crashReporter.apply {
+                    logError("Error in getContinueWatchMovieAndSeries")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
                 null
             }
         }
@@ -93,6 +112,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "SeriesList from repo = $responseBody")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getSeriesListByCategoryName")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "series homeScreen list = exception")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -111,6 +135,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "SeriesList from repo = $responseBody")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getSeriesListByCompany")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "series homeScreen list = exception")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -129,6 +158,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "SeriesList BY GENRE from repo = ${responseBody}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getSeriesListByGenre")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "series list BY GENRE = exception")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -144,6 +178,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "seriesCall}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getSeriesById")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "seriesById = exception")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -160,6 +199,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "SeriesFavorites from repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getSeriesFavorites")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "SeriesFavoritesFrom repo = exception, KIND = $kind")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -176,6 +220,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "episodesListCall")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getSeriesEpisodesBySeasonId")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "Episodes = exception")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -192,6 +241,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "addSeriesInFavorites = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in addSeriesInFavorites")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "${e.message}")
                 null
             }
@@ -207,6 +261,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "removeSeriesFromFavorites repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in removeSeriesFromFavorites")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "removeSeriesFromFavorites repo = exception, seriesId = $seriesId")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -223,6 +282,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "seriesList Search repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in searchSeries")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "seriesList Search repo = exception")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -240,6 +304,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "playlist repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getSeriesPlaylistBySeasonIdAndRgName")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "playlist repo = exception")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -257,6 +326,11 @@ class SakhCastRepository @Inject constructor(
                 getPositionCall.execute()
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in setSeriesEpisodePosition")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
                 null
             }
         }
@@ -274,6 +348,11 @@ class SakhCastRepository @Inject constructor(
 
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getMoviesListByCategoryName")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "movies homeScreen list = exception")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -291,6 +370,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "MovieById from repo = $responseBody")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getMovieByAlphaId")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "movieById = exception")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -308,6 +392,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "refMovieId REPO = ${refMovieId}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getMovieRecommendationsByRefId")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "Episodes = exception")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -324,6 +413,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "MoviesFavorites from repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getMovieFavorites")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "MoviesFavorites from repo = exception")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -340,6 +434,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "SeriesFavorites from repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getMoviesListBySortField")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "SeriesFavoritesFrom repo = exception, sortField = $sortField")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -356,6 +455,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "SeriesFavorites from repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getMoviesListByCompanyId")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "SeriesFavoritesFrom repo = exception, sortField = $sortField")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -372,6 +476,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "SeriesFavorites from repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getMoviesListByPersonId")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "SeriesFavoritesFrom repo = exception, sortField = $sortField")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -388,6 +497,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "SeriesFavorites from repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getMoviesListByGenreId")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "SeriesFavoritesFrom repo = exception, genresId = $genresId")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -408,6 +522,35 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "addMovieInFavorites REPO= ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in putMovieInFavorites")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
+//                Log.i("!!!", "${e.message}")
+                null
+            }
+        }
+    }
+
+    suspend fun changeMovieFavoritesType(movieAlphaId: String, kind: String): Result? {
+        return withContext(ioDispatcher) {
+            try {
+                val addMovieInFavCall =
+                    sakhCastApiService.changeMovieFavoritesType(
+                        movieAlphaId = movieAlphaId,
+                        kind = kind
+                    )
+                val responseBody = addMovieInFavCall.execute()
+//                Log.i("!!!", "addMovieInFavCall REPO = $addMovieInFavCall")
+//                Log.i("!!!", "addMovieInFavorites REPO= ${responseBody.body()}")
+                responseBody.body()
+            } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in putMovieInFavorites")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "${e.message}")
                 null
             }
@@ -423,6 +566,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "deleteMovieFromFavorites repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in deleteMovieFromFavorites")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "movieFromFavorites repo = exception, movieId = $movieAlphaId")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -439,6 +587,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "notificationList repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getNotificationsList")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "notificationList repo = exception")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -455,6 +608,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "makeAllNotificationsRead repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in makeAllNotificationsRead")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "makeAllNotificationsRead repo = exception")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -471,6 +629,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "movieList Search repo = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in searchMovie")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
 //                Log.i("!!!", "movieList Search repo = exception")
 //                Log.i("!!!", "${e.message}")
                 null
@@ -487,6 +650,11 @@ class SakhCastRepository @Inject constructor(
 //                Log.i("!!!", "send position to backend = ${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in setMoviePosition")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
                 null
             }
         }
@@ -500,6 +668,28 @@ class SakhCastRepository @Inject constructor(
                 val responseBody = notificationListCall.execute()
                 responseBody.body()
             } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getMoviePosition")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
+                null
+            }
+        }
+    }
+
+    suspend fun fetchHlsManifest(uri: String): String? {
+        return withContext(ioDispatcher) {
+            try {
+                val call = sakhCastApiService.fetchHlsManifest(uri)
+                val response = call.execute()
+                response.body()
+            } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in fetchHlsManifest")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
                 null
             }
         }

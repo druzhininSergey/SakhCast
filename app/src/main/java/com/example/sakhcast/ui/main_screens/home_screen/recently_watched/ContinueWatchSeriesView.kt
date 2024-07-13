@@ -40,9 +40,9 @@ fun ContinueWatchSeriesView(
     val imageUrl = seriesCard.data.backdropAlt + ".webp"
 
     val backdropColor1 =
-        Color(android.graphics.Color.parseColor(seriesCard.data.backdropColors.background1))
+        Color(android.graphics.Color.parseColor(seriesCard.data.backdropColors?.background1 ?: "#17061d"))
     val backdropColor2 =
-        Color(android.graphics.Color.parseColor(seriesCard.data.backdropColors.background2))
+        Color(android.graphics.Color.parseColor(seriesCard.data.backdropColors?.background2 ?: "#3e2c44"))
     val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
     Card(
         modifier = Modifier

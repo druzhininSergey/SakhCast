@@ -27,6 +27,20 @@ fun Long.formatMinSec(): String {
     }
 }
 
+fun Int.formatMinSec(): String {
+    return if (this == 0) {
+        "..."
+    } else {
+        String.format(
+            Locale.ENGLISH,
+            "%02d:%02d:%02d",
+            TimeUnit.SECONDS.toHours(this.toLong()),
+            TimeUnit.SECONDS.toMinutes(this.toLong()) % TimeUnit.HOURS.toMinutes(1),
+            this % 60
+        )
+    }
+}
+
 fun Context.findActivity(): Activity? = when (this) {
     is Activity -> this
     is ContextWrapper -> baseContext.findActivity()

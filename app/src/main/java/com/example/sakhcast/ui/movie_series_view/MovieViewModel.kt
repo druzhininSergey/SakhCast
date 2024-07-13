@@ -61,16 +61,25 @@ class MovieViewModel @Inject constructor(
 
     fun onFavoriteButtonPushed(kind: String) {
         viewModelScope.launch {
+            val currentFavType = _movieState.value?.movie?.userFavourite?.favKind
             val movieAlphaId = movieState.value?.movie?.idAlpha ?: "0"
-            if (movieState.value?.isFavorite == false) {
+            if (kind == "delete") {
+                val response = sakhCastRepository.deleteMovieFromFavorites(movieAlphaId)
+                if (response?.result == true) _movieState.value =
+                    movieState.value?.copy(isFavorite = false)
+            } else if (_movieState.value?.isFavorite == true && kind != currentFavType) {
+                val response =
+                    sakhCastRepository.changeMovieFavoritesType(
+                        movieAlphaId = movieAlphaId,
+                        kind = kind
+                    )
+                if (response?.result == true) _movieState.value =
+                    movieState.value?.copy(isFavorite = true)
+            } else {
                 val response =
                     sakhCastRepository.putMovieInFavorites(movieAlphaId = movieAlphaId, kind = kind)
                 if (response?.result == true) _movieState.value =
                     movieState.value?.copy(isFavorite = true)
-            } else {
-                val response = sakhCastRepository.deleteMovieFromFavorites(movieAlphaId)
-                if (response?.result == true) _movieState.value =
-                    movieState.value?.copy(isFavorite = false)
             }
         }
     }

@@ -15,6 +15,9 @@ import com.example.sakhcast.SHARED_PREFS_TOKEN_KEY
 import com.example.sakhcast.data.api_service.SakhCastApiService
 import com.example.sakhcast.data.downloader.AndroidDownloader
 import com.example.sakhcast.data.downloader.Downloader
+import com.example.sakhcast.data.firebase_messaging.CrashReporter
+import com.example.sakhcast.data.firebase_messaging.FirebaseCrashReporter
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -105,6 +108,12 @@ class SakhCastModule {
     @Singleton
     fun provideDownloader(@ApplicationContext context: Context): Downloader {
         return AndroidDownloader(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCrashReporter(): CrashReporter {
+        return FirebaseCrashReporter(FirebaseCrashlytics.getInstance())
     }
 
 }

@@ -3,7 +3,6 @@ package com.example.sakhcast.ui.player
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import com.example.sakhcast.data.repository.SakhCastRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,15 +38,15 @@ class PlayerViewModel @Inject constructor(
             _isPositionSending.value = true
             viewModelScope.launch {
                 val uri = movieWatchState.value.hlsUri
-                val title = movieWatchState.value.title
+//                val title = movieWatchState.value.title
                 player.setMediaItem(
                     MediaItem.Builder()
                         .setUri(uri)
-                        .setMediaMetadata(
-                            MediaMetadata.Builder()
-                                .setDisplayTitle(title)
-                                .build()
-                        )
+//                        .setMediaMetadata(
+//                            MediaMetadata.Builder()
+//                                .setDisplayTitle(title)
+//                                .build()
+//                        )
                         .build()
                 )
                 player.prepare()
