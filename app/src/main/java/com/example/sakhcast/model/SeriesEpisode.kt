@@ -1,8 +1,10 @@
 package com.example.sakhcast.model
 
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Immutable
 @Serializable
 data class Episode(
     @SerialName("id") val id: Int,
@@ -15,6 +17,7 @@ data class Episode(
     @SerialName("rgs") val rgs: List<RG>
 )
 
+@Immutable
 @Serializable
 data class RG(
     @SerialName("id") val id: Int,
@@ -28,6 +31,7 @@ data class RG(
     @SerialName("tracks") val tracks: List<TrackEpisode>
 )
 
+@Immutable
 @Serializable
 data class TrackEpisode(
     @SerialName("id") val id: Int,

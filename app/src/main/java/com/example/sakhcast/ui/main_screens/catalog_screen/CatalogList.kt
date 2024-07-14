@@ -91,7 +91,7 @@ fun CatalogList(
         expanded = expanded,
         onDismissRequest = { expanded = false }
     ) {
-        if (tabIndex == 0){
+        if (tabIndex == 0) {
             Genres.seriesGenres.forEach { category ->
                 DropdownMenuItem(
                     onClick = {

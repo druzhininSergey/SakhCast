@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -384,7 +383,7 @@ fun MovieRecommendations(
         verticalAlignment = Alignment.CenterVertically,
         contentPadding = PaddingValues(16.dp)
     ) {
-        itemsIndexed(movieRecommendations.items) { _, movie ->
+        items(items = movieRecommendations.items, key = { it.id }) { movie ->
             MovieItemView(
                 movieCard = movie,
                 navigateToMovieByAlphaId = navigateToMovieByAlphaId
@@ -410,7 +409,7 @@ fun MovieProductionCompanies(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
     ) {
-        itemsIndexed(productionCompanies) { _, company ->
+        items(items = productionCompanies, key = { it.id }) { company ->
             val productionCompanyUri = Uri.encode(company.name)
 
             Text(
@@ -683,7 +682,7 @@ fun MovieGenres(
     navigateToMovieCategoriesByGenresId: (String, String) -> Unit
 ) {
     LazyRow(Modifier.fillMaxWidth()) {
-        itemsIndexed(genres) { _, genres ->
+        items(items = genres, key = { it.id }) { genres ->
             TextButton(onClick = {
                 navigateToMovieCategoriesByGenresId(
                     genres.name,
@@ -787,7 +786,7 @@ fun MovieExpandableCastTab(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = PaddingValues(16.dp)
                 ) {
-                    items(members) { person ->
+                    items(items = members, key = { it.id }) { person ->
                         PersonItem(person, navigateToMovieCategoriesByGenresId)
                     }
                 }

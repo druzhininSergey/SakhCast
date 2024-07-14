@@ -1,8 +1,10 @@
 package com.example.sakhcast.model
 
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Immutable
 @Serializable
 data class SeriesList(
     @SerialName("amount")
@@ -11,6 +13,7 @@ data class SeriesList(
     val items: List<SeriesCard>
 )
 
+@Immutable
 @Serializable
 data class SeriesCard(
     @SerialName("available")
@@ -53,6 +56,7 @@ data class SeriesCard(
     val year: Int
 )
 
+@Immutable
 @Serializable
 data class Progress(
     val viewed: Int,
@@ -61,6 +65,7 @@ data class Progress(
     val variant: String,
 )
 
+@Immutable
 @Serializable
 data class CoverColors(
     @SerialName("background1")

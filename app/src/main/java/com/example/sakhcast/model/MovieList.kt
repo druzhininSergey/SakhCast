@@ -1,8 +1,10 @@
 package com.example.sakhcast.model
 
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Immutable
 @Serializable
 data class MovieList(
     @SerialName("amount") val amount: Int,
@@ -11,12 +13,14 @@ data class MovieList(
     @SerialName("title") val title: String
 )
 
+@Immutable
 @Serializable
 data class User(
     @SerialName("fav_kind") val favKind: String?,
     @SerialName("is_fav") val isFav: Boolean
 )
 
+@Immutable
 @Serializable
 data class MovieCard(
     @SerialName("adult") val adult: Boolean,
