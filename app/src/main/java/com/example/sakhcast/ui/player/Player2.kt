@@ -1,10 +1,16 @@
 package com.example.sakhcast.ui.player
 
 import android.app.Activity
+import android.app.PictureInPictureParams
+import android.content.Context
+import android.content.ContextWrapper
+import android.os.Build
+import android.util.Rational
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
+import androidx.activity.ComponentActivity
 import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -45,16 +51,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toAndroidRectF
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.app.PictureInPictureModeChangedInfo
+import androidx.core.graphics.toRect
+import androidx.core.util.Consumer
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
+import com.example.sakhcast.R
 import com.example.sakhcast.data.formatMinSec
 import com.example.sakhcast.data.hideSystemUi
 import com.example.sakhcast.data.lockOrientationLandscape
@@ -77,11 +93,11 @@ fun Player2(
     activity?.lockOrientationLandscape()
     context.hideSystemUi()
 
-    LaunchedEffect(Unit) { playerViewModel.setMovieData(hls, title, position, movieAlphaId) }
+    val inPipMode = rememberIsInPipMode(playerViewModel.player)
     val movieState = playerViewModel.movieWatchState.collectAsState()
+    var shouldEnterPipMode by remember { mutableStateOf(false) }
 
     var continueTime by remember { mutableIntStateOf(0) }
-
 
     var lifecycle by remember { mutableStateOf(Lifecycle.Event.ON_CREATE) }
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -91,6 +107,7 @@ fun Player2(
     var isControllerVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+        playerViewModel.setMovieData(hls, title, position, movieAlphaId)
         playerViewModel.startPlayer()
         continueTime = movieState.value.position
 
@@ -104,15 +121,42 @@ fun Player2(
         }
     }
 
+    val pipModifier = Modifier.onGloballyPositioned { layoutCoordinates ->
+        val builder = PictureInPictureParams.Builder()
+        if (shouldEnterPipMode && playerViewModel.player.videoSize != VideoSize.UNKNOWN) {
+            val sourceRect = layoutCoordinates.boundsInWindow().toAndroidRectF().toRect()
+            builder.setSourceRectHint(sourceRect)
+            builder.setAspectRatio(
+                Rational(
+                    playerViewModel.player.videoSize.width,
+                    playerViewModel.player.videoSize.height
+                )
+            )
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            builder.setAutoEnterEnabled(shouldEnterPipMode)
+        }
+        context.findActivity().setPictureInPictureParams(builder.build())
+    }
+
     DisposableEffect(key1 = lifecycleOwner) {
+        val listener = object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                shouldEnterPipMode = isPlaying
+            }
+        }
         val observer = LifecycleEventObserver { _, event ->
             lifecycle = event
         }
         val window = (context as? Activity)?.window
         window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         lifecycleOwner.lifecycle.addObserver(observer)
+        playerViewModel.player.addListener(listener)
         playerViewModel.player.playWhenReady = true
         onDispose {
+            playerViewModel.player.removeListener(listener)
+            shouldEnterPipMode = false
             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             lifecycleOwner.lifecycle.removeObserver(observer)
             activity?.unlockOrientation()
@@ -122,14 +166,12 @@ fun Player2(
 
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
-            modifier =
-            Modifier
-                .padding()
+            modifier = pipModifier
                 .fillMaxSize(),
             factory = {
-                PlayerView(context).apply {
+                PlayerView(it).apply {
                     player = playerViewModel.player
-                    useController = true
+                    useController = !inPipMode
                     layoutParams =
                         FrameLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -162,7 +204,12 @@ fun Player2(
             enter = fadeIn(),
             exit = fadeOut()
         ) {
-            TopControls(navigateUp, movieState.value.title)
+            if (!inPipMode)
+                TopControls(navigateUp, movieState.value.title, onPipClick = {
+                    context.findActivity().enterPictureInPictureMode(
+                        PictureInPictureParams.Builder().build()
+                    )
+                })
         }
 
         SnackbarHost(
@@ -202,7 +249,7 @@ fun Player2(
 }
 
 @Composable
-fun TopControls(navigateUp: () -> Boolean, title: String) {
+fun TopControls(navigateUp: () -> Boolean, title: String, onPipClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -218,9 +265,41 @@ fun TopControls(navigateUp: () -> Boolean, title: String) {
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "Exit",
-                tint = Color.Gray
+                tint = Color.White
             )
         }
         Text(text = title, fontWeight = FontWeight.Bold, color = Color.White)
+        IconButton(onClick = onPipClick) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_pip),
+                contentDescription = "Enter PiP mode"
+            )
+        }
     }
+}
+
+@Composable
+fun rememberIsInPipMode(player: Player): Boolean {
+    val activity = LocalContext.current.findActivity()
+    var pipMode by remember { mutableStateOf(activity.isInPictureInPictureMode) }
+    DisposableEffect(activity) {
+        val observer = Consumer<PictureInPictureModeChangedInfo> { info ->
+            pipMode = info.isInPictureInPictureMode
+            if (!info.isInPictureInPictureMode) {
+                player.playWhenReady = false
+            }
+        }
+        activity.addOnPictureInPictureModeChangedListener(observer)
+        onDispose { activity.removeOnPictureInPictureModeChangedListener(observer) }
+    }
+    return pipMode
+}
+
+internal fun Context.findActivity(): ComponentActivity {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is ComponentActivity) return context
+        context = context.baseContext
+    }
+    throw IllegalStateException("Picture in picture should be called in the context of an Activity")
 }

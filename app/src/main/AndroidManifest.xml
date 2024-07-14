@@ -19,6 +19,8 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:supportsPictureInPicture="true"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:theme="@style/Theme.SakhCast">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

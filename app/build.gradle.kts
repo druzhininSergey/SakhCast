@@ -61,7 +61,7 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.messaging)
 
-    //accompanist . systemuicontroller
+    //accompanist.systemuicontroller
     implementation(libs.accompanist.systemuicontroller)
 
     //kotlinx.serialization
@@ -83,6 +83,7 @@ dependencies {
 
     //okhttp3
     implementation(libs.okhttp)
+
     //logging interceptor
     implementation(libs.logging.interceptor)
 
@@ -106,6 +107,7 @@ dependencies {
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.media3.exoplayer.hls)
     implementation(libs.androidx.media3.common)
+    implementation(libs.androidx.media3.session)
 
     //material
     implementation(libs.androidx.material)
