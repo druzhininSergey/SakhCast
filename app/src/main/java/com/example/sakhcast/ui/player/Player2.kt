@@ -141,16 +141,20 @@ fun Player2(
     }
 
     DisposableEffect(key1 = lifecycleOwner) {
+        val window = (context as? Activity)?.window
         val listener = object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 shouldEnterPipMode = isPlaying
+                if (isPlaying) {
+                    window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                } else {
+                    window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                }
             }
         }
         val observer = LifecycleEventObserver { _, event ->
             lifecycle = event
         }
-        val window = (context as? Activity)?.window
-        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         lifecycleOwner.lifecycle.addObserver(observer)
         playerViewModel.player.addListener(listener)
         playerViewModel.player.playWhenReady = true
