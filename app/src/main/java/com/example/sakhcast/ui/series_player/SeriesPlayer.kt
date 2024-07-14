@@ -63,6 +63,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.example.sakhcast.R
 import com.example.sakhcast.data.formatMinSec
@@ -100,6 +101,14 @@ fun SeriesPlayer(
     val scope = rememberCoroutineScope()
     var showSnackbar by rememberSaveable { mutableStateOf(true) }
     var isControllerVisible by remember { mutableStateOf(false) }
+    val resizeModes = listOf(
+        AspectRatioFrameLayout.RESIZE_MODE_FIT,
+        AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
+        AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT,
+        AspectRatioFrameLayout.RESIZE_MODE_FILL,
+        AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+    )
+    var currentResizeModeIndex by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(seriesState) {
         if (isPlayListLoaded || isDataLoaded) {
@@ -206,6 +215,10 @@ fun SeriesPlayer(
                     setControllerVisibilityListener(PlayerView.ControllerVisibilityListener { visibility ->
                         isControllerVisible = visibility == View.VISIBLE
                     })
+                    setFullscreenButtonClickListener {
+                        currentResizeModeIndex = (currentResizeModeIndex + 1) % resizeModes.size
+                        resizeMode = resizeModes[currentResizeModeIndex]
+                    }
                 }
             },
             update = {
