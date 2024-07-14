@@ -272,7 +272,8 @@ fun TopControls(navigateUp: () -> Boolean, title: String, onPipClick: () -> Unit
         IconButton(onClick = onPipClick) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_pip),
-                contentDescription = "Enter PiP mode"
+                contentDescription = "Enter PiP mode",
+                tint = Color.White
             )
         }
     }
