@@ -137,10 +137,18 @@ fun MovieView(
     val imageUrl = movie?.posterAlt + ".webp"
 
     val backdropColor1 =
-        if (movie != null) Color(android.graphics.Color.parseColor(movie.backdropColors.background1))
+        if (movie != null) Color(
+            android.graphics.Color.parseColor(
+                movie.backdropColors?.background1 ?: "#17061d"
+            )
+        )
         else Color.Gray
     val backdropColor2 =
-        if (movie != null) Color(android.graphics.Color.parseColor(movie.backdropColors.background2))
+        if (movie != null) Color(
+            android.graphics.Color.parseColor(
+                movie.backdropColors?.background2 ?: "#17061d"
+            )
+        )
         else Color.Blue
     val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
 

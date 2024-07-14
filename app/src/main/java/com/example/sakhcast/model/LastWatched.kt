@@ -39,7 +39,7 @@ data class MovieDataRecent(
     @SerialName("available") val available: Boolean,
     @SerialName("backdrop") val backdrop: String,
     @SerialName("backdrop_alt") val backdropAlt: String,
-    @SerialName("backdrop_colors") val backdropColors: BackdropColors,
+    @SerialName("backdrop_colors") val backdropColors: BackdropColors?,
     @SerialName("cover") val cover: String,
     @SerialName("cover_alt") val coverAlt: String,
     @SerialName("cover_colors") val coverColors: PosterColors?,
