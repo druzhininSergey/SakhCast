@@ -1,6 +1,9 @@
 package com.example.sakhcast.ui.series_player
 
 import android.app.Activity
+import android.app.PictureInPictureParams
+import android.os.Build
+import android.util.Rational
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -44,22 +47,32 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toAndroidRectF
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.graphics.toRect
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
+import com.example.sakhcast.R
 import com.example.sakhcast.data.formatMinSec
 import com.example.sakhcast.data.hideSystemUi
 import com.example.sakhcast.data.lockOrientationLandscape
 import com.example.sakhcast.data.showSystemUi
 import com.example.sakhcast.data.unlockOrientation
+import com.example.sakhcast.ui.player.findActivity
+import com.example.sakhcast.ui.player.rememberIsInPipMode
 import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
@@ -77,6 +90,9 @@ fun SeriesPlayer(
     val activity = context as? Activity
     activity?.lockOrientationLandscape()
 
+    val inPipMode = rememberIsInPipMode(player)
+    var shouldEnterPipMode by remember { mutableStateOf(false) }
+
     var continueTime by remember { mutableIntStateOf(0) }
 
     var lifecycle by remember { mutableStateOf(Lifecycle.Event.ON_CREATE) }
@@ -85,6 +101,14 @@ fun SeriesPlayer(
     val scope = rememberCoroutineScope()
     var showSnackbar by rememberSaveable { mutableStateOf(true) }
     var isControllerVisible by remember { mutableStateOf(false) }
+    val resizeModes = listOf(
+        AspectRatioFrameLayout.RESIZE_MODE_FIT,
+        AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
+        AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT,
+        AspectRatioFrameLayout.RESIZE_MODE_FILL,
+        AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+    )
+    var currentResizeModeIndex by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(seriesState) {
         if (isPlayListLoaded || isDataLoaded) {
@@ -100,6 +124,25 @@ fun SeriesPlayer(
                 showSnackbar = false
             }
         }
+    }
+
+    val pipModifier = Modifier.onGloballyPositioned { layoutCoordinates ->
+        val builder = PictureInPictureParams.Builder()
+        if (shouldEnterPipMode && player.videoSize != VideoSize.UNKNOWN) {
+            val sourceRect = layoutCoordinates.boundsInWindow().toAndroidRectF().toRect()
+            builder.setSourceRectHint(sourceRect)
+            builder.setAspectRatio(
+                Rational(
+                    player.videoSize.width,
+                    player.videoSize.height
+                )
+            )
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            builder.setAutoEnterEnabled(shouldEnterPipMode)
+        }
+        context.findActivity().setPictureInPictureParams(builder.build())
     }
     val playerListener = object : Player.Listener {
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
@@ -122,17 +165,30 @@ fun SeriesPlayer(
 
 
     DisposableEffect(key1 = lifecycleOwner) {
+        val window = (context as? Activity)?.window
+        val listener = object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                shouldEnterPipMode = isPlaying
+                if (isPlaying) {
+                    window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                } else {
+                    window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                }
+            }
+        }
         val observer = LifecycleEventObserver { _, event ->
             lifecycle = event
         }
-        val window = (context as? Activity)?.window
         window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         lifecycleOwner.lifecycle.addObserver(observer)
         player.playWhenReady = true
+        player.addListener(listener)
         player.addListener(playerListener)
 
         onDispose {
             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            player.removeListener(listener)
+            shouldEnterPipMode = false
             lifecycleOwner.lifecycle.removeObserver(observer)
             player.removeListener(playerListener)
             activity?.unlockOrientation()
@@ -143,13 +199,12 @@ fun SeriesPlayer(
     Box(modifier = Modifier.fillMaxSize()) {
 
         AndroidView(
-            modifier = Modifier
-                .padding()
+            modifier = pipModifier
                 .fillMaxSize(),
             factory = {
-                PlayerView(context).apply {
+                PlayerView(it).apply {
                     this.player = player
-                    useController = true
+                    useController = !inPipMode
                     layoutParams =
                         FrameLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -160,6 +215,10 @@ fun SeriesPlayer(
                     setControllerVisibilityListener(PlayerView.ControllerVisibilityListener { visibility ->
                         isControllerVisible = visibility == View.VISIBLE
                     })
+                    setFullscreenButtonClickListener {
+                        currentResizeModeIndex = (currentResizeModeIndex + 1) % resizeModes.size
+                        resizeMode = resizeModes[currentResizeModeIndex]
+                    }
                 }
             },
             update = {
@@ -179,7 +238,15 @@ fun SeriesPlayer(
             enter = fadeIn(),
             exit = fadeOut()
         ) {
-            SeriesTopControls(navigateUp, seriesState.seriesTitle, player.currentMediaItemIndex)
+            SeriesTopControls(
+                navigateUp,
+                seriesState.seriesTitle,
+                player.currentMediaItemIndex,
+                onPipClick = {
+                    context.findActivity().enterPictureInPictureMode(
+                        PictureInPictureParams.Builder().build()
+                    )
+                })
         }
 
         SnackbarHost(
@@ -218,7 +285,12 @@ fun SeriesPlayer(
 }
 
 @Composable
-fun SeriesTopControls(navigateUp: () -> Boolean, seriesTitle: String, currentMediaItemIndex: Int) {
+fun SeriesTopControls(
+    navigateUp: () -> Boolean,
+    seriesTitle: String,
+    currentMediaItemIndex: Int,
+    onPipClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -241,6 +313,13 @@ fun SeriesTopControls(navigateUp: () -> Boolean, seriesTitle: String, currentMed
             Text(text = seriesTitle, fontWeight = FontWeight.Bold, color = Color.White)
             Text(text = " | ", fontWeight = FontWeight.Bold, color = Color.White)
             Text(text = "Эпизод ${currentMediaItemIndex + 1}", color = Color.White)
+        }
+        IconButton(onClick = onPipClick) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_pip),
+                contentDescription = "Enter PiP mode",
+                tint = Color.White
+            )
         }
     }
 }

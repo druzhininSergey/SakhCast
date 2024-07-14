@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -380,7 +379,7 @@ fun SeriesExpandableCastTab(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = PaddingValues(16.dp)
                 ) {
-                    items(members) { person ->
+                    items(items = members, key = { it.id }) { person ->
                         SeriesPersonItem(person, navigateToSeriesCategoriesByGenresId)
                     }
                 }
@@ -504,7 +503,7 @@ fun SeriesProductionCompanies(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
     ) {
-        itemsIndexed(productionCompanies) { _, company ->
+        items(items = productionCompanies, key = { it.id }) { company ->
             Text(
                 text = company.name,
                 color = Color.Gray,
@@ -801,7 +800,7 @@ fun SeriesRating(_imdbRating: Double?, _kinopoiskRating: Double?, imdbUrl: Strin
 @Composable
 fun SeriesGenres(genres: List<Genre>, navigateToSeriesCategoryScreen: (String) -> Unit) {
     LazyRow(Modifier.fillMaxWidth()) {
-        itemsIndexed(genres) { _, genres ->
+        items(items = genres, key = { it.id }) { genres ->
             TextButton(onClick = {}) {
                 Text(
                     text = genres.name.uppercase(),

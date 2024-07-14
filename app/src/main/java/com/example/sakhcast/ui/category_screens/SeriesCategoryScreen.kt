@@ -81,7 +81,9 @@ fun SeriesCategoryScreen(
                 contentPadding = PaddingValues(Dimens.mainPadding),
                 state = lazyGridState
             ) {
-                items(pagingItems.itemCount) { index ->
+                items(pagingItems.itemCount, key = { index ->
+                    pagingItems[index]?.id ?: index.toString()
+                }) { index ->
                     pagingItems[index]?.let {
                         SeriesCategoryCardItem(
                             it,

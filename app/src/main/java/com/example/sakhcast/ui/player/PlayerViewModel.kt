@@ -34,24 +34,15 @@ class PlayerViewModel @Inject constructor(
 
     fun startPlayer() {
         if (!isPositionSending.value) {
-//            Log.i("!!!", "startPlayer")
             _isPositionSending.value = true
             viewModelScope.launch {
                 val uri = movieWatchState.value.hlsUri
-//                val title = movieWatchState.value.title
                 player.setMediaItem(
                     MediaItem.Builder()
                         .setUri(uri)
-//                        .setMediaMetadata(
-//                            MediaMetadata.Builder()
-//                                .setDisplayTitle(title)
-//                                .build()
-//                        )
                         .build()
                 )
                 player.prepare()
-                delay(1000)
-                player.playWhenReady = true
                 setMoviePosition()
             }
         }

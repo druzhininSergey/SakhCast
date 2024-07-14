@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
@@ -49,7 +49,10 @@ fun MovieCategoryView(
         contentPadding = PaddingValues(start = Dimens.mainPadding, end = Dimens.mainPadding),
         horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding)
     ) {
-        itemsIndexed(movieList.items) { _, item ->
+        items(
+            items = movieList.items,
+            key = { it.id }
+        ) { item ->
             MovieItemView(movieCard = item, navigateToMovieByAlphaId)
         }
     }

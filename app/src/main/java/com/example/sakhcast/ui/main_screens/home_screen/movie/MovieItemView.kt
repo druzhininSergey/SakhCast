@@ -109,9 +109,9 @@ fun MovieCard(movieCard: MovieCard) {
     }
 
     val backdropColor1 =
-        Color(android.graphics.Color.parseColor(movieCard.coverColors.background1))
+        Color(android.graphics.Color.parseColor(movieCard.coverColors?.background1 ?: "#17061d"))
     val backdropColor2 =
-        Color(android.graphics.Color.parseColor(movieCard.coverColors.background2))
+        Color(android.graphics.Color.parseColor(movieCard.coverColors?.background2 ?: "#17061d"))
     val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
 
     Card(
@@ -127,9 +127,13 @@ fun MovieCard(movieCard: MovieCard) {
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.FillBounds,
-                loading = { Box(modifier = Modifier
-                    .fillMaxSize()
-                    .background(brush = brush)) }
+                loading = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(brush = brush)
+                    )
+                }
             )
             Row(
                 modifier = Modifier

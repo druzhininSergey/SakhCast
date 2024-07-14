@@ -2,8 +2,10 @@ package com.example.sakhcast.data.downloader
 
 import android.app.DownloadManager
 import android.content.Context
+import android.net.Uri
+import android.os.Build
 import android.os.Environment
-import androidx.core.net.toUri
+import java.io.File
 
 class AndroidDownloader(
     context: Context
@@ -12,13 +14,20 @@ class AndroidDownloader(
     private val downloadManager = context.getSystemService(DownloadManager::class.java)
 
     override fun downloadFile(url: String, fileName: String): Long {
-        val request = DownloadManager.Request(url.toUri())
-            .setMimeType("video/mp4")
-            .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+        val request = DownloadManager.Request(Uri.parse(url))
+            .setTitle(fileName)
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            .setTitle("$fileName.mp4")
-            .addRequestHeader("Authorization", "Bearer <token>")
-            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "$fileName.mp4")
+            .setAllowedOverMetered(true)
+            .setAllowedOverRoaming(true)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+        } else {
+            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            val destinationFile = File(downloadsDir, fileName)
+            request.setDestinationUri(Uri.fromFile(destinationFile))
+        }
+
         return downloadManager.enqueue(request)
     }
 }

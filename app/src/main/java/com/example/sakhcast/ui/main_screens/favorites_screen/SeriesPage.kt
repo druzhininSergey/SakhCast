@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -86,15 +86,16 @@ fun SeriesPage(
                     horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding)
                 ) {
 
-                    itemsIndexed(
-                        when (index) {
+                    items(
+                        items = when (index) {
                             0 -> seriesCardWatching.items
                             1 -> seriesCardWillWatch.items
                             2 -> seriesCardFinishedWatching.items
                             3 -> seriesCardWatched.items
                             else -> emptyList()
-                        }
-                    ) { _, series ->
+                        },
+                        key = { it.id }
+                    ) { series ->
                         SeriesItemView(
                             seriesCard = series,
                             navigateToSeriesById = navigateToSeriesById

@@ -11,7 +11,7 @@ data class Movie(
     @SerialName("audio_tracks") val audioTracks: List<AudioTrack>,
     @SerialName("backdrop") val backdrop: String,
     @SerialName("backdrop_alt") val backdropAlt: String,
-    @SerialName("backdrop_colors") val backdropColors: BackdropColors,
+    @SerialName("backdrop_colors") val backdropColors: BackdropColors?,
     @SerialName("budget") val budget: Int?,
     @SerialName("create_date") val createDate: String,
     @SerialName("downloads") val downloads: List<Download>,
