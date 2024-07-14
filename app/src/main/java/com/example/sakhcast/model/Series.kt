@@ -27,7 +27,7 @@ data class Series(
     @SerialName("poster") val poster: String,
     @SerialName("poster_alt") val posterAlt: String,
     @SerialName("poster_colors") val posterColors: PosterColors,
-    @SerialName("runtime") val runtime: String,
+    @SerialName("runtime") val runtime: String?,
     @SerialName("seasons") val seasons: List<Season>,
     @SerialName("status") val status: String,
     @SerialName("titles") val titles: List<String>,

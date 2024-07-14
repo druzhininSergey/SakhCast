@@ -57,7 +57,7 @@ data class MovieDataRecent(
     @SerialName("origin_title") val originTitle: String,
     @SerialName("release_date") val releaseDate: String,
     @SerialName("ru_title") val ruTitle: String,
-    @SerialName("runtime") val runtime: Int,
+    @SerialName("runtime") val runtime: Int?,
     @SerialName("user") val userFavourite: UserFavourite?
 )
 
@@ -80,7 +80,7 @@ data class SerialDataRecent(
     @SerialName("poster") val poster: String,
     @SerialName("poster_alt") val posterAlt: String,
     @SerialName("poster_colors") val posterColors: PosterColors,
-    @SerialName("runtime") val runtime: String,
+    @SerialName("runtime") val runtime: String?,
     @SerialName("status") val status: String,
     @SerialName("tvshow") val tvshow: String,
     @SerialName("url") val url: String,
