@@ -49,11 +49,7 @@ import com.example.sakhcast.model.Episode
 @Composable
 fun PreviewSeriesEpisodeView() {
     val episodes = SeriesEpisodesSample.getSeriesEpisodesList()
-    val x = "1"
-    val w = "2"
-    val q = "3"
-    val z = "4"
-    SeriesEpisodeView(episodes, navigateToSeriesPlayer = { x, w, q, z ->
+    SeriesEpisodeView(episodes, navigateToSeriesPlayer = { _, _, _, _ ->
     }, 0, "")
 }
 
@@ -61,11 +57,7 @@ fun PreviewSeriesEpisodeView() {
 @Composable
 fun PreviewSeriesEpisodeItemView() {
     val episodes = SeriesEpisodesSample.getSeriesEpisodesList()[0]
-    val x = "1"
-    val w = "2"
-    val q = "3"
-    val z = "4"
-    SeriesEpisodeItemView(seriesEpisode = episodes, navigateToSeriesPlayer = { x, w, q, z ->
+    SeriesEpisodeItemView(seriesEpisode = episodes, navigateToSeriesPlayer = { _, _, _, _ ->
     }, seasonId = 0, seriesName = "", "")
 }
 
@@ -85,7 +77,7 @@ fun SeriesEpisodeView(
             SeriesEpisodeItemView(
                 seriesEpisode = episode,
                 navigateToSeriesPlayer = navigateToSeriesPlayer,
-                seasonId, seriesName, episode.index
+                seasonId, seriesName, episode.index,
             )
         }
     }
@@ -132,7 +124,17 @@ fun SeriesEpisodeItemView(
 
     Card(modifier = Modifier
         .width(190.dp)
-        .clickable { isExpanded = true }) {
+        .clickable {
+            if (seriesEpisode.rgs.size == 1) {
+                navigateToSeriesPlayer(
+                    seasonId.toString(),
+                    seriesName,
+                    episodeChosenIndex,
+                    seriesEpisode.rgs[0].rg
+                )
+            } else
+                isExpanded = true
+        }) {
         Box() {
             SubcomposeAsyncImage(
                 model = imageUrl,
@@ -197,7 +199,12 @@ fun SeriesEpisodeItemView(
                 DropdownMenuItem(
                     text = { Text(text = rgs.runame) },
                     onClick = {
-                        navigateToSeriesPlayer(seasonId.toString(), seriesName, episodeChosenIndex, rgs.rg)
+                        navigateToSeriesPlayer(
+                            seasonId.toString(),
+                            seriesName,
+                            episodeChosenIndex,
+                            rgs.rg
+                        )
                         isExpanded = false
                     },
                 )
