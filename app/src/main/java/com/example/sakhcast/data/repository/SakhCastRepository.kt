@@ -2,6 +2,7 @@ package com.example.sakhcast.data.repository
 
 import com.example.sakhcast.data.api_service.SakhCastApiService
 import com.example.sakhcast.data.firebase_messaging.CrashReporter
+import com.example.sakhcast.model.AppVersionResponseItem
 import com.example.sakhcast.model.CurrentUser
 import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.LastWatched
@@ -670,6 +671,24 @@ class SakhCastRepository @Inject constructor(
             } catch (e: Exception) {
                 crashReporter.apply {
                     logError("Error in getMoviePosition")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
+                null
+            }
+        }
+    }
+
+    suspend fun getVersionsList(): List<AppVersionResponseItem>? {
+        return withContext(ioDispatcher) {
+            try {
+                val notificationListCall =
+                    sakhCastApiService.getVersionsList()
+                val responseBody = notificationListCall.execute()
+                responseBody.body()
+            } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in getVersionsList")
                     setCustomKey("error_message", e.message ?: "Unknown error")
                     recordException(e)
                 }

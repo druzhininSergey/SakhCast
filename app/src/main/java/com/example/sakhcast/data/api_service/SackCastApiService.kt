@@ -1,5 +1,6 @@
 package com.example.sakhcast.data.api_service
 
+import com.example.sakhcast.model.AppVersionResponseItem
 import com.example.sakhcast.model.CurrentUser
 import com.example.sakhcast.model.Episode
 import com.example.sakhcast.model.LastWatched
@@ -217,7 +218,7 @@ interface SakhCastApiService {
 
 // General
 
-    @GET("v1/users/get_notifies?amount=20&from=0&subject_only=0")
+    @GET("v1/users/get_notifies")
     fun getNotificationsList(
         @Query("amount") amount: Int = 40,
         @Query("from") from: Int = 0,
@@ -233,5 +234,10 @@ interface SakhCastApiService {
         @Query("amount") amount: Int = 40,
         @Query("person") personId: String,
     ): Call<MovieList>
+
+    @GET("v2/system/app/builds/{vendor}")
+    fun getVersionsList(
+        @Path("vendor") vendor: String = "android"
+    ): Call<List<AppVersionResponseItem>>
 
 }

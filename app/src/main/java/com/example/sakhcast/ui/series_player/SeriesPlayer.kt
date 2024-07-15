@@ -131,19 +131,30 @@ fun SeriesPlayer(
         if (shouldEnterPipMode && player.videoSize != VideoSize.UNKNOWN) {
             val sourceRect = layoutCoordinates.boundsInWindow().toAndroidRectF().toRect()
             builder.setSourceRectHint(sourceRect)
-            builder.setAspectRatio(
-                Rational(
-                    player.videoSize.width,
-                    player.videoSize.height
-                )
-            )
+
+            val width = player.videoSize.width
+            val height = player.videoSize.height
+            var ratio = Rational(width, height)
+
+            if (ratio.toFloat() < 0.418410f) {
+                ratio = Rational(41841, 100000)
+            } else if (ratio.toFloat() > 2.390000f) {
+                ratio = Rational(239000, 100000)
+            }
+
+            builder.setAspectRatio(ratio)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             builder.setAutoEnterEnabled(shouldEnterPipMode)
         }
-        context.findActivity().setPictureInPictureParams(builder.build())
+        try {
+            context.findActivity().setPictureInPictureParams(builder.build())
+        } catch (e: Exception){
+            e.stackTrace
+        }
     }
+
     val playerListener = object : Player.Listener {
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             when (reason) {
