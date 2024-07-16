@@ -89,9 +89,14 @@ fun SeriesPlayer(
     context.hideSystemUi()
     val activity = context as? Activity
     activity?.lockOrientationLandscape()
+    var isAppInForeground by remember { mutableStateOf(true) }
 
-    val inPipMode = rememberIsInPipMode(player)
-    var shouldEnterPipMode by remember { mutableStateOf(false) }
+    var shouldEnterPipMode by rememberSaveable { mutableStateOf(false) }
+    val inPipMode = rememberIsInPipMode(player) { isInPipMode ->
+        if (!isInPipMode) {
+            shouldEnterPipMode = false
+        }
+    }
 
     var continueTime by remember { mutableIntStateOf(0) }
 
@@ -125,6 +130,7 @@ fun SeriesPlayer(
             }
         }
     }
+
 
     val pipModifier = Modifier.onGloballyPositioned { layoutCoordinates ->
         val builder = PictureInPictureParams.Builder()
@@ -179,16 +185,30 @@ fun SeriesPlayer(
         val window = (context as? Activity)?.window
         val listener = object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
-                shouldEnterPipMode = isPlaying
                 if (isPlaying) {
                     window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 } else {
                     window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 }
+                if (!isAppInForeground && !shouldEnterPipMode && isPlaying) {
+                    player.pause()
+                }
             }
         }
         val observer = LifecycleEventObserver { _, event ->
             lifecycle = event
+            when(event) {
+                Lifecycle.Event.ON_PAUSE -> {
+                    isAppInForeground = false
+                    if (!shouldEnterPipMode) {
+                        player.pause()
+                    }
+                }
+                Lifecycle.Event.ON_RESUME -> {
+                    isAppInForeground = true
+                }
+                else -> Unit
+            }
         }
         window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -254,6 +274,7 @@ fun SeriesPlayer(
                 seriesState.seriesTitle,
                 player.currentMediaItemIndex,
                 onPipClick = {
+                    shouldEnterPipMode = true
                     context.findActivity().enterPictureInPictureMode(
                         PictureInPictureParams.Builder().build()
                     )

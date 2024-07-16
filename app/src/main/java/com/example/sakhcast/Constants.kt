@@ -21,7 +21,7 @@ const val IMDB_SEARCH_URL = "https://www.imdb.com/title/"
 
 const val SHARED_PREFS_TOKEN_KEY = "shared_preferences_token"
 
-const val CURRENT_VERSION = "0.38.5"
+const val CURRENT_VERSION = "0.40"
 
 //const val LOG_IN_SCREEN = "login_screen"
 //const val USER_TOKEN_KEY = "user_token"

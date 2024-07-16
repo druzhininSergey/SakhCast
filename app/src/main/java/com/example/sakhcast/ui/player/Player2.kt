@@ -93,10 +93,15 @@ fun Player2(
     val activity = context as? Activity
     activity?.lockOrientationLandscape()
     context.hideSystemUi()
+    var isAppInForeground by remember { mutableStateOf(true) }
 
-    val inPipMode = rememberIsInPipMode(playerViewModel.player)
+    var shouldEnterPipMode by rememberSaveable { mutableStateOf(false) }
+    val inPipMode = rememberIsInPipMode(playerViewModel.player) { isInPipMode ->
+        if (!isInPipMode) {
+            shouldEnterPipMode = false
+        }
+    }
     val movieState = playerViewModel.movieWatchState.collectAsState()
-    var shouldEnterPipMode by remember { mutableStateOf(false) }
 
     var continueTime by remember { mutableIntStateOf(0) }
 
@@ -163,16 +168,30 @@ fun Player2(
         val window = (context as? Activity)?.window
         val listener = object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
-                shouldEnterPipMode = isPlaying
                 if (isPlaying) {
                     window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 } else {
                     window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 }
+                if (!isAppInForeground && !shouldEnterPipMode && isPlaying) {
+                    playerViewModel.player.pause()
+                }
             }
         }
         val observer = LifecycleEventObserver { _, event ->
             lifecycle = event
+            when(event) {
+                Lifecycle.Event.ON_PAUSE -> {
+                    isAppInForeground = false
+                    if (!shouldEnterPipMode) {
+                        playerViewModel.player.pause()
+                    }
+                }
+                Lifecycle.Event.ON_RESUME -> {
+                    isAppInForeground = true
+                }
+                else -> Unit
+            }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         playerViewModel.player.addListener(listener)
@@ -233,6 +252,7 @@ fun Player2(
         ) {
             if (!inPipMode)
                 TopControls(navigateUp, movieState.value.title, onPipClick = {
+                    shouldEnterPipMode = true
                     context.findActivity().enterPictureInPictureMode(
                         PictureInPictureParams.Builder().build()
                     )
@@ -307,12 +327,13 @@ fun TopControls(navigateUp: () -> Boolean, title: String, onPipClick: () -> Unit
 }
 
 @Composable
-fun rememberIsInPipMode(player: Player): Boolean {
+fun rememberIsInPipMode(player: Player, onPipModeChanged: (Boolean) -> Unit): Boolean {
     val activity = LocalContext.current.findActivity()
     var pipMode by remember { mutableStateOf(activity.isInPictureInPictureMode) }
     DisposableEffect(activity) {
         val observer = Consumer<PictureInPictureModeChangedInfo> { info ->
             pipMode = info.isInPictureInPictureMode
+            onPipModeChanged(info.isInPictureInPictureMode)
             if (!info.isInPictureInPictureMode) {
                 player.playWhenReady = false
             }
@@ -322,6 +343,8 @@ fun rememberIsInPipMode(player: Player): Boolean {
     }
     return pipMode
 }
+
+
 
 internal fun Context.findActivity(): ComponentActivity {
     var context = this
