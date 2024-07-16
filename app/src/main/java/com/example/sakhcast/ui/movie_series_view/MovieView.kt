@@ -58,6 +58,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
@@ -487,6 +488,11 @@ fun TopMovieBar(
             Text(
                 text = ruTitle,
                 color = MaterialTheme.colorScheme.onPrimary.copy(alpha = alpha),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Box {
                 Icon(
@@ -599,27 +605,48 @@ fun MovieCountryYearStatus(
     movieStatus: String
 ) {
     val infoColumns = listOf("Страна", "Год", "Статус")
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        infoColumns.forEachIndexed { index, columnName ->
-            val info = when (index) {
-                0 -> country.joinToString(", ") { it.name }
-                1 -> releaseDate.take(4)
-                2 -> movieStatus
-                else -> ""
+        // Row для названий колонок
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            infoColumns.forEach { columnName ->
+                Text(
+                    text = columnName,
+                    color = Color.Gray,
+                    fontSize = 14.sp,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
+                )
             }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = columnName, color = Color.Gray, fontSize = 14.sp)
-                Spacer(modifier = Modifier.width(16.dp))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Row для значений
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val infoList = listOf(
+                country.joinToString(", ") { it.name },
+                releaseDate.take(4),
+                movieStatus
+            )
+
+            infoList.forEach { info ->
                 Text(
                     text = info,
                     color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 18.sp
+                    fontSize = 18.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
                 )
             }
         }

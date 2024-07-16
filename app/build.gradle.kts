@@ -16,8 +16,8 @@ android {
         applicationId = "com.example.sakhcast"
         minSdk = 28
         targetSdk = 34
-        versionCode = 3
-        versionName = "0.38.5"
+        versionCode = 1
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
