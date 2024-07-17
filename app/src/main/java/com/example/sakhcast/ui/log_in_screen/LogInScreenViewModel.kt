@@ -6,7 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sakhcast.SHARED_PREFS_TOKEN_KEY
+import com.example.sakhcast.data.downloader.Downloader
 import com.example.sakhcast.data.repository.SakhCastRepository
+import com.example.sakhcast.model.AppVersionResponseItem
 import com.example.sakhcast.model.CurrentUser
 import com.example.sakhcast.model.LoginResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,22 +20,22 @@ import javax.inject.Inject
 class LogInScreenViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences,
     private val sakhCastRepository: SakhCastRepository,
-//    private val downloader: Downloader,
+    private val downloader: Downloader,
 ) : ViewModel() {
 
     private var _userDataState = MutableLiveData(UserDataState())
     val userDataState: LiveData<UserDataState> = _userDataState
 
-//    private var _appVersionsList = MutableLiveData(AppVersionResponse())
-//    val appVersionsList: LiveData<AppVersionResponse> = _appVersionsList
+    private var _appVersionsList = MutableLiveData(AppVersionResponse())
+    val appVersionsList: LiveData<AppVersionResponse> = _appVersionsList
 
-//    init {
-//        getVersionsList()
-//    }
+    init {
+        getVersionsList()
+    }
 
-//    data class AppVersionResponse(
-//        var appVersionResponse: List<AppVersionResponseItem> = emptyList()
-//    )
+    data class AppVersionResponse(
+        var appVersionResponse: List<AppVersionResponseItem> = emptyList()
+    )
 
     data class UserDataState(
         var currentUser: CurrentUser? = null,
@@ -122,15 +124,15 @@ class LogInScreenViewModel @Inject constructor(
         }
     }
 
-//    private fun getVersionsList() {
-//        viewModelScope.launch {
-//            val versionList = sakhCastRepository.getVersionsList() ?: emptyList()
-//            _appVersionsList.value = appVersionsList.value?.copy(appVersionResponse = versionList)
-//        }
-//    }
+    private fun getVersionsList() {
+        viewModelScope.launch {
+            val versionList = sakhCastRepository.getVersionsList()?.dropLast(3) ?: emptyList()
+            _appVersionsList.value = appVersionsList.value?.copy(appVersionResponse = versionList)
+        }
+    }
 
-//    fun downloadApk(url: String, fileName: String) {
-//        downloader.downloadFile(url, fileName)
-//    }
+    fun downloadApk(url: String, fileName: String) {
+        downloader.downloadFile(url, fileName)
+    }
 
 }
