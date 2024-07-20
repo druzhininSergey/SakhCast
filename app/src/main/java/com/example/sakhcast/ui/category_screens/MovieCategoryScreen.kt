@@ -20,6 +20,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -27,6 +30,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.sakhcast.Dimens
 import com.example.sakhcast.model.MovieCard
+import kotlinx.coroutines.flow.filterNotNull
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,6 +51,16 @@ fun MovieCategoryScreen(
         else movieCategoryScreenViewModel.initCategory(searchGenreId)
     }
     val lazyGridState = rememberLazyGridState()
+
+    val isDataLoaded = remember { mutableStateOf(false) }
+
+    LaunchedEffect(moviePagingData) {
+        snapshotFlow { moviePagingData?.itemCount }
+            .filterNotNull()
+            .collect { itemCount ->
+                isDataLoaded.value = itemCount > 0
+            }
+    }
 
     Column {
         CenterAlignedTopAppBar(
@@ -70,25 +84,27 @@ fun MovieCategoryScreen(
         )
 
         moviePagingData?.let { pagingItems ->
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .padding(bottom = paddingValues.calculateBottomPadding())
-                    .background(MaterialTheme.colorScheme.primary)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding),
-                verticalArrangement = Arrangement.spacedBy(Dimens.mainPadding),
-                contentPadding = PaddingValues(Dimens.mainPadding),
-                state = lazyGridState
-            ) {
-                items(pagingItems.itemCount, key = { index ->
-                    pagingItems[index]?.id ?: index.toString()
-                }) { index ->
-                    pagingItems[index]?.let {
-                        MovieCategoryCardItem(
-                            it,
-                            navigateToMovieByAlphaId
-                        )
+            if (isDataLoaded.value) {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .padding(bottom = paddingValues.calculateBottomPadding())
+                        .background(MaterialTheme.colorScheme.primary)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.mainPadding),
+                    contentPadding = PaddingValues(Dimens.mainPadding),
+                    state = lazyGridState
+                ) {
+                    items(pagingItems.itemCount, key = { index ->
+                        pagingItems[index]?.id ?: index.toString()
+                    }) { index ->
+                        pagingItems[index]?.let {
+                            MovieCategoryCardItem(
+                                it,
+                                navigateToMovieByAlphaId
+                            )
+                        }
                     }
                 }
             }
