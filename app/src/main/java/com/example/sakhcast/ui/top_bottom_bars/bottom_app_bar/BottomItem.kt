@@ -13,10 +13,10 @@ sealed class BottomItem(
     val icon: ImageVector,
     val route: String,
 ) {
-    object HomeScreen : BottomItem("Главная", Icons.Sharp.Home, "home_screen")
-    object CatalogScreen : BottomItem("Каталог", Icons.Filled.Menu, "catalog_screen")
-    object FavoritesScreen : BottomItem("Избранное", Icons.Filled.Star, "favorites_screen")
-    object NotificationsScreen : BottomItem("Уведомления", Icons.Filled.Notifications, "notifications_screen")
-    object SearchScreen : BottomItem("Поиск", Icons.Sharp.Search, "search_screen")
+    data object HomeScreen : BottomItem("Главная", Icons.Sharp.Home, "home_screen")
+    data object CatalogScreen : BottomItem("Каталог", Icons.Filled.Menu, "catalog_screen")
+    data object FavoritesScreen : BottomItem("Избранное", Icons.Filled.Star, "favorites_screen")
+    data object NotificationsScreen : BottomItem("Уведомления", Icons.Filled.Notifications, "notifications_screen")
+    data object SearchScreen : BottomItem("Поиск", Icons.Sharp.Search, "search_screen")
 }
 
