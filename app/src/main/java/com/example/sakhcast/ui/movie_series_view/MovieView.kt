@@ -70,6 +70,7 @@ import com.example.sakhcast.IMDB_SEARCH_URL
 import com.example.sakhcast.KINOPOISK_MOVIE_SEARCH_URL
 import com.example.sakhcast.R
 import com.example.sakhcast.data.browserIntent
+import com.example.sakhcast.model.AudioTrack
 import com.example.sakhcast.model.Cast
 import com.example.sakhcast.model.Download
 import com.example.sakhcast.model.Genre
@@ -308,7 +309,13 @@ fun MovieInfo(
         modifier = Modifier.background(MaterialTheme.colorScheme.primary)
     ) {
         MovieGenres(movie.genres, navigateToMovieCategoriesByGenresId)
-        if (isRatingExists) MovieRating(movie.imdbRating, movie.kpRating, movie.imdbId, movie.kpId)
+        if (isRatingExists) MovieRating(
+            movie.imdbRating,
+            movie.kpRating,
+            movie.imdbId,
+            movie.kpId,
+            movie.audioTracks
+        )
         MovieCountryYearStatus(movie.productionCountries, movie.releaseDate, movie.status)
         MovieDownloads(movie.downloads, download, movie.ruTitle)
         movie.overview?.let { MovieOverview(it) }
@@ -608,7 +615,6 @@ fun MovieCountryYearStatus(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        // Row для названий колонок
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -626,7 +632,6 @@ fun MovieCountryYearStatus(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Row для значений
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -655,12 +660,40 @@ fun MovieCountryYearStatus(
 }
 
 @Composable
-fun MovieRating(_imdbRating: Double?, _kinopoiskRating: Double?, imdbId: String?, kpId: Int?) {
+fun MovieRating(
+    _imdbRating: Double?,
+    _kinopoiskRating: Double?,
+    imdbId: String?,
+    kpId: Int?,
+    audioTracks: List<AudioTrack>
+) {
     val imdbRating = String.format(Locale.US, "%.1f", _imdbRating)
     val kinopoiskRating = String.format(Locale.US, "%.1f", _kinopoiskRating)
     val context = LocalContext.current
+    var isExpandedFavorite by remember { mutableStateOf(false) }
 
-    Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box {
+            IconButton(onClick = { isExpandedFavorite = true }) {
+                Icon(painter = painterResource(id = R.drawable.ic_voice), contentDescription = null)
+            }
+            DropdownMenu(
+                modifier = Modifier.background(
+                    color = Color.Gray.copy(alpha = 0.5f)
+                ),
+                offset = DpOffset(0.dp, 8.dp),
+                expanded = isExpandedFavorite,
+                onDismissRequest = { isExpandedFavorite = false },
+            ) {
+                audioTracks.forEach { audioTrack ->
+                    DropdownMenuItem(text = { Text(text = audioTrack.title) }, onClick = {})
+                }
+            }
+        }
         if (_imdbRating != null && _imdbRating != 0.0) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
