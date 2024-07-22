@@ -88,7 +88,11 @@ fun NotificationScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { navigateToSeriesById(notification.summary.notificationData.serialId.toString()) },
+                            .clickable {
+                                if ( notification.summary != null) {
+                                    navigateToSeriesById(notification.summary.notificationData.serialId.toString())
+                                } else Unit
+                            },
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {

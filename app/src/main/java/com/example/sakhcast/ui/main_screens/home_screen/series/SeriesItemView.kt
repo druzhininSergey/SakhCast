@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -79,9 +80,12 @@ fun SeriesItemView(
                     text = seriesCard.year.toString(), fontSize = 10.sp,
                     color = MaterialTheme.colorScheme.onPrimary,
                 )
+                Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = seriesCard.seasons, fontSize = 8.sp,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

@@ -85,7 +85,9 @@ fun MovieItemView(
                 if (movieCard.runtime != null) Text(
                     text = convertMinutes(movieCard.runtime),
                     fontSize = 8.sp,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
