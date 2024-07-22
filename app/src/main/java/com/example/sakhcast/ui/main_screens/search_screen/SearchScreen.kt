@@ -189,7 +189,10 @@ fun SearchScreen(
                     seriesPagingItems?.itemCount?.let {
                         items(it) { index2 ->
                             seriesPagingItems[index2]?.let { seriesCard ->
-                                SeriesCategoryCardItem(seriesCard, navigateToSeriesById)
+                                SeriesCategoryCardItem(
+                                    seriesCard = seriesCard,
+                                    navigateToSeriesById = navigateToSeriesById
+                                )
                             }
                         }
                     }

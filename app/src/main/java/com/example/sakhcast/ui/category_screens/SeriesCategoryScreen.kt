@@ -100,10 +100,19 @@ fun SeriesCategoryScreen(
                         pagingItems[index]?.id ?: index.toString()
                     }) { index ->
                         pagingItems[index]?.let {
-                            SeriesCategoryCardItem(
-                                it,
-                                navigateToSeriesById
-                            )
+                            if (categoryName.endsWith(".favorite")) {
+                                SeriesCategoryCardItem(
+                                    seriesCard = it,
+                                    isFavoriteScreen = true,
+                                    navigateToSeriesById = navigateToSeriesById
+                                )
+                            } else {
+                                SeriesCategoryCardItem(
+                                    seriesCard = it,
+                                    navigateToSeriesById = navigateToSeriesById
+                                )
+                            }
+
                         }
                     }
                 }

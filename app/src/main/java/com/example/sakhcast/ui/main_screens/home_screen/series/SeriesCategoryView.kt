@@ -50,7 +50,7 @@ fun SeriesCategoryView(
         horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding)
     ) {
         items(items = seriesList.items, key = { it.id }) { item ->
-            SeriesItemView(seriesCard = item, navigateToSeriesById)
+            SeriesItemView(seriesCard = item, navigateToSeriesById = navigateToSeriesById)
         }
     }
 }

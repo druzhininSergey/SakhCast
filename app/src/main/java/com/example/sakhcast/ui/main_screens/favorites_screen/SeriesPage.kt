@@ -98,6 +98,7 @@ fun SeriesPage(
                     ) { series ->
                         SeriesItemView(
                             seriesCard = series,
+                            isFavoriteScreen = true,
                             navigateToSeriesById = navigateToSeriesById
                         )
                     }
