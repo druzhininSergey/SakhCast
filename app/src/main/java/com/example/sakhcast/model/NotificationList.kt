@@ -12,7 +12,7 @@ data class NotificationList(
 @Serializable
 data class Notification(
     @SerialName("ack") var acknowledge: Boolean,
-    @SerialName("context") val summary: Summary,
+    @SerialName("context") val summary: Summary?,
     @SerialName("date") val date: String,
     @SerialName("id") val id: Int,
     @SerialName("plain_text") val plainText: String,

@@ -16,8 +16,8 @@ android {
         applicationId = "com.example.sakhcast"
         minSdk = 28
         targetSdk = 34
-        versionCode = 4
-        versionName = "0.42"
+        versionCode = 5
+        versionName = "0.43"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -108,6 +108,9 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer.hls)
     implementation(libs.androidx.media3.common)
     implementation(libs.androidx.media3.session)
+
+    //media
+    implementation(libs.androidx.media)
 
     //material
     implementation(libs.androidx.material)

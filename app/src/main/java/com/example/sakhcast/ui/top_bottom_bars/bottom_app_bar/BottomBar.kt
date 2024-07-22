@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -25,12 +26,12 @@ fun BottomBar(navController: NavHostController) {
     )
     BottomAppBar(modifier = Modifier.background(MaterialTheme.colorScheme.primary)) {
         val backStackEntry by navController.currentBackStackEntryAsState()
-        val curentRoute = backStackEntry?.destination?.route
+        val currentRoute = backStackEntry?.destination?.route
+
         NavigationBar {
             listItems.forEach { item ->
-
                 NavigationBarItem(
-                    selected = curentRoute == item.route,
+                    selected = currentRoute == item.route,
                     onClick = { navController.navigate(item.route) },
                     icon = {
                         Icon(
@@ -43,7 +44,9 @@ fun BottomBar(navController: NavHostController) {
                         Text(
                             text = item.title,
                             fontSize = 9.sp,
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                 )
