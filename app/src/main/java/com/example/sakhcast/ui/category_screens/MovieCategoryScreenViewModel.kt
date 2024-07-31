@@ -33,12 +33,16 @@ class MovieCategoryScreenViewModel
             if (categoryName != null) {
                 val pagingSource = MoviesPagingSource(sakhCastRepository, categoryName)
                 val pager = Pager(
-                    config = PagingConfig(pageSize = 40, enablePlaceholders = false),
+                    config = PagingConfig(
+                        pageSize = 40,
+                        prefetchDistance = 1,
+                        initialLoadSize = 40,
+                        enablePlaceholders = false
+                    ),
                     pagingSourceFactory = { pagingSource }
                 )
                 val flow = pager.flow.cachedIn(viewModelScope)
-                _moviesCategoryScreenState.value =
-                    moviesCategoryScreenState.value?.copy(moviesPagingData = flow)
+                _moviesCategoryScreenState.value = moviesCategoryScreenState.value?.copy(moviesPagingData = flow)
             }
         }
     }

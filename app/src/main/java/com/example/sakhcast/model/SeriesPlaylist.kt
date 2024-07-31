@@ -8,7 +8,7 @@ data class SeriesPlaylist(
     @SerialName("episode_id") val episodeId: Int,
     @SerialName("episode_index") val episodeIndex: String,
     @SerialName("episode_name") val episodeName: String,
-    @SerialName("episode_playlist") val episodePlaylist: String,
+    @SerialName("episode_playlist") val episodePlaylist: String?,
     @SerialName("episode_playlist_variants") val episodePlaylistVariants: List<EpisodePlaylistVariants>,
     @SerialName("media_id") val mediaId: Int,
     @SerialName("rg") val rg: String,

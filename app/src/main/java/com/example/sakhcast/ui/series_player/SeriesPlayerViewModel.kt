@@ -129,7 +129,7 @@ class SeriesPlayerViewModel @Inject constructor(
             viewModelScope.launch {
                 val playlist =
                     sakhCastRepository.getSeriesPlaylistBySeasonIdAndRgName(seasonId, rgChosen)
-                val playlistUriList = playlist?.map { it.episodePlaylist }
+                val playlistUriList = playlist?.mapNotNull { it.episodePlaylist }
                 _seriesWatchState.value = seriesWatchState.value.copy(
                     playlist = playlist,
                     playlistUriList = playlistUriList
