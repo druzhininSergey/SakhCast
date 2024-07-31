@@ -77,6 +77,7 @@ import com.example.sakhcast.data.hideSystemUi
 import com.example.sakhcast.data.lockOrientationLandscape
 import com.example.sakhcast.data.showSystemUi
 import com.example.sakhcast.data.unlockOrientation
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
@@ -123,8 +124,9 @@ fun Player2(
     LaunchedEffect(Unit) {
         playerViewModel.setMovieData(hls, title, position, movieAlphaId)
         playerViewModel.startPlayer()
-        continueTime = movieState.value.position
 
+        delay(500)
+        continueTime = movieState.value.position
         val userTime = (continueTime * 1000L).formatMinSec()
         if (continueTime != 0 && showSnackbar) scope.launch {
             snackbarHostState.showSnackbar(
@@ -159,7 +161,7 @@ fun Player2(
         }
         try {
             context.findActivity().setPictureInPictureParams(builder.build())
-        } catch (e: Exception){
+        } catch (e: Exception) {
             e.stackTrace
         }
     }
@@ -180,16 +182,18 @@ fun Player2(
         }
         val observer = LifecycleEventObserver { _, event ->
             lifecycle = event
-            when(event) {
+            when (event) {
                 Lifecycle.Event.ON_PAUSE -> {
                     isAppInForeground = false
                     if (!shouldEnterPipMode) {
                         playerViewModel.player.pause()
                     }
                 }
+
                 Lifecycle.Event.ON_RESUME -> {
                     isAppInForeground = true
                 }
+
                 else -> Unit
             }
         }
@@ -343,8 +347,6 @@ fun rememberIsInPipMode(player: Player, onPipModeChanged: (Boolean) -> Unit): Bo
     }
     return pipMode
 }
-
-
 
 internal fun Context.findActivity(): ComponentActivity {
     var context = this

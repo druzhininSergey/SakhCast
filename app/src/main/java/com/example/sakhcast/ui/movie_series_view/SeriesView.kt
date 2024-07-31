@@ -292,7 +292,6 @@ fun SeriesInfo(
     Column(
         modifier = Modifier.background(MaterialTheme.colorScheme.primary)
     ) {
-
         SeriesGenres(series.genres, navigateToSeriesCategoryScreen)
         if (isRatingExists) SeriesRating(
             series.imdbRating,
